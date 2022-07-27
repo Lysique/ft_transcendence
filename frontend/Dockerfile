@@ -1,8 +1,6 @@
 FROM node:16
 
 # Create app directory
-RUN mkdir -p /usr/src/app
-RUN mkdir -p /usr/src/app/frontend
 WORKDIR /usr/src/app/frontend
 
 # Copy package json and install dependencies
