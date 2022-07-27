@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import ProTip from "./components/ProTip";
 import ResponsiveAppBar from "./components/AppBar";
@@ -11,9 +11,6 @@ import Box from "@mui/material/Box";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import IconButton from "@mui/material/IconButton";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -24,12 +21,14 @@ function App() {
     },
   });
 
-  const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  const [context, setContext] = React.useState<CanvasRenderingContext2D | null>(
-    null
-  );
+  const handleToggle = () => {
+    setDarkMode(!darkMode);
+  };
 
-  React.useEffect(() => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
+
+  useEffect(() => {
     if (canvasRef.current) {
       const renderCtx = canvasRef.current.getContext("2d");
 
@@ -52,7 +51,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <div className="App">
-        <ResponsiveAppBar />
+        <ResponsiveAppBar onClick={handleToggle} />
         <Container maxWidth="sm">
           <Box sx={{ my: 4 }}>
             <Typography variant="h4" component="h1" gutterBottom align="center">
@@ -71,20 +70,15 @@ function App() {
               }}
             ></canvas>
           </Box>
-          <Box textAlign="center">
-            <IconButton
-              sx={{ ml: 1 }}
-              onClick={() => setDarkMode(!darkMode)}
-              color="inherit"
-            >
+          {/* <Box textAlign="center">
+            <IconButton sx={{ ml: 1 }} onClick={handleToggle} color="inherit">
               {theme.palette.mode === "dark" ? (
                 <Brightness7Icon />
               ) : (
                 <Brightness4Icon />
               )}
             </IconButton>{" "}
-          </Box>
-
+          </Box> */}
           <ProTip />
           <Copyright />
         </Container>

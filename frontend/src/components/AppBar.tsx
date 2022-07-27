@@ -11,11 +11,20 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { useTheme } from "@mui/material/styles";
 
 const pages = ["Play now", "Chat with friends"];
 const settings = ["Profile", "Dashboard", "Logout"];
 
-const ResponsiveAppBar = () => {
+interface ResponsiveAppBarProps {
+  onClick: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+}
+
+const ResponsiveAppBar = ({ onClick }: ResponsiveAppBarProps) => {
+  const theme = useTheme();
+
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -124,6 +133,15 @@ const ResponsiveAppBar = () => {
                 {page}
               </Button>
             ))}
+          </Box>
+          <Box textAlign="center">
+            <IconButton sx={{ mr: 3 }} onClick={onClick} color="inherit">
+              {theme.palette.mode === "dark" ? (
+                <Brightness7Icon />
+              ) : (
+                <Brightness4Icon />
+              )}
+            </IconButton>
           </Box>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Update settings">
