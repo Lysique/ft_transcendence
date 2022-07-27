@@ -70,15 +70,6 @@ function App() {
               }}
             ></canvas>
           </Box>
-          {/* <Box textAlign="center">
-            <IconButton sx={{ ml: 1 }} onClick={handleToggle} color="inherit">
-              {theme.palette.mode === "dark" ? (
-                <Brightness7Icon />
-              ) : (
-                <Brightness4Icon />
-              )}
-            </IconButton>{" "}
-          </Box> */}
           <ProTip />
           <Copyright />
         </Container>
