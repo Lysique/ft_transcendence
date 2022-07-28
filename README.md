@@ -15,6 +15,7 @@ Finally, they can play the mighty Pong game against each other or watch other pl
 - Containerization: Docker
 
 ## How to build the project
-Make sure docker is installed and simply run `make` command while at the root of the repository and then navigate to localhost:80/ .
+Make sure docker is installed.
+Clone this repository and simply run the `make` command while at the root of the repository and then navigate to `localhost:80/`.
 
-If you want to run the project from one of school 42's mac, make sure to first launch the init_docker.sh script.
+If you want to run the project from one of school 42's mac, make sure to first launch the `init_docker.sh` script.
