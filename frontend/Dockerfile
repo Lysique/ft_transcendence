@@ -5,7 +5,7 @@ WORKDIR /usr/src/app/frontend
 
 # Copy package json and install dependencies
 COPY package*.json ./
-RUN npm install --legacy-peer-deps
+RUN npm install
 
 # Bundle app source
 COPY . .
