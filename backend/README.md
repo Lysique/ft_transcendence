@@ -35,6 +35,9 @@ $ npm install
 ## Running the app
 
 ```bash
+# run database
+$ docker run --name db -e POSTGRES_PASSWORD={YOUR PWD} POSTRGRES_DB={DB NAME} -d postgres
+
 # development
 $ npm run start
 

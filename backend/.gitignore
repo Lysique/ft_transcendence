@@ -3,7 +3,7 @@
 /node_modules
 
 # environment
-src/envs/development.env
+*/.env
 
 # Logs
 logs
