@@ -7,23 +7,33 @@ services:
       - "80:3000" # Bind port 80 of host to 3000 of container
     restart: always # What to do if container crashes
     container_name: frontend
+    networks:
+      - mynetwork
 
   # Create backend container
   backend:
     build: ./backend
+    depends_on:
+      - db
     ports:
       - "8080:8080"
     container_name: backend-docker
     restart: always
-    links:
-      - db
+    networks:
+      - mynetwork
 
   # Create database container
   db:
-    image: postgres:11.6-alpine
+    image: postgres
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_PASSWORD: pwd
+      POSTGRES_DB: nest_api
     container_name: database-docker
     restart: always
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
