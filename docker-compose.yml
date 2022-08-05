@@ -9,20 +9,21 @@ services:
     container_name: frontend
 
   # Create backend container
-  # backend:
-  #   # Create backend container
-  #   build: ./backend
-  #   ports:
-  #     - "8080:8080"
-  #   container_name: backend-docker
-  #   restart: always
-  #   links:
-  #     - db
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    container_name: backend-docker
+    restart: always
+    links:
+      - db
 
   # Create database container
-  # db:
-  #   image: postgres:11.6-alpine
-  #   ports:
-  #     - "5432:5432"
-  #   container_name: database-docker
-  #   restart: always
+  db:
+    image: postgres:11.6-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: secretpassword
+    container_name: database-docker
+    restart: always
