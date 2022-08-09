@@ -6,8 +6,10 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
 
+  //  Use Express platform ; allow exclusive methods from that platform
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  
   //  Get our config service, to retrieve port and base url
-  const app: NestExpressApplication = await NestFactory.create(AppModule);
   const config: ConfigService = app.get(ConfigService);
   const port: number = config.get<number>('PORT');
 

@@ -37,17 +37,21 @@ $ npm install
 ```bash
 
 # run testing container
-$ docker run -h db --name postgres --env-file .env -p 5432:5432 -d postgres
-$ docker run --link postgres:db --name adminer -p 8080:8080 -d adminer
 
 # Change the db host in the ./backend/src/common/envs/.env to localhost (don't forget to change it to 'db' after).
-# Connect to adminer (localhost:8080) with :
+
+# run the database from backend directory
+$ docker run -h db --name postgres --env-file ../.env -p 5432:5432 -d postgres
+
+#run adminer
+$ docker run --link postgres:db --name adminer -p 8080:8080 -d adminer
+
+# You can connect to adminer (localhost:8080) with :
 # - System : PostgreSQL
 # - Server : db
 # - Username : postgres
 # - Password : password provided in the ./backend/src/common/envs/.env file
 # - Database : (blank)
-# Create a database with the DATABASE_NAME provided in the ./backend/src/common/envs/.env file
 
 # stop testing databases
 $ docker stop postgres adminer
