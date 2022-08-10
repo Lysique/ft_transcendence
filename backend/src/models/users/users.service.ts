@@ -62,7 +62,7 @@ export class UsersService {
     //  Check which variable are asked to be modified
     user.pseudo = updateUserDto.pseudo || user.pseudo;
     user.status = updateUserDto.status || user.status;
-    
+
     await this.userRepository.save(user);
 
     const userDto: UserDto = this.entityToDto(user);
@@ -70,7 +70,11 @@ export class UsersService {
     return userDto;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  public async remove(id: number) {
+    const user: User = await this.userRepository.findOneBy({ id: id});
+
+    if (!user) throw new NotFoundException(`User with id ${id} was not found`)
+
+    await this.userRepository.remove(user);
   }
 }
