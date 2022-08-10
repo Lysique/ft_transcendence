@@ -17,12 +17,16 @@ export class UsersController {
 
   @Get()
   public async findAll() {
-   return this.usersService.findAll();
+    const resp = await this.usersService.findAll();
+    
+    return resp;
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  
+  @Get('/:id')
+  public async findOne(@Param('id') id: number) {
+    const resp = await this.usersService.findOne(id);
+  
+    return resp;
   }
 
   @Patch(':id')
