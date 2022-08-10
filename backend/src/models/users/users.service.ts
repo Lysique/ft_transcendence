@@ -12,6 +12,16 @@ export class UsersService {
   //  This creates a Repository of the User instance for the UsersService class
   constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
 
+  //  Utility method to get dto object from entity
+  private entityToDto(user: User): UserDto {
+    const userDto = new UserDto();
+    userDto.id = user.id;
+    userDto.status = user.status;
+    userDto.pseudo = user.pseudo;
+
+    return userDto;
+  }
+
   public async create(createUserDto: CreateUserDto) {
 
     //  Create user entity based on userDto
@@ -22,16 +32,16 @@ export class UsersService {
     await this.userRepository.save(user);
 
     //  Create a UserDto (!= CreateUserDto) to return
-    const userDto = new UserDto();
-    userDto.id = user.id;
-    userDto.status = user.status;
-    userDto.pseudo = user.pseudo;
-
+    const userDto = this.entityToDto(user);
     return userDto;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  public async findAll() {
+    const users: User[] = await this.userRepository.find();
+
+    const usersDto: UserDto[] = users.map(x => this.entityToDto(x));
+
+    return usersDto;
   }
 
   findOne(id: number) {
