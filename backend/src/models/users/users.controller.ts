@@ -28,10 +28,12 @@ export class UsersController {
   
     return resp;
   }
-
+  
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  public async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
+    const resp = await this.usersService.update(id, updateUserDto);
+  
+    return resp;
   }
 
   @Delete(':id')
