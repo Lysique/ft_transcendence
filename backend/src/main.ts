@@ -1,4 +1,3 @@
-import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -12,9 +11,6 @@ async function bootstrap() {
   //  Get our config service, to retrieve port and base url
   const config: ConfigService = app.get(ConfigService);
   const port: number = config.get<number>('PORT');
-
-  //  Add global pipe for better validation
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   await app.listen(port, () => {
     console.log('[WEB]', config.get<string>('BASE_URL'));

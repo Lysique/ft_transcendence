@@ -22,7 +22,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       //  Database tables
       entities: ['dist/**/*.entity.{ts,js}'],
 
-      //  We don't need to use migrations for this project
+      //  Db migrations
       migrations: ['dist/migrations/*.{ts,js}'],
       migrationsTableName: 'typeorm_migrations',
     
