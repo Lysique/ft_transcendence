@@ -17,7 +17,7 @@ export class UsersService {
     const userDto = new UserDto();
     userDto.id = user.id;
     userDto.status = user.status;
-    userDto.pseudo = user.pseudo;
+    userDto.name = user.name;
 
     return userDto;
   }
@@ -26,7 +26,7 @@ export class UsersService {
 
     //  Create user entity based on userDto
     const user: User = new User();
-    user.pseudo = createUserDto.pseudo;
+    user.name = createUserDto.name;
     user.status = UserStatus.Online;
 
     await this.userRepository.save(user);
@@ -44,7 +44,17 @@ export class UsersService {
     return usersDto;
   }
   
-  public async findOne(id: number) {
+  public async findOneById(id: number) {
+    const user: User = await this.userRepository.findOneBy({ id: id});
+
+    if (!user) throw new NotFoundException(`User with id ${id} was not found`)
+  
+    const userDto: UserDto = this.entityToDto(user);
+  
+    return userDto;
+  }
+
+  public async findOneByUsername(id: number) {
     const user: User = await this.userRepository.findOneBy({ id: id});
 
     if (!user) throw new NotFoundException(`User with id ${id} was not found`)
@@ -60,7 +70,7 @@ export class UsersService {
     if (!user) throw new NotFoundException(`User with id ${id} was not found`)
 
     //  Check which variable are asked to be modified
-    user.pseudo = updateUserDto.pseudo || user.pseudo;
+    user.name = updateUserDto.name || user.name;
     user.status = updateUserDto.status || user.status;
 
     await this.userRepository.save(user);

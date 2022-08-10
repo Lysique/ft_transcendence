@@ -3,6 +3,6 @@ import { UserStatus } from '../entities/user.entity';
 import { CreateUserDto } from './create-user.dto';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
-    pseudo?: string;
+    name?: string;
     status?: UserStatus;
 }

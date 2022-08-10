@@ -13,7 +13,7 @@ export class User {
     id: number;
 
     @Column()
-    pseudo: string;
+    name: string;
 
     @Column()
     status: UserStatus;
