@@ -22,6 +22,7 @@ export class AuthService {
             const createUserDto = new CreateUserDto;
             createUserDto.id = user.id;
             createUserDto.name = user.name;
+            createUserDto.photoUrl = user.photoUrl;
             this.usersService.create(createUserDto);
         }
         

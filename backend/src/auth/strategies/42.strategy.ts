@@ -36,7 +36,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
     const user = {
       id: profile.id,
       name: profile.username,
-      photo: profile.photos[0].value,
+      photoUrl: profile.photos[0].value,
     }
 
     done(null, user);

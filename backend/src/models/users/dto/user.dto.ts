@@ -5,4 +5,5 @@ export class UserDto {
     id: number;
     name: string;
     status: UserStatus;
+    photoUrl: string;
 }

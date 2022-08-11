@@ -17,4 +17,7 @@ export class User {
 
     @Column()
     status: UserStatus;
+
+    @Column()
+    photoUrl: string;
 }
