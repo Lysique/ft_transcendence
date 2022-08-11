@@ -80,13 +80,88 @@ function collision(ball: any, player: any) {
 
 /* CANVAS COMPONENT */
 
-interface CanvasProps {
-  width: number;
-  height: number;
+// interface CanvasProps {
+//   width: number;
+//   height: number;
+// }
+
+function debounce(fn:any, ms:any) {
+  let timer:any;
+
+  return () => {
+    clearTimeout(timer);
+
+    timer = setTimeout(function() {
+      timer = null;
+
+      fn.apply(window.self, arguments);
+    }, ms);
+  };
 }
 
-const Canvas = ({ width, height }: CanvasProps) => {
+const Canvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const [dimensions, setDimensions] = React.useState({
+    height: window.innerHeight,
+    width: window.innerWidth,
+  });
+
+  React.useEffect(() => {
+    const debouncedHandleResize = debounce(function handleResize() {
+      setDimensions({
+        height: window.innerHeight,
+        width: window.innerWidth,
+      });
+    }, 1000);
+
+    window.addEventListener("resize", debouncedHandleResize);
+
+    return () => {
+      window.removeEventListener("resize", debouncedHandleResize);
+    };
+  });
+
+  //   const [dimensions, setDimensions] = React.useState({
+  //     height: window.innerHeight,
+
+  //     width: window.innerWidth,
+  //   });
+
+  //   React.useEffect(() => {
+  //     function handleResize() {
+  //       setDimensions({
+  //         height: window.innerHeight,
+
+  //         width: window.innerWidth,
+  //       });
+  //     }
+
+  //     window.addEventListener("resize", handleResize);
+
+  //     return () => {
+  //       window.removeEventListener("resize", handleResize);
+  //     };
+  //   });
+
+  //   const [windowSize, setWindowSize] = useState(getWindowSize());
+
+  //   useEffect(() => {
+  //     function handleWindowResize() {
+  //       setWindowSize(getWindowSize());
+  //     }
+
+  //     window.addEventListener("resize", handleWindowResize);
+
+  //     return () => {
+  //       window.removeEventListener("resize", handleWindowResize);
+  //     };
+  //   }, []);
+
+  //   function getWindowSize() {
+  //     const { innerWidth, innerHeight } = window;
+  //     return { innerWidth, innerHeight };
+  //   }
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -100,14 +175,34 @@ const Canvas = ({ width, height }: CanvasProps) => {
 
     const render = () => {
       /* Clear the canvas */
-      drawRect(context, 0, 0, 500, 500, "grey");
+	//   context.clearRect(0, 0, window.innerWidth * 0.5, window.innerHeight * 0.5);
+      drawRect(
+        context,
+        0,
+        0,
+        dimensions.width * 0.5,
+        dimensions.height * 0.5,
+        "#E0E0E0"
+      );
 
       /* Draw score */
-      drawText(context, user1.score, 500 / 4, 500 / 5, "white");
-      drawText(context, user2.score, (3 * 500) / 4, 500 / 5, "white");
+      drawText(
+        context,
+        user1.score,
+        (dimensions.width * 0.5) / 4,
+        (dimensions.height * 0.5) / 6,
+        "black"
+      );
+      drawText(
+        context,
+        user2.score,
+        (3 * dimensions.width * 0.5) / 4,
+        (dimensions.height * 0.5) / 6,
+        "black"
+      );
 
       /* Draw net */
-      for (let i = 0; i <= 500; i += 15) {
+      for (let i = 0; i <= dimensions.height * 0.5; i += 15) {
         drawRect(context, net.x, net.y + i, net.width, net.height, net.color);
       }
 
@@ -162,26 +257,26 @@ const Canvas = ({ width, height }: CanvasProps) => {
   /* User1 paddle */
   const user1 = {
     x: 0,
-    y: (500 - 100) / 2, // canvas.height/2 - 100/2
+    y: (dimensions.height * 0.5 - 100) / 2,
     width: 10,
     height: 100,
-    color: "blue",
+    color: "black",
     score: 0,
   };
 
   /* User2 paddle */
   const user2 = {
-    x: 500 - 10, // canvas.width - 10
-    y: (500 - 100) / 2, // canvas.height/2 - 100/2
+    x: dimensions.width * 0.5 - 10,
+    y: (dimensions.height * 0.5 - 100) / 2,
     width: 10,
     height: 100,
-    color: "blue",
+    color: "black",
     score: 0,
   };
 
   /* Net */
   const net = {
-    x: (500 - 2) / 2,
+    x: (dimensions.width * 0.5 - 2) / 2,
     y: 0,
     height: 10,
     width: 2,
@@ -190,18 +285,18 @@ const Canvas = ({ width, height }: CanvasProps) => {
 
   /* Ball */
   const ball = {
-    x: 500 / 2,
-    y: 500 / 2,
+    x: (dimensions.width * 0.5) / 2,
+    y: (dimensions.height * 0.5) / 2,
     radius: 10,
     speed: 4,
     velocityX: 5,
     velocityY: 5,
-    color: "red",
+    color: "black",
   };
 
   function resetBall() {
-    ball.x = 500 / 2;
-    ball.y = 500 / 2;
+    ball.x = (dimensions.width * 0.5) / 2;
+    ball.y = (dimensions.height * 0.5) / 2;
     ball.velocityX = -ball.velocityX;
     ball.speed = 4;
   }
@@ -212,7 +307,7 @@ const Canvas = ({ width, height }: CanvasProps) => {
     if (ball.x - ball.radius < 0) {
       user2.score++;
       resetBall();
-    } else if (ball.x + ball.radius > 500) {
+    } else if (ball.x + ball.radius > dimensions.width * 0.5) {
       user1.score++;
       resetBall();
     }
@@ -224,11 +319,15 @@ const Canvas = ({ width, height }: CanvasProps) => {
     let computerLevel: number = 0.1;
     user2.y += (ball.y - (user2.y + user2.height / 2)) * computerLevel;
 
-    if (ball.y + ball.radius > 500 || ball.y - ball.radius < 0) {
+    if (
+      ball.y + ball.radius > dimensions.height * 0.5 ||
+      ball.y - ball.radius < 0
+    ) {
       ball.velocityY = -ball.velocityY;
     }
 
-    let player = ball.x + ball.radius < 500 / 2 ? user1 : user2;
+    let player =
+      ball.x + ball.radius < (dimensions.width * 0.5) / 2 ? user1 : user2;
 
     if (collision(ball, player) === true) {
       let collidePoint = ball.y - (player.y + player.height / 2);
@@ -238,7 +337,8 @@ const Canvas = ({ width, height }: CanvasProps) => {
       let angleRad = (collidePoint * Math.PI) / 4;
 
       /* X direction  of ball when hit */
-      let direction = ball.x + ball.radius < 500 / 2 ? 1 : -1;
+      let direction =
+        ball.x + ball.radius < (dimensions.width * 0.5) / 2 ? 1 : -1;
       /* Change velocity */
       ball.velocityX = direction * ball.speed * Math.cos(angleRad);
       ball.velocityY = ball.speed * Math.sin(angleRad);
@@ -247,12 +347,18 @@ const Canvas = ({ width, height }: CanvasProps) => {
     }
   }
 
-  return <canvas ref={canvasRef} height={height} width={width} />;
+  return (
+    <canvas
+      ref={canvasRef}
+      width={dimensions.width * 0.5}
+      height={dimensions.height * 0.5}
+    />
+  );
 };
 
-Canvas.defaultProps = {
-  width: window.innerWidth / 2,
-  height: window.innerHeight / 2,
-};
+// Canvas.defaultProps = {
+//   width: 600,
+//   height: 500,
+// };
 
 export default Canvas;
