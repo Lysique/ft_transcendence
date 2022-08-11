@@ -32,13 +32,41 @@
 $ npm install
 ```
 
+##  Setup
+
+# Env file configuration :
+
+- Make a copy of the template.env in the src/common/envs folder and name it a .env file in the same folder.
+
+- DATABASE_PASSWORD and DATABASE_NAME should match the configuration of the .env in the root folder.
+
+- FORTYTWO_ID and FORTYTWO_APP_SECRET will be given when registrating the app on the intra
+
+# Register the app on the intra
+
+- Go on the intra -> settings -> api -> register a new app
+- Fill the blanks with the informations provided here
+
+Name : ft_transcendance  
+Image: None  
+Description: 42 project: Website with a pong and a chat.
+Website: http://localhost:3000  
+Public: Yes  
+Redirect URI: http://localhost:3000/auth/42/callback  
+
+Scopes: Keep defaults  
+
+- You will be given an UID and a secret to put on the .env file.
+
+
 ## run testing database
 
 ```bash
 
 # run testing container
 
-# Change the db host in the ./backend/src/common/envs/.env to localhost (don't forget to change it to 'db' after).
+# Change the db host in the ./backend/src/common/envs/.env to localhost
+# Don't forget to change it to 'db' after if you want to run backend with docker.
 
 # run the database from backend directory
 $ docker run -h db --name postgres --env-file ../.env -p 5432:5432 -d postgres

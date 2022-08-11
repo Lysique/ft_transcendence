@@ -26,6 +26,7 @@ export class UsersService {
 
     //  Create user entity based on userDto
     const user: User = new User();
+    user.id = createUserDto.id;
     user.name = createUserDto.name;
     user.status = UserStatus.Online;
 
@@ -47,17 +48,17 @@ export class UsersService {
   public async findOneById(id: number) {
     const user: User = await this.userRepository.findOneBy({ id: id});
 
-    if (!user) throw new NotFoundException(`User with id ${id} was not found`)
+    if (!user) return null;
   
     const userDto: UserDto = this.entityToDto(user);
   
     return userDto;
   }
 
-  public async findOneByUsername(id: number) {
-    const user: User = await this.userRepository.findOneBy({ id: id});
+  public async findOneByName(name: string) {
+    const user: User = await this.userRepository.findOneBy({ name: name});
 
-    if (!user) throw new NotFoundException(`User with id ${id} was not found`)
+    if (!user) throw new NotFoundException(`User with name ${name} was not found`)
   
     const userDto: UserDto = this.entityToDto(user);
   

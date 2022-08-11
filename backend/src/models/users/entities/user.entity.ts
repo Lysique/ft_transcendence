@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 export enum UserStatus {
     Online = 0,
@@ -9,7 +9,7 @@ export enum UserStatus {
 //  User table
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn()
     id: number;
 
     @Column()
