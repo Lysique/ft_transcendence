@@ -20,6 +20,7 @@ export class UsersService {
     userDto.status = user.status;
     userDto.photoUrl = user.photoUrl;
     userDto.twoFactAuth = user.twoFactAuth;
+    userDto.secret = user.secret;
 
     return userDto;
   }
@@ -89,6 +90,8 @@ export class UsersService {
     user.name = updateUserDto.name || user.name;
     user.status = updateUserDto.status || user.status;
     user.photoUrl = updateUserDto.photoUrl || user.photoUrl;
+    user.secret = updateUserDto.secret || user.secret;
+    user.twoFactAuth = updateUserDto.twoFactAuth || user.twoFactAuth;
 
     await this.userRepository.save(user);
 

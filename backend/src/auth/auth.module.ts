@@ -7,7 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants/constants';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthController } from './auth.controller';
-import { PhoneStrategy } from './strategies/mail.strategy';
+import { JwtTwoFactAuthStrategy } from './strategies/jwt-2fa.strategy';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import { PhoneStrategy } from './strategies/mail.strategy';
     AuthService, 
     FortyTwoStrategy, 
     JwtStrategy,
-    PhoneStrategy,
+    JwtTwoFactAuthStrategy
   ],
   controllers: [AuthController],
 })

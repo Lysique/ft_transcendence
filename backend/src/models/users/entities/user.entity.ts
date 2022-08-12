@@ -23,4 +23,7 @@ export class User {
 
     @Column({ default: false })
     twoFactAuth: boolean;
+
+    @Column({ nullable: true })
+    secret: string;
 }

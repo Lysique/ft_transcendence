@@ -7,7 +7,7 @@ import { UserDto } from 'src/models/users/dto/user.dto';
 import { Request } from 'express';
 
 // The jwt strategy checks if the token extracted from the request is a valid token.
-// We create the token in AuthService -> login.
+// It checks if the given token has been verified by the 2fa (if activated).
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly userService: UsersService) {
@@ -20,7 +20,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any): Promise<UserDto> {
     const user: UserDto = await this.userService.findOneById(payload.sub);
-    return user;
+    if (!user.twoFactAuth) {
+      return user;
+    }
+    if (payload.isTwoFactAuth) {
+      return user;
+    }
   }
 }
 
