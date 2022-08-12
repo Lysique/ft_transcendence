@@ -1,6 +1,6 @@
 import { Strategy } from 'passport-42';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { Injectable, ExecutionContext } from '@nestjs/common';
 import { VerifiedCallback } from 'passport-jwt';
 
 //  auth42 strategy

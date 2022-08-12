@@ -15,9 +15,12 @@ export class User {
     @Column()
     name: string;
 
-    @Column()
+    @Column({ default: UserStatus.Online })
     status: UserStatus;
 
     @Column()
     photoUrl: string;
+
+    @Column({ default: false })
+    twoFactAuth: boolean;
 }

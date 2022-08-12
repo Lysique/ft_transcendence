@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
-import { User, UserStatus } from './entities/user.entity';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +19,7 @@ export class UsersService {
     userDto.name = user.name;
     userDto.status = user.status;
     userDto.photoUrl = user.photoUrl;
+    userDto.twoFactAuth = user.twoFactAuth;
 
     return userDto;
   }
@@ -30,7 +31,6 @@ export class UsersService {
     const user: User = new User();
     user.id = createUserDto.id;
     user.name = createUserDto.name;
-    user.status = UserStatus.Online;
     user.photoUrl = createUserDto.photoUrl;
 
     await this.userRepository.save(user);

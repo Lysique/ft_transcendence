@@ -11,23 +11,31 @@ export class AuthService {
         private jwtService: JwtService
     ) {}
 
-    async login(user: any) {
-        const payload = { 
-            name: user.username, 
-            sub: user.id 
-        };
+    async auth42(request: any) {
+        const user = request.user;
 
-        const userDto: UserDto = await this.usersService.findOneById(user.id);
+        var userDto: UserDto = await this.usersService.findOneById(user.id);
         if (!userDto) {
             const createUserDto = new CreateUserDto;
             createUserDto.id = user.id;
             createUserDto.name = user.name;
             createUserDto.photoUrl = user.photoUrl;
-            this.usersService.create(createUserDto);
+            userDto = await this.usersService.create(createUserDto);
         }
         
-        return {
-          access_token: this.jwtService.sign(payload),
+        if (userDto.twoFactAuth == true) {
+        }
+
+        return this.login(request);
+    }
+
+    async login(request: any) {
+        const payload = {
+            sub: request.user.id 
         };
+
+        const accessTokenCookie = this.jwtService.sign(payload);
+ 
+        return accessTokenCookie;
     }
 }
