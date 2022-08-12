@@ -11,10 +11,10 @@ export class AuthService {
         private jwtService: JwtService
     ) {}
 
-    async auth42(request: any) {
-        const user = request.user;
-
+    async auth42(user: any) {
         var userDto: UserDto = await this.usersService.findOneById(user.id);
+
+        //  If the user is not registered in our database, we create one.
         if (!userDto) {
             const createUserDto = new CreateUserDto;
             createUserDto.id = user.id;
@@ -26,12 +26,12 @@ export class AuthService {
         if (userDto.twoFactAuth == true) {
         }
 
-        return this.login(request);
+        return this.login(user);
     }
 
-    async login(request: any) {
+    async login(user: any) {
         const payload = {
-            sub: request.user.id 
+            sub: user.id 
         };
 
         const accessTokenCookie = this.jwtService.sign(payload);

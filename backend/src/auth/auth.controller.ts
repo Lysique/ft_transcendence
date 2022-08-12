@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Req, Res } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { FortyTwoAuthGuard } from './guards/42-auth.guard';
@@ -19,10 +19,10 @@ export class AuthController {
       @Req() req: Request,
       @Res({passthrough: true}) res: Response
       ) {
-      const accessToken = await this.authService.auth42(req);
+      // Login user and get jwt token for login.
+      const accessToken = await this.authService.auth42(req.user);
 
       //  Store accessToken
-
       res.cookie('jwt', accessToken, { httpOnly: true });
       
       return req.user;
@@ -33,5 +33,12 @@ export class AuthController {
     @Get('profile')
     async profile(@Req() req: Request) {
       return req.user;
+    }
+
+    // User logout
+    @Post('logout')
+    async logout(@Res({passthrough: true}) response: Response) {
+      response.clearCookie('jwt');
+      return 'success';
     }
   }
