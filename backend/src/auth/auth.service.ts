@@ -11,31 +11,31 @@ export class AuthService {
         private jwtService: JwtService
     ) {}
 
-    async auth42(user: any) {
+    async getUser(user: any): Promise<UserDto> {
         var userDto: UserDto = await this.usersService.findOneById(user.id);
 
         //  If the user is not registered in our database, we create one.
         if (!userDto) {
-            const createUserDto = new CreateUserDto;
-            createUserDto.id = user.id;
-            createUserDto.name = user.name;
-            createUserDto.photoUrl = user.photoUrl;
-            userDto = await this.usersService.create(createUserDto);
+            userDto = await this.signup(user);
         }
         
-        if (userDto.twoFactAuth == true) {
-        }
-
-        return this.login(user);
+        return userDto;
     }
 
-    async login(user: any) {
-        const payload = {
-            sub: user.id 
-        };
+    //  Create a new user in database.
+    async signup(user: any): Promise<UserDto> {
+        const createUserDto = new CreateUserDto;
 
-        const accessTokenCookie = this.jwtService.sign(payload);
- 
-        return accessTokenCookie;
+        createUserDto.id = user.id;
+        createUserDto.name = user.name;
+        createUserDto.photoUrl = user.photoUrl;
+
+        const userDto = await this.usersService.create(createUserDto);
+
+        return userDto;
+    }
+
+    async generateToken(payload: any, options: any = {}) {
+        return this.jwtService.sign(payload, options);
     }
 }
