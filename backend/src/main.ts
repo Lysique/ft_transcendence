@@ -1,18 +1,20 @@
-import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
 
+  //  Use Express platform ; allow exclusive methods from that platform
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  
   //  Get our config service, to retrieve port and base url
-  const app: NestExpressApplication = await NestFactory.create(AppModule);
   const config: ConfigService = app.get(ConfigService);
   const port: number = config.get<number>('PORT');
 
-  //  Add global pipe for better validation
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  //  Needed to parse cookies
+  app.use(cookieParser());
 
   await app.listen(port, () => {
     console.log('[WEB]', config.get<string>('BASE_URL'));
