@@ -45,17 +45,7 @@ $ npm install
 # Register the app on the intra
 
 - Go on the intra -> settings -> api -> register a new app
-- Fill the blanks with the informations provided here
-
-Name : ft_transcendance  
-Image: None  
-Description: 42 project: Website with a pong and a chat.
-Website: http://localhost:3000  
-Public: Yes  
-Redirect URI: http://localhost:3000/auth/42/callback  
-
-Scopes: Keep defaults  
-
+- Fill the form
 - You will be given an UID and a secret to put on the .env file.
 
 
