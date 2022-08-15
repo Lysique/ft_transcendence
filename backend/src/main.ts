@@ -16,6 +16,12 @@ async function bootstrap() {
   //  Needed to parse cookies
   app.use(cookieParser());
 
+  //  Enable cross-origin ressource sharing
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
+
   await app.listen(port, () => {
     console.log('[WEB]', config.get<string>('BASE_URL'));
   });

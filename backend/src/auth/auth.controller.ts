@@ -12,7 +12,7 @@ export class AuthController {
 
     // This function is used to login thanks to the guard.
     @UseGuards(FortyTwoAuthGuard)
-    @Post('login')
+    @Get('login')
     async login(@Req() req: Request) {}
     
     // Function called by 42 strategy
@@ -47,7 +47,7 @@ export class AuthController {
     
     // User logout
     @UseGuards(JwtAuthGuard)
-    @Post('logout')
+    @Get('logout')
     async logout(@Res({passthrough: true}) response: Response) {
       response.clearCookie('jwt');
       return 'success';
