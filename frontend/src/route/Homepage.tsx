@@ -2,44 +2,14 @@ import React from "react";
 import { useState, useEffect, useRef } from "react";
 
 import ProTip from "../components/ProTip";
-import ResponsiveAppBar from "../components/AppBar";
 import Copyright from "../components/CopyRight";
 
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import { UserAPI } from "../api/user.api";
-import { UserDto } from "../api/dto/user.dto";
-
-export function Homepage() {
-  //  Dark/ligh mode
-  const [darkMode, setDarkMode] = useState(false);
-
-  const theme = createTheme({
-    palette: {
-      mode: darkMode ? "dark" : "light",
-    },
-  });
-
-  const handleToggle = () => {
-    setDarkMode(!darkMode);
-  };
+export const Homepage = () => {
   
-    //  user state
-    const [user, setUser] = React.useState<UserDto | null>();
-  
-    React.useEffect(() => {
-      const fetchProfile = async () => {
-        const data = await UserAPI.getUserProfile();
-        setUser(data);
-      }
-  
-      fetchProfile();
-    }, [])
-
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   
@@ -63,14 +33,7 @@ export function Homepage() {
   }, [context]);
 
   return (
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <div className="App">
-          <ResponsiveAppBar
-            handleToggle={handleToggle}
-            user={user}
-            setUser={setUser}
-          />
+        <div className="Homepage">
           <Container maxWidth="sm">
             <Box sx={{ my: 4 }}>
               <Typography variant="h4" component="h1" gutterBottom align="center">
@@ -93,6 +56,5 @@ export function Homepage() {
             <Copyright />
           </Container>
         </div>
-      </ThemeProvider>
   );
 }

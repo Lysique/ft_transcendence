@@ -2,13 +2,6 @@ import { createTheme, ThemeProvider } from "@mui/material";
 import React from "react";
 import { UserDto } from "../api/dto/user.dto";
 import { UserAPI } from "../api/user.api";
-import ResponsiveAppBar from "../components/AppBar";
-
-interface GlobalProps {
-    handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
-    user: UserDto | null | undefined
-    setUser: any
-}
 
 export function Profile () {
 
@@ -36,19 +29,8 @@ export function Profile () {
     fetchProfile();
     }, [])
 
-    const globalProps: GlobalProps = {
-        handleToggle: handleToggle,
-        user: user,
-        setUser: setUser
-    }
-
     return (
         <ThemeProvider theme={theme}>
-            <ResponsiveAppBar
-                handleToggle={handleToggle}
-                user={user}
-                setUser={setUser}
-            />
         </ThemeProvider>
     );
 }

@@ -75,8 +75,22 @@ const ResponsiveAppBar = ({ handleToggle, user, setUser }: ResponsiveAppBarProps
         key="Profile"
         component={Link}
         to="/profile"
+        onClick={handleCloseUserMenu}
       >
         <Typography textAlign="center">Profile</Typography>
+      </MenuItem>
+   );
+  };
+
+  const HomepageRedirect = () => {
+    return (
+      <MenuItem 
+        key="Homepage"
+        component={Link}
+        to="/"
+        onClick={handleCloseUserMenu}
+      >
+        <Typography textAlign="center">Home</Typography>
       </MenuItem>
    );
   };
@@ -111,11 +125,17 @@ const ResponsiveAppBar = ({ handleToggle, user, setUser }: ResponsiveAppBarProps
   }, {
     name: "Profile",
     onClick: ProfileRedirect()
+  }, {
+    name: "Homepage",
+    onClick: HomepageRedirect()
   }];
 
   const loggedOutSettings = [{
     name: "Login",
     onClick: LoginButton()
+  }, {
+    name: "Homepage",
+    onClick: HomepageRedirect()
   }];
 
   return (
