@@ -27,13 +27,13 @@ export class AuthController {
       const userDto: UserDto = await this.authService.getUser(req.user);
       
       //  Create and store jwt token to enable connection
-      const accessToken = await this.authService.generateToken({ sub: userDto.id });
+      const accessToken = await this.authService.generateToken({ 
+        sub: userDto.id, 
+        IsTwoFactAuth: false
+      });
       res.cookie('jwt', accessToken, { httpOnly: true });
     
-      if (userDto.twoFactAuth == false) {
-        return userDto;
-      }
-      return;
+      res.status(302).redirect('http://localhost:3001');
     }
     
     // Check if user is logged in and get user profile.
@@ -50,7 +50,6 @@ export class AuthController {
     @Get('logout')
     async logout(@Res({passthrough: true}) response: Response) {
       response.clearCookie('jwt');
-      return 'success';
     }
     
     // Generate QrCode
