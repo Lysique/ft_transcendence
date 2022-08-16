@@ -16,15 +16,15 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useTheme } from "@mui/material/styles";
 import { UserAPI } from "../api/user.api";
 import { UserDto } from "../api/dto/user.dto";
-
+import { Link } from "react-router-dom";
 
 interface ResponsiveAppBarProps {
-  onClick: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
+  handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
   user: UserDto | null | undefined
   setUser: any
 }
 
-const ResponsiveAppBar = ({ onClick, user, setUser }: ResponsiveAppBarProps) => {
+const ResponsiveAppBar = ({ handleToggle, user, setUser }: ResponsiveAppBarProps) => {
   const theme = useTheme();
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -69,6 +69,18 @@ const ResponsiveAppBar = ({ onClick, user, setUser }: ResponsiveAppBarProps) => 
    );
   };
 
+  const ProfileRedirect = () => {
+    return (
+      <MenuItem 
+        key="Profile"
+        component={Link}
+        to="/profile"
+      >
+        <Typography textAlign="center">Profile</Typography>
+      </MenuItem>
+   );
+  };
+
   function LogoutButton() {
     return (
       <MenuItem 
@@ -96,6 +108,9 @@ const ResponsiveAppBar = ({ onClick, user, setUser }: ResponsiveAppBarProps) => 
   const loggedInSettings = [{
     name: "Logout",
     onClick: LogoutButton()
+  }, {
+    name: "Profile",
+    onClick: ProfileRedirect()
   }];
 
   const loggedOutSettings = [{
@@ -190,7 +205,7 @@ const ResponsiveAppBar = ({ onClick, user, setUser }: ResponsiveAppBarProps) => 
             ))}
           </Box>
           <Box textAlign="center">
-            <IconButton sx={{ mr: 3 }} onClick={onClick} color="inherit">
+            <IconButton sx={{ mr: 3 }} onClick={handleToggle} color="inherit">
               {theme.palette.mode === "dark" ? (
                 <Brightness7Icon />
               ) : (
