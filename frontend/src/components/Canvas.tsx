@@ -53,16 +53,16 @@ function drawText(
 /* GAME MECHANICS */
 
 /* Collision detection */
-function collision(ball: any, player: any, ratioX: number, ratioY: number) {
-  ball.top = ball.y * ratioY - ball.radius;
-  ball.bottom = ball.y * ratioY - ball.radius;
-  ball.left = ball.x * ratioX - ball.radius;
-  ball.right = ball.x * ratioX + ball.radius;
+function collision(ball: any, player: any) {
+  ball.top = ball.y - ball.radius;
+  ball.bottom = ball.y - ball.radius;
+  ball.left = ball.x - ball.radius;
+  ball.right = ball.x + ball.radius;
 
-  player.top = player.y * ratioY;
-  player.bottom = player.y * ratioY + player.height;
-  player.left = player.x * ratioX;
-  player.right = player.x * ratioX + player.width;
+  player.top = player.y;
+  player.bottom = player.y + player.height;
+  player.left = player.x;
+  player.right = player.x + player.width;
 
   return (
     player.left < ball.right &&
@@ -89,6 +89,7 @@ function debounce(fn: any, ms: any) {
 
 const Canvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const requestIdRef = useRef<number>(0);
 
   const [dimensions, setDimensions] = useState({
     prevHeight: window.innerHeight, // debugging purposes
@@ -110,18 +111,18 @@ const Canvas = () => {
     return () => {
       window.removeEventListener("resize", debouncedHandleResize);
     };
-  }, [dimensions]);
+  });
 
   const [ratioX, setRatioX] = useState(1);
   const [ratioY, setRatioY] = useState(1);
 
   useEffect(() => {
     setRatioX(dimensions.width / dimensions.prevWidth);
-  });
+  }, [dimensions]);
 
   useEffect(() => {
     setRatioY(dimensions.height / dimensions.prevHeight);
-  });
+  }, [dimensions]);
 
   /* INITIAL STATE OF GAME */
 
@@ -157,11 +158,133 @@ const Canvas = () => {
     x: (dimensions.width * 0.5) / 2,
     y: (dimensions.height * 0.5) / 2,
     radius: 10,
-    speed: 4,
-    velocityX: 5,
-    velocityY: 5,
+    speed: dimensions.width / 200,
+    velocityX: dimensions.width / 150,
+    velocityY: dimensions.height / 150,
     color: "black",
   };
+
+  const render = (context: any, canvas: any) => {
+    /* Clear the canvas */
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    drawRect(context, 0, 0, canvas.width, canvas.height, "#E0E0E1");
+
+    /* Draw score */
+    drawText(
+      context,
+      user1.score,
+      canvas.width / 4,
+      canvas.height / 6,
+      "black"
+    );
+    drawText(
+      context,
+      user2.score,
+      (3 * canvas.width) / 4,
+      canvas.height / 6,
+      "black"
+    );
+
+    /* Draw net */
+    for (let i = 0; i <= canvas.height; i += 15) {
+      drawRect(
+        context,
+        (canvas.width - 2) / 2,
+        i,
+        net.width,
+        net.height,
+        net.color
+      );
+    }
+
+    /* Draw paddles */
+    drawRect(context, user1.x, user1.y, user1.width, user1.height, user1.color);
+    drawRect(context, user2.x, user2.y, user2.width, user2.height, user2.color);
+
+    /* Draw ball */
+    drawCircle(context, ball.x, ball.y, ball.radius, ball.color);
+  };
+
+  /* Update pos of paddles and ball */
+  const update = (width: number, height: number) => {
+    // console.log("yo: " + ratioX); // HERE IT'S NOT THE EXPECTED ratioX value
+    // console.log("width: " + dimensions.width); // HERE IT'S NOT THE EXPECTED width
+    // console.log("height: " + dimensions.height); // HERE IT'S NOT THE EXPECTED width
+
+    /* Update score */
+    if (ball.x - ball.radius < 0) {
+      user2.score++;
+      resetBall(ball);
+    } else if (ball.x + ball.radius > width) {
+      user1.score++;
+      resetBall(ball);
+    }
+
+    ball.x += ball.velocityX; // * ratioX
+    ball.y += ball.velocityY; // * ratioY
+
+    /* Computer paddle */
+    let computerLevel: number = 0.1;
+    user2.y += (ball.y - (user2.y + user2.height / 2)) * computerLevel;
+	
+    if (ball.y + ball.radius > height || ball.y - ball.radius < 0) {
+		ball.velocityY = -ball.velocityY;
+    }
+	
+	/* Player paddle */
+    let player = ball.x + ball.radius < width / 2 ? user1 : user2;
+
+    if (collision(ball, player) === true) {
+      let collidePoint = ball.y - (player.y + player.height / 2);
+      collidePoint = collidePoint / (player.height / 2);
+
+      /* Calculate angle in Radian */
+      let angleRad = (collidePoint * Math.PI) / 4;
+
+      /* X direction  of ball when hit */
+      let direction = ball.x + ball.radius < width / 2 ? 1 : -1;
+
+      /* Change velocity */
+      ball.velocityX = direction * ball.speed * Math.cos(angleRad);
+      ball.velocityY = ball.speed * Math.sin(angleRad);
+
+      ball.speed += 0.1;
+    }
+  };
+
+  function game(context: any, canvas: any) {
+    if (canvas) {
+      update(canvas.width, canvas.height);
+      render(context, canvas);
+    }
+  }
+
+  const renderFrame = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
+    const context = canvas.getContext("2d");
+    if (!context) {
+      return;
+    }
+    game(context, canvas);
+  };
+
+  const tick = () => {
+    if (!canvasRef.current) return;
+    renderFrame();
+    if (requestIdRef.current) {
+      requestIdRef.current = requestAnimationFrame(tick);
+    }
+  };
+
+  useEffect(() => {
+    requestIdRef.current = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(requestIdRef.current);
+    };
+  });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -173,123 +296,6 @@ const Canvas = () => {
       return;
     }
 
-    const render = () => {
-      /* Clear the canvas */
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      drawRect(context, 0, 0, canvas.width, canvas.height, "#E0E0E1");
-
-      /* Draw score */
-      drawText(
-        context,
-        user1.score,
-        canvas.width / 4,
-        canvas.height / 6,
-        "black"
-      );
-      drawText(
-        context,
-        user2.score,
-        (3 * canvas.width) / 4,
-        canvas.height / 6,
-        "black"
-      );
-
-      /* Draw net */
-      for (let i = 0; i <= canvas.height; i += 15) {
-        drawRect(
-          context,
-          (canvas.width - 2) / 2,
-          i,
-          net.width,
-          net.height,
-          net.color
-        );
-      }
-
-      /* Draw paddles */
-      drawRect(
-        context,
-        user1.x * ratioX,
-        user1.y * ratioY,
-        user1.width,
-        user1.height,
-        user1.color
-      );
-      drawRect(
-        context,
-        user2.x * ratioX,
-        user2.y * ratioY,
-        user2.width,
-        user2.height,
-        user2.color
-      );
-
-      /* Draw ball */
-      drawCircle(
-        context,
-        ball.x * ratioX,
-        ball.y * ratioY,
-        ball.radius,
-        ball.color
-      );
-    };
-
-    /* Update pos of paddles and ball */
-    const update = (width: number, height: number) => {
-
-		console.log("yo: " + ratioX); // HERE IT'S NOT THE EXPECTED ratioX value
-		console.log("width: " + dimensions.width); // HERE IT'S NOT THE EXPECTED width
-		console.log("height: " + dimensions.height); // HERE IT'S NOT THE EXPECTED width
-      /* Update score */
-      if (ball.x * ratioX - ball.radius < 0) {
-        user2.score++;
-        resetBall(ball);
-      } else if (ball.x * ratioX + ball.radius > width) {
-        user1.score++;
-        resetBall(ball);
-      }
-
-      ball.x += ball.velocityX * ratioX;
-      ball.y += ball.velocityY * ratioY;
-
-      /* Computer paddle */
-      let computerLevel: number = 0.1;
-      user2.y +=
-        (ball.y * ratioY -
-          (user2.y * ratioY + user2.height / 2)) *
-        computerLevel;
-
-      if (
-        ball.y * ratioY + ball.radius > height ||
-        ball.y * ratioY - ball.radius < 0
-      ) {
-        ball.velocityY = -ball.velocityY;
-      }
-
-      let player =
-        ball.x * ratioX + ball.radius < width / 2 ? user1 : user2;
-
-      if (collision(ball, player, ratioX, ratioY) === true) {
-        let collidePoint =
-          ball.y * ratioY -
-          (player.y * ratioY + player.height / 2);
-        collidePoint = collidePoint / (player.height / 2);
-
-        /* Calculate angle in Radian */
-        let angleRad = (collidePoint * Math.PI) / 4;
-
-        /* X direction  of ball when hit */
-        let direction =
-          ball.x * ratioX + ball.radius < width / 2 ? 1 : -1;
-        /* Change velocity */
-        ball.velocityX =
-          direction * ball.speed * ratioX * Math.cos(angleRad);
-        ball.velocityY = ball.speed * ratioY * Math.sin(angleRad);
-
-        ball.speed += 0.1;
-      }
-    };
-
     const movePaddle = (evt: MouseEvent) => {
       if (!canvas) {
         return;
@@ -298,37 +304,170 @@ const Canvas = () => {
       user1.y = evt.clientY - rect.top - user1.height / 2;
     };
 
-    function game() {
-      if (canvas) {
-        update(canvas.width, canvas.height);
-        render();
-      }
-    }
-
-    const framePerSecond = 50;
-    setInterval(game, 1000 / framePerSecond);
-
     canvas.addEventListener("mousemove", movePaddle);
     return () => {
       canvas.removeEventListener("mousemove", movePaddle);
     };
-  }, []); // When we leave the array empty, the effect will only run once irrespective of the changes to the state it is attached to.
+  });
+
+  /* Output graphics */
+  //   useEffect(() => {
+  //     const canvas = canvasRef.current;
+  //     if (!canvas) {
+  //       return;
+  //     }
+  //     const context = canvas.getContext("2d");
+  //     if (!context) {
+  //       return;
+  //     }
+
+  //     const render = () => {
+  //       /* Clear the canvas */
+  //       context.clearRect(0, 0, canvas.width, canvas.height);
+  //       drawRect(context, 0, 0, canvas.width, canvas.height, "#E0E0E1");
+
+  //       /* Draw score */
+  //       drawText(
+  //         context,
+  //         user1.score,
+  //         canvas.width / 4,
+  //         canvas.height / 6,
+  //         "black"
+  //       );
+  //       drawText(
+  //         context,
+  //         user2.score,
+  //         (3 * canvas.width) / 4,
+  //         canvas.height / 6,
+  //         "black"
+  //       );
+
+  //       /* Draw net */
+  //       for (let i = 0; i <= canvas.height; i += 15) {
+  //         drawRect(
+  //           context,
+  //           (canvas.width - 2) / 2,
+  //           i,
+  //           net.width,
+  //           net.height,
+  //           net.color
+  //         );
+  //       }
+
+  //       /* Draw paddles */
+  //       drawRect(
+  //         context,
+  //         user1.x * ratioX,
+  //         user1.y * ratioY,
+  //         user1.width,
+  //         user1.height,
+  //         user1.color
+  //       );
+  //       drawRect(
+  //         context,
+  //         user2.x * ratioX,
+  //         user2.y * ratioY,
+  //         user2.width,
+  //         user2.height,
+  //         user2.color
+  //       );
+
+  //       /* Draw ball */
+  //       drawCircle(
+  //         context,
+  //         ball.x * ratioX,
+  //         ball.y * ratioY,
+  //         ball.radius,
+  //         ball.color
+  //       );
+  //     };
+
+  //     /* Update pos of paddles and ball */
+  //     const update = (width: number, height: number) => {
+  //       console.log("yo: " + ratioX); // HERE IT'S NOT THE EXPECTED ratioX value
+  //       console.log("width: " + dimensions.width); // HERE IT'S NOT THE EXPECTED width
+  //       console.log("height: " + dimensions.height); // HERE IT'S NOT THE EXPECTED width
+  //       /* Update score */
+  //       if (ball.x * ratioX - ball.radius < 0) {
+  //         user2.score++;
+  //         resetBall(ball);
+  //       } else if (ball.x * ratioX + ball.radius > width) {
+  //         user1.score++;
+  //         resetBall(ball);
+  //       }
+
+  //       ball.x += ball.velocityX * ratioX;
+  //       ball.y += ball.velocityY * ratioY;
+
+  //       /* Computer paddle */
+  //       let computerLevel: number = 0.1;
+  //       user2.y +=
+  //         (ball.y * ratioY - (user2.y * ratioY + user2.height / 2)) *
+  //         computerLevel;
+
+  //       if (
+  //         ball.y * ratioY + ball.radius > height ||
+  //         ball.y * ratioY - ball.radius < 0
+  //       ) {
+  //         ball.velocityY = -ball.velocityY;
+  //       }
+
+  //       let player = ball.x * ratioX + ball.radius < width / 2 ? user1 : user2;
+
+  //       if (collision(ball, player, ratioX, ratioY) === true) {
+  //         let collidePoint =
+  //           ball.y * ratioY - (player.y * ratioY + player.height / 2);
+  //         collidePoint = collidePoint / (player.height / 2);
+
+  //         /* Calculate angle in Radian */
+  //         let angleRad = (collidePoint * Math.PI) / 4;
+
+  //         /* X direction  of ball when hit */
+  //         let direction = ball.x * ratioX + ball.radius < width / 2 ? 1 : -1;
+  //         /* Change velocity */
+  //         ball.velocityX = direction * ball.speed * ratioX * Math.cos(angleRad);
+  //         ball.velocityY = ball.speed * ratioY * Math.sin(angleRad);
+
+  //         ball.speed += 0.1;
+  //       }
+  //     };
+
+  //     const movePaddle = (evt: MouseEvent) => {
+  //       if (!canvas) {
+  //         return;
+  //       }
+  //       let rect = canvas.getBoundingClientRect();
+  //       user1.y = evt.clientY - rect.top - user1.height / 2;
+  //     };
+
+  //     function game() {
+  //       if (canvas) {
+  //         update(canvas.width, canvas.height);
+  //         render();
+  //       }
+  //     }
+
+  //     // canvas.addEventListener("mousemove", movePaddle);
+  //     // return () => {
+  //     //   canvas.removeEventListener("mousemove", movePaddle);
+  //     // };
+  //   }); // When we leave the array empty, the effect will only run once irrespective of the changes to the state it is attached to.
 
   function resetBall(ball: any) {
     ball.x = (dimensions.width * 0.5) / 2;
     ball.y = (dimensions.height * 0.5) / 2;
     ball.velocityX = -ball.velocityX;
-    ball.speed = 4;
+    ball.speed = dimensions.width / 200;
   }
 
   return (
     <div>
-      <h2>Width before: {dimensions.prevWidth}</h2>
+      {/* <h2>Width before: {dimensions.prevWidth}</h2>
       <h2>Height before: {dimensions.prevHeight}</h2>
       <h2>Width: {dimensions.width}</h2>
       <h2>Height: {dimensions.height}</h2>
       <h2>RatioX: {ratioX}</h2>
-      <h2>RatioY: {ratioY}</h2>
+      <h2>RatioY: {ratioY}</h2> */}
       <canvas
         ref={canvasRef}
         width={dimensions.width * 0.5}

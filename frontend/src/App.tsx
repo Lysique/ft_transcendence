@@ -13,7 +13,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
 function App() {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(false); // WE SHOULD PROBABLY USE USEREF INSTEAD OF USETATE so that it works on re-renders
 
   const theme = createTheme({
     palette: {
@@ -30,13 +30,13 @@ function App() {
       <CssBaseline />
       <div className="App">
         <ResponsiveAppBar onClick={handleToggle} />
-        <Container style={{ backgroundColor: "blue" }} maxWidth="lg">
+        <Container maxWidth="lg">
           {/* <Box sx={{ my: 4 }}>
             <Typography variant="h4" component="h1" gutterBottom align="center">
               Get ready to play the mighty Pong game!
             </Typography>
           </Box> */}
-          <Box textAlign="center" sx={{ bgcolor: "red", my: 3, py: 3, px: 3 }}>
+          <Box textAlign="center" sx={{ my: 3, py: 3, px: 3 }}>
             <Canvas />
           </Box>
           <ProTip />
