@@ -20,7 +20,7 @@ import { Link } from "react-router-dom";
 
 interface ResponsiveAppBarProps {
   handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
-  user: UserDto | null | undefined
+  user: UserDto | null
   setUser: any
 }
 
@@ -53,6 +53,7 @@ const ResponsiveAppBar = ({ handleToggle, user, setUser }: ResponsiveAppBarProps
 
   //  Login / logout
   async function Logout(props: any) {
+    handleCloseUserMenu();
     UserAPI.logout();
     setUser(null);
   }
@@ -100,6 +101,8 @@ const ResponsiveAppBar = ({ handleToggle, user, setUser }: ResponsiveAppBarProps
       <MenuItem 
         key="Logout" 
         onClick={Logout}
+        component={Link}
+        to="/"
       >
         <Typography textAlign="center">Logout</Typography>
       </MenuItem>

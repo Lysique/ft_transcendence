@@ -1,8 +1,16 @@
 import React from "react";
+import { UserDto } from "../api/dto/user.dto";
+import MediaCard from "../components/profile/ProfileImage";
 
-export function Profile () {
+interface ProfileProps {
+    user: UserDto | null
+  }
+
+export const Profile = ({user}: ProfileProps) => {
 
     return (
-        <h1>Profile</h1>
+        <div>
+            <MediaCard image={user?.photoUrl}/>
+        </div>
     );
 }

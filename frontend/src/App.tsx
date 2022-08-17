@@ -23,7 +23,7 @@ function App() {
   };
   
     //  User state
-    const [user, setUser] = React.useState<UserDto | null>();
+    const [user, setUser] = React.useState<UserDto | null>(null);
   
     React.useEffect(() => {
       const fetchProfile = async () => {
@@ -44,7 +44,9 @@ function App() {
         setUser={setUser}
       />
       <Routes>
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<Profile 
+              user={user}
+            />} />
           <Route path="/" element={<Homepage />} />
       </Routes>
     </div>
