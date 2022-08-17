@@ -22,7 +22,7 @@ export class User {
     photoUrl: string;
 
     @Column({ type: 'boolean', default: false })
-    twoFactAuth: boolean;
+    twoFactAuth: boolean = false;
 
     @Column({ nullable: true })
     secret: string;

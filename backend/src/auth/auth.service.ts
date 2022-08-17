@@ -46,9 +46,9 @@ export class AuthService {
     //  Generate a secret and an url
     async generateTwoFactAuthSecret(user: any): Promise<any> {
         const secret = authenticator.generateSecret();
-
+        
         const otpauthUrl = authenticator.keyuri(user.id.toString(), 'ft_transcendence', secret);
-
+        
         await this.usersService.update(user.id, { twoFactAuth: true, secret: secret });
         return otpauthUrl;
     }

@@ -33,7 +33,7 @@ export class AuthController {
       });
       res.cookie('jwt', accessToken, { httpOnly: true });
     
-      res.status(302).redirect('http://localhost:3001');
+      res.status(302).redirect(`http://${process.env.REACT_HOST}:${process.env.REACT_PORT}`);
     }
     
     // Check if user is logged in and get user profile.

@@ -14,7 +14,7 @@ import { JwtTwoFactAuthStrategy } from './strategies/jwt-2fa.strategy';
     UsersModule, 
     PassportModule,
     JwtModule.register({
-      secret: jwtConstants.secret, // env variable.
+      secret: jwtConstants.secret,
       signOptions: { expiresIn: '1d' },
     })
   ],

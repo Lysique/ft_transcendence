@@ -5,6 +5,7 @@
 # environment
 .env
 ./backend/src/common/envs/.env
+./backend/src/auth/common/constants/constants.ts
 
 # Logs
 logs
