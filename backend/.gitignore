@@ -2,6 +2,11 @@
 /dist
 /node_modules
 
+# environment
+.env
+/src/common/envs/.env
+/src/auth/constants/constants.ts
+
 # Logs
 logs
 *.log

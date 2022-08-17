@@ -14,15 +14,17 @@ import MenuItem from "@mui/material/MenuItem";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useTheme } from "@mui/material/styles";
-
-const pages = ["Play now", "Chat with friends"];
-const settings = ["Profile", "Dashboard", "Logout"];
+import { UserAPI } from "../api/user.api";
+import { UserDto } from "../api/dto/user.dto";
+import { Link } from "react-router-dom";
 
 interface ResponsiveAppBarProps {
-  onClick: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+  handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
+  user: UserDto | null | undefined
+  setUser: any
 }
 
-const ResponsiveAppBar = ({ onClick }: ResponsiveAppBarProps) => {
+const ResponsiveAppBar = ({ handleToggle, user, setUser }: ResponsiveAppBarProps) => {
   const theme = useTheme();
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -47,6 +49,95 @@ const ResponsiveAppBar = ({ onClick }: ResponsiveAppBarProps) => {
     setAnchorElUser(null);
   };
 
+  // UserMenu
+
+  //  Login / logout
+  async function Logout(props: any) {
+    UserAPI.logout();
+    setUser(null);
+  }
+  
+  const LoginButton = () => {
+    return (
+      <MenuItem 
+        key="Login"
+        href={`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/auth/login`}
+        component="a"
+      >
+        <Typography textAlign="center">Login</Typography>
+      </MenuItem>
+   );
+  };
+
+  const ProfileRedirect = () => {
+    return (
+      <MenuItem 
+        key="Profile"
+        component={Link}
+        to="/profile"
+        onClick={handleCloseUserMenu}
+      >
+        <Typography textAlign="center">Profile</Typography>
+      </MenuItem>
+   );
+  };
+
+  const HomepageRedirect = () => {
+    return (
+      <MenuItem 
+        key="Homepage"
+        component={Link}
+        to="/"
+        onClick={handleCloseUserMenu}
+      >
+        <Typography textAlign="center">Home</Typography>
+      </MenuItem>
+   );
+  };
+
+  function LogoutButton() {
+    return (
+      <MenuItem 
+        key="Logout" 
+        onClick={Logout}
+      >
+        <Typography textAlign="center">Logout</Typography>
+      </MenuItem>
+    );
+  }
+  
+  function LoginControl(props: any) {
+    const settings = user != null? loggedInSettings: loggedOutSettings;
+
+    return (
+      <div>
+      {settings.map((setting) => (
+        setting.onClick
+      ))}
+      </div>
+    );
+  }
+
+  const pages = ["Play now", "Chat with friends"];
+  const loggedInSettings = [{
+    name: "Logout",
+    onClick: LogoutButton()
+  }, {
+    name: "Profile",
+    onClick: ProfileRedirect()
+  }, {
+    name: "Homepage",
+    onClick: HomepageRedirect()
+  }];
+
+  const loggedOutSettings = [{
+    name: "Login",
+    onClick: LoginButton()
+  }, {
+    name: "Homepage",
+    onClick: HomepageRedirect()
+  }];
+
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
@@ -66,7 +157,6 @@ const ResponsiveAppBar = ({ onClick }: ResponsiveAppBarProps) => {
               textDecoration: "none",
             }}
           >
-            PING-PONG
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -135,7 +225,7 @@ const ResponsiveAppBar = ({ onClick }: ResponsiveAppBarProps) => {
             ))}
           </Box>
           <Box textAlign="center">
-            <IconButton sx={{ mr: 3 }} onClick={onClick} color="inherit">
+            <IconButton sx={{ mr: 3 }} onClick={handleToggle} color="inherit">
               {theme.palette.mode === "dark" ? (
                 <Brightness7Icon />
               ) : (
@@ -146,7 +236,10 @@ const ResponsiveAppBar = ({ onClick }: ResponsiveAppBarProps) => {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Update settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar
+                  alt="Remy Sharp"
+                  src={user?.photoUrl}
+                />
               </IconButton>
             </Tooltip>
             <Menu
@@ -165,11 +258,7 @@ const ResponsiveAppBar = ({ onClick }: ResponsiveAppBarProps) => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
+            <LoginControl />
             </Menu>
           </Box>
         </Toolbar>

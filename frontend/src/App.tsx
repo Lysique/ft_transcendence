@@ -1,19 +1,16 @@
-import React from "react";
-import { useState } from "react";
-
-import ProTip from "./components/ProTip";
+import React, { useState } from "react";
+import { Route, Routes } from "react-router-dom";
+import { Profile } from "./route/Profile";
+import { Homepage } from "./route/Homepage";
+import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
+import { UserDto } from "./api/dto/user.dto";
+import { UserAPI } from "./api/user.api";
 import ResponsiveAppBar from "./components/AppBar";
-import Copyright from "./components/CopyRight";
-import Canvas from "./components/Canvas";
-
-import Container from "@mui/material/Container";
-import Box from "@mui/material/Box";
-
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
 
 function App() {
-  const [darkMode, setDarkMode] = useState(false); // WE SHOULD PROBABLY USE USEREF INSTEAD OF USETATE so that it works on re-renders
+
+  //  Dark/ligh mode
+  const [darkMode, setDarkMode] = useState(false);
 
   const theme = createTheme({
     palette: {
@@ -24,25 +21,33 @@ function App() {
   const handleToggle = () => {
     setDarkMode(!darkMode);
   };
+  
+    //  User state
+    const [user, setUser] = React.useState<UserDto | null>();
+  
+    React.useEffect(() => {
+      const fetchProfile = async () => {
+        const data = await UserAPI.getUserProfile();
+        setUser(data);
+      }
+  
+      fetchProfile();
+    }, [])
 
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <div className="App">
-        <ResponsiveAppBar onClick={handleToggle} />
-        <Container maxWidth="lg">
-          {/* <Box sx={{ my: 4 }}>
-            <Typography variant="h4" component="h1" gutterBottom align="center">
-              Get ready to play the mighty Pong game!
-            </Typography>
-          </Box> */}
-          <Box textAlign="center" sx={{ my: 3, py: 3, px: 3 }}>
-            <Canvas />
-          </Box>
-          <ProTip />
-          <Copyright />
-        </Container>
-      </div>
+    <CssBaseline />
+    <div className="App">
+      <ResponsiveAppBar
+        handleToggle={handleToggle}
+        user={user}
+        setUser={setUser}
+      />
+      <Routes>
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/" element={<Homepage />} />
+      </Routes>
+    </div>
     </ThemeProvider>
   );
 }
