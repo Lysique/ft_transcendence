@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { AvatarsService } from '../avatars/avatars.service';
+import { Avatar } from '../avatars/entities/avatar.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
@@ -10,7 +12,10 @@ import { User } from './entities/user.entity';
 export class UsersService {
 
   //  This creates a Repository of the User instance for the UsersService class
-  constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
+  constructor(
+    private avatarService: AvatarsService,
+    @InjectRepository(User) private userRepository: Repository<User>, 
+    ) {}
 
   //  Utility method to get dto object from entity
   private entityToDto(user: User): UserDto {
@@ -33,6 +38,11 @@ export class UsersService {
     user.id = createUserDto.id;
     user.name = createUserDto.name;
     user.photoUrl = createUserDto.photoUrl;
+    user.twoFactAuth = false;
+
+    const avatar: Avatar = await this.avatarService.create({photoUrl: user.photoUrl, user: user});
+
+    user.avatar = avatar;
 
     await this.userRepository.save(user);
 

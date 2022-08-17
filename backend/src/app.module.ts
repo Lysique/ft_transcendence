@@ -6,6 +6,7 @@ import { getEnvPath } from './common/helper/env.helper';
 import { TypeOrmConfigService } from './config/typeorm/typeorm.service';
 import { UsersModule } from './models/users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { AvatarsModule } from './models/avatars/avatars.module';
 
 //  Get the environment file
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
@@ -16,6 +17,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
     UsersModule,
     AuthModule,
+    AvatarsModule,
   ],
   controllers: [AppController],
   providers: [],

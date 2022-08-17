@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Avatar } from "src/models/avatars/entities/avatar.entity";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
 
 export enum UserStatus {
     Online = 0,
@@ -21,8 +22,12 @@ export class User {
     @Column()
     photoUrl: string;
 
-    @Column({ type: 'boolean', default: false })
-    twoFactAuth: boolean = false;
+    @OneToOne(() => Avatar, (avatar) => avatar.user, { nullable: true} )
+    @JoinColumn()
+    avatar: Avatar;
+
+    @Column()
+    twoFactAuth: boolean;
 
     @Column({ nullable: true })
     secret: string;
