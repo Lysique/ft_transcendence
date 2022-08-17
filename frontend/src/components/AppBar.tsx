@@ -61,7 +61,7 @@ const ResponsiveAppBar = ({ handleToggle, user, setUser }: ResponsiveAppBarProps
     return (
       <MenuItem 
         key="Login"
-        href='http://localhost:8000/auth/login'
+        href={`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/auth/login`}
         component="a"
       >
         <Typography textAlign="center">Login</Typography>

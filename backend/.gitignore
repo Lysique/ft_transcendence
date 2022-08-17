@@ -4,8 +4,8 @@
 
 # environment
 .env
-./backend/src/common/envs/.env
-./backend/src/auth/constants/constants.ts
+/src/common/envs/.env
+/src/auth/constants/constants.ts
 
 # Logs
 logs

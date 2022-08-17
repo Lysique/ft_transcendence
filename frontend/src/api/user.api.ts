@@ -3,7 +3,7 @@ import { UserDto } from "./dto/user.dto";
 export class UserAPI {
     
     public static async getUserProfile(): Promise<UserDto | null> {
-        return fetch("http://localhost:8000/auth/profile", {
+        return fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/auth/profile`, {
             credentials: "include",
         }).then((response) => {
             if (response.ok) {
@@ -20,7 +20,7 @@ export class UserAPI {
     }
 
     public static async logout() {
-        await fetch("http://localhost:8000/auth/logout", {
+        await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/auth/logout`, {
             method: "GET", 
             credentials: "include",
         })
