@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
+import Fireworks from "../components/Fireworks";
 
 /* DRAWING FUNCTIONS */
-
 /* Draw rectangle */
 function drawRect(
   context: any,
@@ -311,6 +311,32 @@ const Canvas = () => {
     };
   }, [keyUpHandler]);
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
+    const context = canvas.getContext("2d");
+    if (!context) {
+      return;
+    }
+
+    const movePaddle = (evt: MouseEvent) => {
+      if (!canvas) {
+        return;
+      }
+      const relativeY = evt.clientY - canvas.offsetTop;
+      if (relativeY > 0 && relativeY < canvas.height) {
+        user1.y = relativeY - user1.height / 2;
+      }
+    };
+
+    canvas.addEventListener("mousemove", movePaddle);
+    return () => {
+      canvas.removeEventListener("mousemove", movePaddle);
+    };
+  });
+
   /* Main game loop */
   const renderFrame = (canvas: HTMLCanvasElement) => {
     // const canvas = canvasRef.current;
@@ -342,30 +368,6 @@ const Canvas = () => {
     };
   });
 
-  // useEffect(() => {
-  //   const canvas = canvasRef.current;
-  //   if (!canvas) {
-  //     return;
-  //   }
-  //   const context = canvas.getContext("2d");
-  //   if (!context) {
-  //     return;
-  //   }
-
-  //   const movePaddle = (evt: MouseEvent) => {
-  //     if (!canvas) {
-  //       return;
-  //     }
-  //     let rect = canvas.getBoundingClientRect();
-  //     user1.y = evt.clientY - rect.top - user1.height / 2;
-  //   };
-
-  //   canvas.addEventListener("mousemove", movePaddle);
-  //   return () => {
-  //     canvas.removeEventListener("mousemove", movePaddle);
-  //   };
-  // });
-
   return (
     <div>
       {/* <h2>Width before: {dimensions.prevWidth}</h2>
@@ -379,6 +381,7 @@ const Canvas = () => {
         width={dimensions.width * 0.5}
         height={dimensions.height * 0.5}
       />
+      {/* <Fireworks /> */}
     </div>
   );
 };
