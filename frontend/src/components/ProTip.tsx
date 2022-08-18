@@ -16,6 +16,6 @@ function ProTip() {
       Pro tip: Press the spacebar to start playing.
     </Typography>
   );
-}
+};
 
 export default ProTip;

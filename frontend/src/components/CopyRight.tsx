@@ -14,6 +14,6 @@ function Copyright() {
       {new Date().getFullYear()}.
     </Typography>
   );
-}
+};
 
 export default Copyright;
