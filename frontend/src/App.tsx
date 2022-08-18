@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Profile } from "./route/Profile";
 import { Homepage } from "./route/Homepage";
+import { Chat } from "./route/Chat";
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { UserDto } from "./api/dto/user.dto";
 import { UserAPI } from "./api/user.api";
@@ -46,6 +47,7 @@ function App() {
       <Routes>
           <Route path="/profile" element={<Profile />} />
           <Route path="/" element={<Homepage />} />
+          <Route path="/chat" element={<Chat />} />
       </Routes>
     </div>
     </ThemeProvider>
