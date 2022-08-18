@@ -13,18 +13,17 @@ export class User {
     @PrimaryColumn()
     id: number;
 
-    @Column()
+    @Column({ unique: true })
     name: string;
 
     @Column({ default: UserStatus.Online })
     status: UserStatus;
 
-    @Column()
-    photoUrl: string;
-
-    @OneToOne(() => Avatar, (avatar) => avatar.user, { nullable: true} )
-    @JoinColumn()
+    @OneToOne(() => Avatar, (avatar) => avatar.current, { nullable: true, eager: true })
     avatar: Avatar;
+    
+    @OneToMany(() => Avatar, (avatar) => avatar.user, { nullable: true, eager: true })
+    avatars: Avatar[];
 
     @Column()
     twoFactAuth: boolean;

@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 export class UsersController {
@@ -13,6 +14,13 @@ export class UsersController {
     const resp = await this.usersService.create(createUserDto);
 
     return resp;
+  }
+
+  @Post('/avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  public async uploadAvatar(@UploadedFile() file: Express.Multer.File)
+  {
+    
   }
 
   @Get()

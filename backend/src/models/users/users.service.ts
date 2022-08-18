@@ -23,7 +23,7 @@ export class UsersService {
     userDto.id = user.id;
     userDto.name = user.name;
     userDto.status = user.status;
-    userDto.photoUrl = user.photoUrl;
+    userDto.photoUrl = user.avatar.photoUrl;
     userDto.twoFactAuth = user.twoFactAuth;
     userDto.secret = user.secret;
 
@@ -37,17 +37,15 @@ export class UsersService {
     const user: User = new User();
     user.id = createUserDto.id;
     user.name = createUserDto.name;
-    user.photoUrl = createUserDto.photoUrl;
     user.twoFactAuth = false;
-
-    const avatar: Avatar = await this.avatarService.create({photoUrl: user.photoUrl, user: user});
-
-    user.avatar = avatar;
-
-    await this.userRepository.save(user);
-
+    
+    //  Create the avatar and add it to current avatar
+    const avatar: Avatar = await this.avatarService.create({photoUrl: createUserDto.photoUrl, user: user});
+    await this.avatarService.addCurrentAvatar(avatar)
+  
     //  Create a UserDto (!= CreateUserDto) to return
-    const userDto = this.entityToDto(user);
+    const userFind = await this.userRepository.findOneBy({id: createUserDto.id})
+    const userDto = this.entityToDto(userFind);
     return userDto;
   }
 
@@ -62,23 +60,12 @@ export class UsersService {
   
   //  Find one user by id.
   public async findOneById(id: number) {
-    const user: User = await this.userRepository.findOneBy({ id: id});
+    const user: User = await this.userRepository.findOneBy({ id: id });
 
     if (!user) return null;
   
     const userDto: UserDto = this.entityToDto(user);
-  
-    return userDto;
-  }
 
-  //  Find one user by name.
-  public async findOneByName(name: string) {
-    const user: User = await this.userRepository.findOneBy({ name: name});
-
-    if (!user) return null;
-  
-    const userDto: UserDto = this.entityToDto(user);
-  
     return userDto;
   }
 
@@ -88,18 +75,9 @@ export class UsersService {
 
     if (!user) throw new NotFoundException(`User with id ${id} was not found`);
 
-    //  Check if name already taken.
-    if (updateUserDto.name) {
-        const checkExistingName: UserDto = await this.findOneByName(updateUserDto.name);
-        if (checkExistingName && checkExistingName.id != user.id) {
-          throw new UnauthorizedException(`This name is already taken`);
-        }
-    }
-
     //  Modify user variables.
     user.name = updateUserDto.name || user.name;
     user.status = updateUserDto.status || user.status;
-    user.photoUrl = updateUserDto.photoUrl || user.photoUrl;
     user.secret = updateUserDto.secret || user.secret;
     user.twoFactAuth = updateUserDto.twoFactAuth || user.twoFactAuth;
 

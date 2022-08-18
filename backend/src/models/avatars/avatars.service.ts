@@ -13,10 +13,22 @@ export class AvatarsService {
       const avatar: Avatar = new Avatar();
       avatar.photoUrl = createAvatarDto.photoUrl;
       avatar.user = createAvatarDto.user;
+      avatar.current = createAvatarDto.user;
   
       await this.avatarRepository.save(avatar);
   
       return avatar;
+  }
+
+  public async addCurrentAvatar(avatar: Avatar)
+  {
+    avatar.current = avatar.user;
+
+    await this.avatarRepository.save(avatar);
+  }
+
+  public async upload(avatar: Avatar)
+  {
   }
 
   findAll() {
