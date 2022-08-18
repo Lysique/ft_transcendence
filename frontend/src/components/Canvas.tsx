@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 /* DRAWING FUNCTIONS */
 
@@ -215,6 +215,15 @@ const Canvas = () => {
 
   /* Update game state */
   const update = (width: number, height: number) => {
+    /* Check if game is over */
+    if (user2.score === 2) {
+      alert("GAME OVER");
+      document.location.reload();
+    } else if (user1.score === 1) {
+      alert("YOU WON");
+      document.location.reload();
+    }
+
     /* Update score */
     if (ball.x - ball.radius < 0) {
       user2.score++;
@@ -232,15 +241,15 @@ const Canvas = () => {
     }
 
     /* Update user1 paddle position */
-    if (downPressed) {
-      user1.x += 7;
-      if (user1.x + user1.width > width) {
-        user1.x = width - user1.width;
+    if (downPressed.current) {
+      user1.y += 7;
+      if (user1.y + user1.height > height) {
+        user1.y = height - user1.height;
       }
-    } else if (upPressed) {
-      user1.x -= 7;
-      if (user1.x < 0) {
-        user1.x = 0;
+    } else if (upPressed.current) {
+      user1.y -= 7;
+      if (user1.y < 0) {
+        user1.y = 0;
       }
     }
 
@@ -270,63 +279,44 @@ const Canvas = () => {
   };
 
   /* Capture user inputs */
-  let downPressed = false;
-  let upPressed = false;
+  const downPressed = useRef(false);
+  const upPressed = useRef(false);
 
-  function keyDownHandler(e: KeyboardEvent) {
+  const keyDownHandler = useCallback((e: KeyboardEvent) => {
     if (e.key === "Down" || e.key === "ArrowDown") {
-      downPressed = true;
+      downPressed.current = true;
     } else if (e.key === "Up" || e.key === "ArrowUp") {
-      upPressed = true;
+      upPressed.current = true;
     }
-  }
-
-  function keyUpHandler(e: KeyboardEvent) {
+  }, []);
+  const keyUpHandler = useCallback((e: KeyboardEvent) => {
     if (e.key === "Down" || e.key === "ArrowDown") {
-      downPressed = false;
+      downPressed.current = false;
     } else if (e.key === "Up" || e.key === "ArrowUp") {
-      upPressed = false;
+      upPressed.current = false;
     }
-  }
+  }, []);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      return;
-    }
-    const context = canvas.getContext("2d");
-    if (!context) {
-      return;
-    }
-
-    canvas.addEventListener("keydown", keyDownHandler, false);
+    window.addEventListener("keydown", keyDownHandler, false);
     return () => {
-      canvas.removeEventListener("keydown", keyDownHandler, false);
+      window.removeEventListener("keydown", keyDownHandler, false);
     };
-  });
+  }, [keyDownHandler]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      return;
-    }
-    const context = canvas.getContext("2d");
-    if (!context) {
-      return;
-    }
-
-    canvas.addEventListener("keyup", keyUpHandler, false);
+    window.addEventListener("keyup", keyUpHandler, false);
     return () => {
-      canvas.removeEventListener("keyup", keyUpHandler, false);
+      window.removeEventListener("keyup", keyUpHandler, false);
     };
-  });
+  }, [keyUpHandler]);
 
   /* Main game loop */
-  const renderFrame = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      return;
-    }
+  const renderFrame = (canvas: HTMLCanvasElement) => {
+    // const canvas = canvasRef.current;
+    // if (!canvas) {
+    //   return;
+    // }
     const context = canvas.getContext("2d");
     if (!context) {
       return;
@@ -338,7 +328,7 @@ const Canvas = () => {
   const requestIdRef = useRef<number>(0);
   const tick = () => {
     if (!canvasRef.current) return;
-    renderFrame();
+    renderFrame(canvasRef.current);
     if (requestIdRef.current) {
       requestIdRef.current = requestAnimationFrame(tick);
     }
@@ -352,29 +342,29 @@ const Canvas = () => {
     };
   });
 
-    // useEffect(() => {
-    //   const canvas = canvasRef.current;
-    //   if (!canvas) {
-    //     return;
-    //   }
-    //   const context = canvas.getContext("2d");
-    //   if (!context) {
-    //     return;
-    //   }
+  // useEffect(() => {
+  //   const canvas = canvasRef.current;
+  //   if (!canvas) {
+  //     return;
+  //   }
+  //   const context = canvas.getContext("2d");
+  //   if (!context) {
+  //     return;
+  //   }
 
-    //   const movePaddle = (evt: MouseEvent) => {
-    //     if (!canvas) {
-    //       return;
-    //     }
-    //     let rect = canvas.getBoundingClientRect();
-    //     user1.y = evt.clientY - rect.top - user1.height / 2;
-    //   };
+  //   const movePaddle = (evt: MouseEvent) => {
+  //     if (!canvas) {
+  //       return;
+  //     }
+  //     let rect = canvas.getBoundingClientRect();
+  //     user1.y = evt.clientY - rect.top - user1.height / 2;
+  //   };
 
-    //   canvas.addEventListener("mousemove", movePaddle);
-    //   return () => {
-    //     canvas.removeEventListener("mousemove", movePaddle);
-    //   };
-    // });
+  //   canvas.addEventListener("mousemove", movePaddle);
+  //   return () => {
+  //     canvas.removeEventListener("mousemove", movePaddle);
+  //   };
+  // });
 
   return (
     <div>
@@ -394,3 +384,9 @@ const Canvas = () => {
 };
 
 export default Canvas;
+
+/* Helpful doc:
+- https://tinyurl.com/yc34ta38
+- https://tinyurl.com/mpw8mvb5
+- https://tinyurl.com/bdah5rw6
+*/

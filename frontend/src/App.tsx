@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Profile } from "./route/Profile";
 import { Homepage } from "./route/Homepage";
@@ -17,7 +17,15 @@ function App() {
     },
   });
 
+  useEffect(() => {
+    const themeType = localStorage.getItem("dark") || "dark";
+    if (themeType === "dark") {
+      setDarkMode(true);
+    }
+  }, []);
+
   const handleToggle = () => {
+    localStorage.setItem("dark", darkMode ? "light" : "dark");
     setDarkMode(!darkMode);
   };
 

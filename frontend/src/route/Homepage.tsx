@@ -1,7 +1,5 @@
 import React from "react";
 
-import { useState, useEffect, useRef } from "react";
-
 import ProTip from "../components/ProTip";
 import Copyright from "../components/CopyRight";
 import Canvas from "../components/Canvas";
@@ -10,12 +8,10 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
-
 export const Homepage = () => {
-
   return (
     <div className="Homepage">
-      <Container maxWidth="sm">
+      <Container maxWidth="lg">
         <Box sx={{ my: 4 }}>
           <Typography variant="h4" component="h1" gutterBottom align="center">
             Get ready to play the mighty Pong game!
