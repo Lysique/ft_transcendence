@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 async function bootstrap() {
 
@@ -21,6 +22,9 @@ async function bootstrap() {
     origin: true,
     credentials: true,
   });
+
+  //  Globad guard
+  app.useGlobalGuards(new JwtAuthGuard());
 
   await app.listen(port, () => {
     console.log('[WEB]', config.get<string>('BASE_URL'));

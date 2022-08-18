@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, UseInterceptors, UploadedFile, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -17,12 +19,16 @@ export class UsersController {
   }
 
   @Post('/avatar')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image'))
-  public async uploadAvatar(@UploadedFile() file: Express.Multer.File)
+  public async uploadAvatar(
+    @UploadedFile() file: Express.Multer.File, 
+    @Req() req: Request
+  )
   {
-    this.usersService.addAvatar({photoUrl: file.originalname});
     console.log(file.buffer);
-    //return file.buffer;
+    console.log(req.user);
+    // this.usersService.addAvatar({photoUrl: file.originalname});
   }
 
   @Get()
