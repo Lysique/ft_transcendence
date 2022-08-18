@@ -4,17 +4,16 @@ import { UsersController } from './users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { AvatarsModule } from '../avatars/avatars.module';
-import { HttpModule } from '@nestjs/axios';
+import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, JwtStrategy],
    
   //  Import repository for entity User
   imports: [
-    TypeOrmModule.forFeature([User]), 
+    TypeOrmModule.forFeature([User]),
     AvatarsModule,
-    HttpModule,
   ],
   exports: [UsersService]
 })

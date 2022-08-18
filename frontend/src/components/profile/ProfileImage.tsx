@@ -5,8 +5,25 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import defaultAvatar from '../../default_avatar/profile_image.jpeg';
+import { UserAPI } from '../../api/user.api';
 
 export default function MediaCard({user}: any) {
+
+  const AddAvatar = (event: any) => {
+      event.preventDefault();
+
+      if (!event.target.files[0]) {
+        return ;
+      }
+
+      const upload_file = event.target.files[0];
+    
+      const formData = new FormData();
+      formData.append('image', upload_file, upload_file.name);
+
+      UserAPI.addAvatar(formData);
+  };
+
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardMedia
@@ -26,7 +43,14 @@ export default function MediaCard({user}: any) {
       </CardContent>
       <CardActions>
         <Button size="small">Update</Button>
-        <Button size="small">Add</Button>
+        <Button
+        component="label"
+        aria-label="upload picture"
+        size="small"
+        >
+          Add
+        <input hidden accept="image/*" type="file" onChange={AddAvatar}/>
+        </Button>
       </CardActions>
     </Card>
   );

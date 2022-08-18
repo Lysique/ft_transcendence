@@ -23,9 +23,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  //  Globad guard
-  app.useGlobalGuards(new JwtAuthGuard());
-
   await app.listen(port, () => {
     console.log('[WEB]', config.get<string>('BASE_URL'));
   });

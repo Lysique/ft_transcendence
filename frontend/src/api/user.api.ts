@@ -25,4 +25,12 @@ export class UserAPI {
             credentials: "include",
         })
     }
+
+    public static async addAvatar(formData: FormData) {
+      await fetch (`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/avatar`, {
+        method: "POST", 
+        credentials: "include",
+        body: formData,
+      })
+    }
 }

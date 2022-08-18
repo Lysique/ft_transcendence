@@ -19,5 +19,5 @@ export class Avatar {
     current: User;
 
     @Column()
-    photoUrl: string;
+    data: String;
 }

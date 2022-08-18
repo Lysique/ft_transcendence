@@ -16,7 +16,6 @@ export class UsersService {
   //  This creates a Repository of the User instance for the UsersService class
   constructor(
     private avatarService: AvatarsService,
-    private httpService: HttpService,
     @InjectRepository(User) private userRepository: Repository<User>,
     ) {}
 
@@ -48,9 +47,15 @@ export class UsersService {
     return userDto;
   }
 
-  public async addAvatar(createAvatarDto: CreateAvatarDto)
+  public async addAvatar(userDto: UserDto, data: Buffer)
   {
+    const user = await this.userRepository.findOneBy({id : userDto.id})
     
+    const avatar = await this.avatarService.create({
+      user:user, 
+      data: data.toString('base64')
+    });
+    this.avatarService.addCurrentAvatar({id : avatar.id, user: user});
   }
 
   //  Find all users.

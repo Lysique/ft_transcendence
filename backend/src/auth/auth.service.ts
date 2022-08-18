@@ -15,7 +15,7 @@ export class AuthService {
     ) {}
 
     async getUser(user: any): Promise<UserDto> {
-        var userDto: UserDto = await this.usersService.findOneById(user.id);
+        let userDto: UserDto = await this.usersService.findOneById(user.id);
 
         //  If the user is not registered in our database, we create one.
         if (!userDto) {

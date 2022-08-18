@@ -9,11 +9,10 @@ import { Avatar } from './entities/avatar.entity';
 export class AvatarsService {
   constructor(@InjectRepository(Avatar) private avatarRepository: Repository<Avatar>) {}
 
-
   public async create(createAvatarDto: CreateAvatarDto) {
       const avatar: Avatar = new Avatar();
-      avatar.photoUrl = createAvatarDto.photoUrl;
       avatar.user = createAvatarDto.user;
+      avatar.data = createAvatarDto.data;
   
       await this.avatarRepository.save(avatar);
   
@@ -22,7 +21,7 @@ export class AvatarsService {
 
   public async addCurrentAvatar(updateAvatarDto: UpdateAvatarDto)
   {
-    const avatar = await this.avatarRepository.findOneBy({id: updateAvatarDto.id})
+    const avatar = await this.avatarRepository.findOneBy({id: updateAvatarDto.id});
     avatar.current = updateAvatarDto.user;
 
     await this.avatarRepository.save(avatar);
