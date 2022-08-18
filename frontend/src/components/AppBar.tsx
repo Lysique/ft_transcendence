@@ -242,7 +242,7 @@ const ResponsiveAppBar = ({ handleToggle, user, setUser }: ResponsiveAppBarProps
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar
                   alt="Remy Sharp"
-                  src={user && user.avatar? user.avatar : defaultAvatar}
+                  src={!user? undefined : user.avatar? user.avatar : defaultAvatar}
                 />
               </IconButton>
             </Tooltip>

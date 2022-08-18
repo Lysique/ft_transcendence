@@ -41,9 +41,9 @@ export class UsersService {
     user.name = createUserDto.name;
     user.twoFactAuth = false;
   
+    await this.userRepository.save(user);
     //  Create a UserDto (!= CreateUserDto) to return
-    const userFind = await this.userRepository.findOneBy({id: createUserDto.id})
-    const userDto = this.entityToDto(userFind);
+    const userDto = this.entityToDto(user);
 
     return userDto;
   }
