@@ -6,6 +6,5 @@ export class UserDto {
     name: string;
     status: UserStatus;
     secret: string;
-    photoUrl: string;
     twoFactAuth: boolean;
 }

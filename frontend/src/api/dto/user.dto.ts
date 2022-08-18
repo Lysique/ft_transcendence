@@ -9,6 +9,6 @@ export interface UserDto {
     name: string;
     status: UserStatus;
     secret: string;
-    photoUrl: string;
+    avatar: string;
     twoFactAuth: boolean;
 }

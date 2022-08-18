@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateAvatarDto } from './dto/create-avatar.dto';
+import { UpdateAvatarDto } from './dto/update-avatar.dto';
 import { Avatar } from './entities/avatar.entity';
 
 @Injectable()
@@ -13,22 +14,18 @@ export class AvatarsService {
       const avatar: Avatar = new Avatar();
       avatar.photoUrl = createAvatarDto.photoUrl;
       avatar.user = createAvatarDto.user;
-      avatar.current = createAvatarDto.user;
   
       await this.avatarRepository.save(avatar);
   
       return avatar;
   }
 
-  public async addCurrentAvatar(avatar: Avatar)
+  public async addCurrentAvatar(updateAvatarDto: UpdateAvatarDto)
   {
-    avatar.current = avatar.user;
+    const avatar = await this.avatarRepository.findOneBy({id: updateAvatarDto.id})
+    avatar.current = updateAvatarDto.user;
 
     await this.avatarRepository.save(avatar);
-  }
-
-  public async upload(avatar: Avatar)
-  {
   }
 
   findAll() {

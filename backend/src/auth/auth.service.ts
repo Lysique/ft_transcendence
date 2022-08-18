@@ -31,7 +31,6 @@ export class AuthService {
 
         createUserDto.id = user.id;
         createUserDto.name = user.name;
-        createUserDto.photoUrl = user.photoUrl;
 
         const userDto = await this.usersService.create(createUserDto);
 

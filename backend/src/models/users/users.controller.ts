@@ -17,10 +17,12 @@ export class UsersController {
   }
 
   @Post('/avatar')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('image'))
   public async uploadAvatar(@UploadedFile() file: Express.Multer.File)
   {
-    
+    this.usersService.addAvatar({photoUrl: file.originalname});
+    console.log(file.buffer);
+    //return file.buffer;
   }
 
   @Get()

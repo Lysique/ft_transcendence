@@ -13,7 +13,7 @@ export class Avatar {
     @OneToOne(() => User, (user) => user.avatar, {
         cascade: true, 
         onDelete: "CASCADE", 
-        nullable: true
+        nullable: true,
     })
     @JoinColumn()
     current: User;

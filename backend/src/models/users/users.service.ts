@@ -1,7 +1,9 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
+import { CreateAvatarDto } from '../avatars/dto/create-avatar.dto';
 import { Avatar } from '../avatars/entities/avatar.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -14,7 +16,8 @@ export class UsersService {
   //  This creates a Repository of the User instance for the UsersService class
   constructor(
     private avatarService: AvatarsService,
-    @InjectRepository(User) private userRepository: Repository<User>, 
+    private httpService: HttpService,
+    @InjectRepository(User) private userRepository: Repository<User>,
     ) {}
 
   //  Utility method to get dto object from entity
@@ -23,7 +26,6 @@ export class UsersService {
     userDto.id = user.id;
     userDto.name = user.name;
     userDto.status = user.status;
-    userDto.photoUrl = user.avatar.photoUrl;
     userDto.twoFactAuth = user.twoFactAuth;
     userDto.secret = user.secret;
 
@@ -38,15 +40,17 @@ export class UsersService {
     user.id = createUserDto.id;
     user.name = createUserDto.name;
     user.twoFactAuth = false;
-    
-    //  Create the avatar and add it to current avatar
-    const avatar: Avatar = await this.avatarService.create({photoUrl: createUserDto.photoUrl, user: user});
-    await this.avatarService.addCurrentAvatar(avatar)
   
     //  Create a UserDto (!= CreateUserDto) to return
     const userFind = await this.userRepository.findOneBy({id: createUserDto.id})
     const userDto = this.entityToDto(userFind);
+
     return userDto;
+  }
+
+  public async addAvatar(createAvatarDto: CreateAvatarDto)
+  {
+    
   }
 
   //  Find all users.

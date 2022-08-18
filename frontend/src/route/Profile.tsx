@@ -10,7 +10,7 @@ export const Profile = ({user}: ProfileProps) => {
 
     return (
         <div>
-            <MediaCard image={user?.photoUrl}/>
+            <MediaCard image={user}/>
         </div>
     );
 }
