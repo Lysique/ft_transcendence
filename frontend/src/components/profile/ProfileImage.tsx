@@ -13,7 +13,6 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar}: any) 
       event.preventDefault();
 
       if (!event.target.files[0]) {
-        console.log('prout')
         return ;
       }
 
@@ -25,9 +24,6 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar}: any) 
       const resp = await UserAPI.addAvatar(formData);
       if (resp) {
         setCurrentAvatar(resp);
-      }
-      else {
-        console.log(event.target.files[0])
       }
   };
 
