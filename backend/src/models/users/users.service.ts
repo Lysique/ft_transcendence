@@ -72,8 +72,8 @@ export class UsersService {
     });
 
     if (userDto.currentAvatarId == null) {
-      const userDto: UserDto = this.entityToDto(user);
-      this.addCurrentAvatar(avatarDto, userDto);
+      const userDto: UserDto = await this.entityToDto(user);
+      await this.addCurrentAvatar(avatarDto, userDto);
     }
   }
 
@@ -86,10 +86,12 @@ export class UsersService {
   };
 
   public async getCurrentAvatar(userDto: UserDto) {
-    if (userDto.currentAvatarId == null) {
+    const user = await this.userRepository.findOneBy({id: userDto.id});
+
+    if (user.currentAvatarId == null) {
       return null;
     }
-    const avatarDto: AvatarDto = await this.avatarService.findOneById(userDto.currentAvatarId);
+    const avatarDto: AvatarDto = await this.avatarService.findOneById(user.currentAvatarId);
 
     return avatarDto;
   };
