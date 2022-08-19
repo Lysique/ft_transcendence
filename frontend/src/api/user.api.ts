@@ -38,8 +38,8 @@ export class UserAPI {
         }
         throw new Error('Something went wrong');
       })
-      .then((responseJson) => {
-        return responseJson;
+      .then((responseText) => {
+        return responseText;
       })
       .catch((error) => {
         return null;
@@ -56,11 +56,29 @@ export class UserAPI {
         }
         throw new Error('Something went wrong');
       })
-      .then((responseJson) => {
-        return responseJson;
+      .then((responseText) => {
+        return responseText;
       })
       .catch((error) => {
         return null;
     });
   }
+
+  public static async getAllAvatars() {
+    return fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/avatars`, {
+      credentials: "include",
+      method: "GET"
+  }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error('Something went wrong');
+    })
+    .then((responseJson) => {
+      return responseJson;
+    })
+    .catch((error) => {
+      return null;
+  });
+}
 }

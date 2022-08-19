@@ -6,9 +6,12 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import defaultAvatar from '../../default_avatar/profile_image.jpeg';
 import { UserAPI } from '../../api/user.api';
+import { ButtonBase } from '@mui/material';
+import Popup from './Popup';
 
 export default function MediaCard({currentAvatar, user, setCurrentAvatar}: any) {
 
+  //  Add avatar
   const AddAvatar = async (event: any) => {
       event.preventDefault();
 
@@ -27,33 +30,49 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar}: any) 
       }
   };
 
+  //  Popup
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
-    <Card sx={{ maxWidth: 345 }}>
-      <CardMedia
-        component="img"
-        height="160"
-        src={currentAvatar ? `data:image/jpeg;base64,${currentAvatar}` : defaultAvatar}
-        alt="green iguana"
-      />
+    <Card sx={{ maxWidth: 300, mt: 3, ml: 3 }}>
+      <ButtonBase>
+        <CardMedia
+          component="img"
+          height="180"
+          src={currentAvatar ? `data:image/jpeg;base64,${currentAvatar}` : defaultAvatar}
+          alt="green iguana"
+          onClick={handleClickOpen}
+        />
+
+        <Popup 
+          handleClose={handleClose}
+          open={open}
+          user={user}
+        />
+      
+      </ButtonBase>
       <CardContent>
-        {/* <Typography gutterBottom variant="h5" component="div">
-          Lizard
-        </Typography> */}
-        {/* <Typography variant="body2" color="text.secondary">
-          Lizards are a widespread group of squamate reptiles, with over 6,000
-          species, ranging across all continents except Antarctica
-        </Typography> */}
+
       </CardContent>
       <CardActions>
-        <Button size="small">Update</Button>
+
         <Button
         component="label"
         aria-label="upload picture"
         size="small"
         >
-          Add
+          Upload
         <input hidden accept="image/*" type="file" onChange={AddAvatar}/>
         </Button>
+
       </CardActions>
     </Card>
   );

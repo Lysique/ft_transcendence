@@ -54,6 +54,21 @@ export class UsersController {
     return avatarDto.data;
   }
 
+  @Get('/avatars')
+  @UseGuards(JwtAuthGuard)
+  public async getAllAvatars(@Req() req: Request) {
+    const user: any = req.user;
+    const userDto = await this.usersService.findOneById(user.id);
+    
+    const avatarDto: AvatarDto[] | null = await this.usersService.getAllAvatars(userDto);
+
+    if (avatarDto == null) {
+      return null;
+    }
+
+    return avatarDto.map(x => x.data);
+  }
+
   @Get()
   public async findAll() {
     const resp = await this.usersService.findAll();

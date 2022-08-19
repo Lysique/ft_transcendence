@@ -5,6 +5,7 @@ import { createWriteStream } from 'fs';
 import { Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
+import { Avatar } from '../avatars/entities/avatar.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
@@ -92,6 +93,18 @@ export class UsersService {
       return null;
     }
     const avatarDto: AvatarDto = await this.avatarService.findOneById(user.currentAvatarId);
+
+    return avatarDto;
+  };
+
+  public async getAllAvatars(userDto: UserDto) {
+    const user = await this.userRepository.findOneBy({id: userDto.id});
+
+    if (user.currentAvatarId == null) {
+      return null;
+    }
+
+    const avatarDto: AvatarDto[] = user.avatars.map(x => this.avatarService.entityToDto(x));
 
     return avatarDto;
   };

@@ -108,7 +108,6 @@ const ResponsiveAppBar = ({
     handleCloseUserMenu();
     UserAPI.logout();
     setUser(null);
-    setRoute('Homepage');
   }
 
   function LogoutButton() {

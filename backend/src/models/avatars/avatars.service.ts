@@ -10,7 +10,7 @@ export class AvatarsService {
   constructor(
     @InjectRepository(Avatar) private avatarRepository: Repository<Avatar>) {}
 
-  public async entityToDto(avatar: Avatar) {
+  public entityToDto(avatar: Avatar) {
     const avatarDto: AvatarDto = new AvatarDto();
     avatarDto.data = avatar.data;
     avatarDto.id = avatar.id;
@@ -26,7 +26,7 @@ export class AvatarsService {
   
       await this.avatarRepository.save(avatar);
 
-      const avatarDto: AvatarDto = await this.entityToDto(avatar);
+      const avatarDto: AvatarDto = this.entityToDto(avatar);
   
       return avatarDto;
   }
@@ -35,7 +35,7 @@ export class AvatarsService {
   {
     const avatar: Avatar = await this.avatarRepository.findOneBy({id: id});
 
-    const avatarDto: AvatarDto = await this.entityToDto(avatar);
+    const avatarDto: AvatarDto = this.entityToDto(avatar);
 
     return avatarDto;
   }
