@@ -14,13 +14,8 @@ export class AuthService {
         private jwtService: JwtService
     ) {}
 
-    async getUser(user: any): Promise<UserDto> {
-        let userDto: UserDto = await this.usersService.findOneById(user.id);
-
-        //  If the user is not registered in our database, we create one.
-        if (!userDto) {
-            userDto = await this.signup(user);
-        }
+    async fetchUser(user: any): Promise<UserDto> {
+        const userDto: UserDto | null = await this.usersService.findOneById(user.id);
         
         return userDto;
     }

@@ -1,10 +1,7 @@
-import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
-import { CreateAvatarDto } from '../avatars/dto/create-avatar.dto';
-import { Avatar } from '../avatars/entities/avatar.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
