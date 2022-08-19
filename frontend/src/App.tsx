@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Route, Routes } from "react-router-dom";
 import { Profile } from "./route/Profile";
 import { Homepage } from "./route/Homepage";
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
@@ -8,6 +7,34 @@ import { UserAPI } from "./api/user.api";
 import ResponsiveAppBar from "./components/AppBar";
 
 function App() {
+
+    // Route handler
+    const [route, setRoute] = React.useState('Homepage');
+
+    const RouteHandler = (props: any) => {
+      if (route === 'Profile') {
+        return (
+          <Profile 
+            user={user}
+            setUser={setUser}
+            currentAvatar={currentAvatar}
+            setCurrentAvatar={setCurrentAvatar}
+          />
+        )
+      }
+
+      else if (route === 'Homepage') {
+        return (
+          <Homepage />
+        )
+      }
+
+      else {
+        return (
+          <h1>Path not defined</h1>
+        )
+      }
+    }
 
   //  Dark/ligh mode
   const [darkMode, setDarkMode] = useState(false);
@@ -21,6 +48,8 @@ function App() {
   const handleToggle = () => {
     setDarkMode(!darkMode);
   };
+
+  //  Check if user is logged in to prevent errors
   
   //  User state
   const [user, setUser] = React.useState<UserDto | null>(null);
@@ -46,6 +75,9 @@ function App() {
     fetchCurrentAvatar();
   }, [user])
 
+  React.useEffect(() => {
+  }, [currentAvatar])
+
   return (
     <ThemeProvider theme={theme}>
     <CssBaseline />
@@ -55,14 +87,9 @@ function App() {
         user={user}
         setUser={setUser}
         currentAvatar={currentAvatar}
+        setRoute={setRoute}
       />
-      <Routes>
-          <Route path="/profile" element={<Profile 
-              user={user}
-              currentAvatar={currentAvatar}
-            />} />
-          <Route path="/" element={<Homepage />} />
-      </Routes>
+      <RouteHandler />
     </div>
     </ThemeProvider>
   );

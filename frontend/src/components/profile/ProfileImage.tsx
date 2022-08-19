@@ -7,9 +7,9 @@ import Button from '@mui/material/Button';
 import defaultAvatar from '../../default_avatar/profile_image.jpeg';
 import { UserAPI } from '../../api/user.api';
 
-export default function MediaCard({currentAvatar}: any) {
+export default function MediaCard({currentAvatar, user, setCurrentAvatar}: any) {
 
-  const AddAvatar = (event: any) => {
+  const AddAvatar = async (event: any) => {
       event.preventDefault();
 
       if (!event.target.files[0]) {
@@ -21,7 +21,10 @@ export default function MediaCard({currentAvatar}: any) {
       const formData = new FormData();
       formData.append('image', upload_file, upload_file.name);
 
-      UserAPI.addAvatar(formData);
+      const resp = await UserAPI.addAvatar(formData);
+      if (resp) {
+        setCurrentAvatar(resp);
+      }
   };
 
   return (

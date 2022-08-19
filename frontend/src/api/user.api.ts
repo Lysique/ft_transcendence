@@ -28,12 +28,23 @@ export class UserAPI {
     }
 
     public static async addAvatar(formData: FormData) {
-      await fetch (`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/avatar`, {
-        method: "POST", 
+      return fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/avatar`, {
         credentials: "include",
-        body: formData,
+        method: "POST",
+        body: formData
+    }).then((response) => {
+        if (response.ok) {
+          return response.text();
+        }
+        throw new Error('Something went wrong');
       })
-    }
+      .then((responseJson) => {
+        return responseJson;
+      })
+      .catch((error) => {
+        return null;
+    });
+  }
 
     public static async getCurrentAvatar(): Promise<string | null> {
       return fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/avatar`, {
@@ -46,11 +57,9 @@ export class UserAPI {
         throw new Error('Something went wrong');
       })
       .then((responseJson) => {
-        console.log('ok')
         return responseJson;
       })
       .catch((error) => {
-        console.log(error)
         return null;
     });
   }

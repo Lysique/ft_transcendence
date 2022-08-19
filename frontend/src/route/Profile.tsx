@@ -5,14 +5,20 @@ import MediaCard from "../components/profile/ProfileImage";
 
 interface ProfileProps {
     user: UserDto | null,
-    currentAvatar: string | null, 
+    setUser: any
+    currentAvatar: string | null,
+    setCurrentAvatar: any
   }
 
-export const Profile = ({user, currentAvatar}: ProfileProps) => {
+export const Profile = ({user, currentAvatar, setUser, setCurrentAvatar}: ProfileProps) => {
 
     return (
         <div>
-            <MediaCard currentAvatar={currentAvatar}/>
+            <MediaCard 
+                currentAvatar={currentAvatar}
+                user={user}
+                setCurrentAvatar={setCurrentAvatar}
+            />
         </div>
     );
 }

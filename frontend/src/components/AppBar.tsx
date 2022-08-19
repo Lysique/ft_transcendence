@@ -16,17 +16,24 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useTheme } from "@mui/material/styles";
 import { UserAPI } from "../api/user.api";
 import { UserDto } from "../api/dto/user.dto";
-import { Link } from "react-router-dom";
 import defaultAvatar from '../default_avatar/profile_image.jpeg';
 
 interface ResponsiveAppBarProps {
   handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
   user: UserDto | null
   setUser: any
+  setRoute: any
   currentAvatar: string | null
 }
 
-const ResponsiveAppBar = ({ handleToggle, user, setUser, currentAvatar }: ResponsiveAppBarProps) => {
+const ResponsiveAppBar = ({
+  handleToggle,
+  user,
+  setUser,
+  currentAvatar,
+  setRoute
+}: ResponsiveAppBarProps) => {
+
   const theme = useTheme();
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -53,12 +60,38 @@ const ResponsiveAppBar = ({ handleToggle, user, setUser, currentAvatar }: Respon
 
   // UserMenu
 
-  async function Logout(props: any) {
+  const setToProfile = () => {
     handleCloseUserMenu();
-    UserAPI.logout();
-    setUser(null);
+    setRoute('Profile');
   }
-  
+
+  const ProfileRedirect = () => {
+    return (
+      <MenuItem 
+        key="Profile"
+        onClick={setToProfile}
+      >
+        <Typography textAlign="center">Profile</Typography>
+      </MenuItem>
+   );
+  };
+
+  const setToHomepage = () => {
+    handleCloseUserMenu();
+    setRoute('Homepage');
+  }
+
+  const HomepageRedirect = () => {
+    return (
+      <MenuItem 
+        key="Homepage"
+        onClick={setToHomepage}
+      >
+        <Typography textAlign="center">Home</Typography>
+      </MenuItem>
+   );
+  };
+
   const LoginButton = () => {
     return (
       <MenuItem 
@@ -71,39 +104,18 @@ const ResponsiveAppBar = ({ handleToggle, user, setUser, currentAvatar }: Respon
    );
   };
 
-  const ProfileRedirect = () => {
-    return (
-      <MenuItem 
-        key="Profile"
-        component={Link}
-        to="/profile"
-        onClick={handleCloseUserMenu}
-      >
-        <Typography textAlign="center">Profile</Typography>
-      </MenuItem>
-   );
-  };
-
-  const HomepageRedirect = () => {
-    return (
-      <MenuItem 
-        key="Homepage"
-        component={Link}
-        to="/"
-        onClick={handleCloseUserMenu}
-      >
-        <Typography textAlign="center">Home</Typography>
-      </MenuItem>
-   );
-  };
+  async function Logout(props: any) {
+    handleCloseUserMenu();
+    UserAPI.logout();
+    setUser(null);
+    setRoute('Profile');
+  }
 
   function LogoutButton() {
     return (
       <MenuItem 
         key="Logout" 
         onClick={Logout}
-        component={Link}
-        to="/"
       >
         <Typography textAlign="center">Logout</Typography>
       </MenuItem>

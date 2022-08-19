@@ -29,6 +29,14 @@ export class UsersController {
     const user: any = req.user;
     const userDto = await this.usersService.findOneById(user.id);
     this.usersService.addAvatar(userDto, file.buffer);
+
+    const avatarDto: AvatarDto | null = await this.usersService.getCurrentAvatar(userDto);
+
+    if (avatarDto == null) {
+      return null;
+    }
+
+    return avatarDto.data;
   }
 
   @Get('/avatar')
