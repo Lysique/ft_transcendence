@@ -5,6 +5,7 @@ export class UserAPI {
     public static async getUserProfile(): Promise<UserDto | null> {
         return fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/auth/profile`, {
             credentials: "include",
+            method: "GET"
         }).then((response) => {
             if (response.ok) {
               return response.json();
@@ -33,4 +34,24 @@ export class UserAPI {
         body: formData,
       })
     }
+
+    public static async getCurrentAvatar(): Promise<string | null> {
+      return fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/avatar`, {
+        credentials: "include",
+        method: "GET"
+    }).then((response) => {
+        if (response.ok) {
+          return response.text();
+        }
+        throw new Error('Something went wrong');
+      })
+      .then((responseJson) => {
+        console.log('ok')
+        return responseJson;
+      })
+      .catch((error) => {
+        console.log(error)
+        return null;
+    });
+  }
 }

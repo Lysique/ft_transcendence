@@ -39,7 +39,11 @@ export class UsersController {
     
     const avatarDto: AvatarDto | null = await this.usersService.getCurrentAvatar(userDto);
 
-    return avatarDto? avatarDto.data : null;
+    if (avatarDto == null) {
+      return null;
+    }
+
+    return avatarDto.data;
   }
 
   @Get()

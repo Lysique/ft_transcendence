@@ -2,7 +2,6 @@ import React from "react";
 
 import ProTip from "../components/ProTip";
 import Copyright from "../components/CopyRight";
-import Canvas from "../components/Canvas";
 
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";

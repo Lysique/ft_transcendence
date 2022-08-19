@@ -22,17 +22,29 @@ function App() {
     setDarkMode(!darkMode);
   };
   
-    //  User state
-    const [user, setUser] = React.useState<UserDto | null>(null);
-  
-    React.useEffect(() => {
-      const fetchProfile = async () => {
-        const data = await UserAPI.getUserProfile();
-        setUser(data);
-      }
-  
-      fetchProfile();
-    }, [])
+  //  User state
+  const [user, setUser] = React.useState<UserDto | null>(null);
+
+  React.useEffect(() => {
+    const fetchProfile = async () => {
+      const data = await UserAPI.getUserProfile();
+      setUser(data);
+    }
+
+    fetchProfile();
+  }, [])
+
+  //  User profile pic
+  const [currentAvatar, setCurrentAvatar] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const fetchCurrentAvatar = async () => {
+      const data = await UserAPI.getCurrentAvatar();
+      setCurrentAvatar(data);
+    }
+
+    fetchCurrentAvatar();
+  }, [user])
 
   return (
     <ThemeProvider theme={theme}>
@@ -42,10 +54,12 @@ function App() {
         handleToggle={handleToggle}
         user={user}
         setUser={setUser}
+        currentAvatar={currentAvatar}
       />
       <Routes>
           <Route path="/profile" element={<Profile 
               user={user}
+              currentAvatar={currentAvatar}
             />} />
           <Route path="/" element={<Homepage />} />
       </Routes>

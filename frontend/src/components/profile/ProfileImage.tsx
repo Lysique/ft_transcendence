@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import defaultAvatar from '../../default_avatar/profile_image.jpeg';
 import { UserAPI } from '../../api/user.api';
 
-export default function MediaCard({user}: any) {
+export default function MediaCard({currentAvatar}: any) {
 
   const AddAvatar = (event: any) => {
       event.preventDefault();
@@ -29,7 +29,7 @@ export default function MediaCard({user}: any) {
       <CardMedia
         component="img"
         height="160"
-        image={defaultAvatar}
+        src={currentAvatar ? `data:image/jpeg;base64,${currentAvatar}` : defaultAvatar}
         alt="green iguana"
       />
       <CardContent>

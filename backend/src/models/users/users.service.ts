@@ -1,9 +1,10 @@
+import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { createWriteStream } from 'fs';
 import { Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
-import { Avatar } from '../avatars/entities/avatar.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
@@ -15,6 +16,7 @@ export class UsersService {
   //  This creates a Repository of the User instance for the UsersService class
   constructor(
     private avatarService: AvatarsService,
+    private httpService: HttpService,
     @InjectRepository(User) private userRepository: Repository<User>,
     ) {}
 
@@ -24,6 +26,7 @@ export class UsersService {
     userDto.id = user.id;
     userDto.name = user.name;
     userDto.status = user.status;
+    userDto.currentAvatarId = user.currentAvatarId;
     userDto.twoFactAuth = user.twoFactAuth;
     userDto.secret = user.secret;
 
@@ -33,18 +36,30 @@ export class UsersService {
   //  Create a user.
   public async create(createUserDto: CreateUserDto) {
 
-    //  Create user entity based on userDto
+    //  Create user entity based on createUserDto
     const user: User = new User();
     user.id = createUserDto.id;
     user.name = createUserDto.name;
     user.twoFactAuth = false;
-  
+
     await this.userRepository.save(user);
 
-    //  Create a UserDto (!= CreateUserDto) to return
     const userDto = this.entityToDto(user);
+    const imageData: Buffer = await this.downloadImage(createUserDto.photoUrl);
+    this.addAvatar(userDto, imageData);
 
     return userDto;
+  }
+
+  public async downloadImage(url : string) {
+
+  const response = await this.httpService.axiosRef({
+        url: url,
+        method: 'GET',
+        responseType: 'arraybuffer'
+    });
+
+    return Buffer.from(response.data, 'binary');
   }
 
   public async addAvatar(userDto: UserDto, data: Buffer)

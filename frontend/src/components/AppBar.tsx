@@ -23,9 +23,10 @@ interface ResponsiveAppBarProps {
   handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
   user: UserDto | null
   setUser: any
+  currentAvatar: string | null
 }
 
-const ResponsiveAppBar = ({ handleToggle, user, setUser }: ResponsiveAppBarProps) => {
+const ResponsiveAppBar = ({ handleToggle, user, setUser, currentAvatar }: ResponsiveAppBarProps) => {
   const theme = useTheme();
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -52,7 +53,6 @@ const ResponsiveAppBar = ({ handleToggle, user, setUser }: ResponsiveAppBarProps
 
   // UserMenu
 
-  //  Login / logout
   async function Logout(props: any) {
     handleCloseUserMenu();
     UserAPI.logout();
@@ -242,7 +242,7 @@ const ResponsiveAppBar = ({ handleToggle, user, setUser }: ResponsiveAppBarProps
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar
                   alt="Remy Sharp"
-                  src={defaultAvatar}
+                  src={currentAvatar ? `data:image/jpeg;base64,${currentAvatar}` : defaultAvatar}
                 />
               </IconButton>
             </Tooltip>

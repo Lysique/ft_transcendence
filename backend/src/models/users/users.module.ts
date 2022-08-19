@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { AvatarsModule } from '../avatars/avatars.module';
 import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
+import { HttpModule, HttpService } from '@nestjs/axios';
 
 @Module({
   controllers: [UsersController],
@@ -14,6 +15,7 @@ import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
   imports: [
     TypeOrmModule.forFeature([User]),
     AvatarsModule,
+    HttpModule
   ],
   exports: [UsersService]
 })
