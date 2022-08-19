@@ -29,7 +29,7 @@ export default function MediaCard({user}: any) {
       <CardMedia
         component="img"
         height="160"
-        image={user.avatar ? user.avatar: defaultAvatar}
+        image={defaultAvatar}
         alt="green iguana"
       />
       <CardContent>

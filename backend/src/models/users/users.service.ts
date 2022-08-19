@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
+import { AvatarDto } from '../avatars/dto/avatar.dto';
+import { Avatar } from '../avatars/entities/avatar.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
@@ -38,6 +40,7 @@ export class UsersService {
     user.twoFactAuth = false;
   
     await this.userRepository.save(user);
+
     //  Create a UserDto (!= CreateUserDto) to return
     const userDto = this.entityToDto(user);
 
@@ -48,12 +51,33 @@ export class UsersService {
   {
     const user = await this.userRepository.findOneBy({id : userDto.id})
     
-    const avatar = await this.avatarService.create({
-      user:user, 
+    const avatarDto: AvatarDto = await this.avatarService.create({
+      user: user,
       data: data.toString('base64')
     });
-    this.avatarService.addCurrentAvatar({id : avatar.id, user: user});
+
+    if (userDto.currentAvatarId == null) {
+      const userDto: UserDto = this.entityToDto(user);
+      this.addCurrentAvatar(avatarDto, userDto);
+    }
   }
+
+  public async addCurrentAvatar(avatarDto: AvatarDto, userDto: UserDto) {
+    const user = await this.userRepository.findOneBy({id: userDto.id});
+
+    user.currentAvatarId = avatarDto.id;
+
+    await this.userRepository.save(user);
+  };
+
+  public async getCurrentAvatar(userDto: UserDto) {
+    if (userDto.currentAvatarId == null) {
+      return null;
+    }
+    const avatarDto: AvatarDto = await this.avatarService.findOneById(userDto.currentAvatarId);
+
+    return avatarDto;
+  };
 
   //  Find all users.
   public async findAll() {

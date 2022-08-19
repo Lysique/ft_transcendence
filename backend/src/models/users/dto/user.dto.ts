@@ -6,5 +6,6 @@ export class UserDto {
     name: string;
     status: UserStatus;
     secret: string;
+    currentAvatarId?: number;
     twoFactAuth: boolean;
 }

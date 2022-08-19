@@ -4,8 +4,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { UserDto } from './dto/user.dto';
 import { Request } from 'express';
+import { AvatarDto } from '../avatars/dto/avatar.dto';
 
 @Controller('users')
 export class UsersController {
@@ -25,11 +25,21 @@ export class UsersController {
   public async uploadAvatar(
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request
-  )
-  {
+  ) {
     const user: any = req.user;
     const userDto = await this.usersService.findOneById(user.id);
     this.usersService.addAvatar(userDto, file.buffer);
+  }
+
+  @Get('/avatar')
+  @UseGuards(JwtAuthGuard)
+  public async getCurrentAvatar(@Req() req: Request) {
+    const user: any = req.user;
+    const userDto = await this.usersService.findOneById(user.id);
+    
+    const avatarDto: AvatarDto | null = await this.usersService.getCurrentAvatar(userDto);
+
+    return avatarDto? avatarDto.data : null;
   }
 
   @Get()

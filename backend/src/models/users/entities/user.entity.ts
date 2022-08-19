@@ -18,12 +18,12 @@ export class User {
 
     @Column({ default: UserStatus.Online })
     status: UserStatus;
-
-    @OneToOne(() => Avatar, (avatar) => avatar.current, { nullable: true, eager: true })
-    avatar: Avatar;
     
     @OneToMany(() => Avatar, (avatar) => avatar.user, { nullable: true, eager: true })
     avatars: Avatar[];
+
+    @Column({ nullable: true })
+    currentAvatarId: number;
 
     @Column()
     twoFactAuth: boolean;
