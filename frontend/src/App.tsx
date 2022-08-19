@@ -1,40 +1,14 @@
 import React, { useState } from "react";
-import { Profile } from "./route/Profile";
-import { Homepage } from "./route/Homepage";
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { UserDto } from "./api/dto/user.dto";
 import { UserAPI } from "./api/user.api";
 import ResponsiveAppBar from "./components/AppBar";
+import { RouteHandler } from "./components/RouteHandler";
 
 function App() {
 
     // Route handler
     const [route, setRoute] = React.useState('Homepage');
-
-    const RouteHandler = (props: any) => {
-      if (route === 'Profile') {
-        return (
-          <Profile 
-            user={user}
-            setUser={setUser}
-            currentAvatar={currentAvatar}
-            setCurrentAvatar={setCurrentAvatar}
-          />
-        )
-      }
-
-      else if (route === 'Homepage') {
-        return (
-          <Homepage />
-        )
-      }
-
-      else {
-        return (
-          <h1>Path not defined</h1>
-        )
-      }
-    }
 
   //  Dark/ligh mode
   const [darkMode, setDarkMode] = useState(false);
@@ -89,7 +63,15 @@ function App() {
         currentAvatar={currentAvatar}
         setRoute={setRoute}
       />
-      <RouteHandler />
+      <RouteHandler 
+        handleToggle={handleToggle}
+        user={user}
+        setUser={setUser}
+        route={route}
+        setRoute={setRoute}
+        currentAvatar={currentAvatar}
+        setCurrentAvatar={setCurrentAvatar}
+      />
     </div>
     </ThemeProvider>
   );

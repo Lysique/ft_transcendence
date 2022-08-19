@@ -72,7 +72,7 @@ export class UsersService {
     });
 
     if (userDto.currentAvatarId == null) {
-      const userDto: UserDto = await this.entityToDto(user);
+      const userDto: UserDto = this.entityToDto(user);
       await this.addCurrentAvatar(avatarDto, userDto);
     }
   }
