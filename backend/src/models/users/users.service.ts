@@ -1,11 +1,9 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { createWriteStream } from 'fs';
 import { Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
-import { Avatar } from '../avatars/entities/avatar.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
@@ -72,10 +70,7 @@ export class UsersService {
       data: data.toString('base64')
     });
 
-    if (userDto.currentAvatarId == null) {
-      const userDto: UserDto = this.entityToDto(user);
-      await this.addCurrentAvatar(avatarDto, userDto);
-    }
+    await this.addCurrentAvatar(avatarDto, userDto);
   }
 
   public async addCurrentAvatar(avatarDto: AvatarDto, userDto: UserDto) {

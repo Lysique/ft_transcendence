@@ -1,34 +1,49 @@
 import * as React from 'react';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import defaultAvatar from '../../default_avatar/profile_image.jpeg';
 import { UserAPI } from '../../api/user.api';
-import { ButtonBase } from '@mui/material';
+import { ButtonBase, IconButton } from '@mui/material';
 import Popup from './Popup';
+import { PhotoCamera } from '@mui/icons-material';
+import ConfirmationUpload from './Confirmation';
 
 export default function MediaCard({currentAvatar, user, setCurrentAvatar}: any) {
 
   //  Add avatar
-  const AddAvatar = async (event: any) => {
-      event.preventDefault();
+  const [upload, setUpload] = React.useState<any | null>(null);
 
-      if (!event.target.files[0]) {
+  const onUploadChange = (event: any) => {
+    if (!event.target.files[0]) {
+      setUpload(null);
+    }
+    else {
+      setUpload(event.target.files[0]);
+    }
+  }
+
+  //  Upload
+  const AddAvatar = async () => {
+
+      if (!upload) {
         return ;
       }
-
-      const upload_file = event.target.files[0];
     
       const formData = new FormData();
-      formData.append('image', upload_file, upload_file.name);
+      formData.append('image', upload, upload.name);
 
       const resp = await UserAPI.addAvatar(formData);
       if (resp) {
         setCurrentAvatar(resp);
       }
+      setUpload(null);
+      setConfirmation(true);
   };
+
+  //  confirmation
+  const [confirmation, setConfirmation] = React.useState(false);
 
   //  Popup
   const [open, setOpen] = React.useState(false);
@@ -42,8 +57,10 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar}: any) 
   };
 
   return (
-    <Card sx={{ maxWidth: 300, mt: 3, ml: 3 }}>
+    <Card sx={{ maxWidth: 240, mt: 3, ml: 3 }}>
+
       <ButtonBase>
+
         <CardMedia
           component="img"
           height="180"
@@ -59,19 +76,25 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar}: any) 
         />
       
       </ButtonBase>
-      <CardContent>
 
-      </CardContent>
       <CardActions>
+
+      <IconButton color="primary" aria-label="upload picture" component="label">
+        <input hidden accept="image/*" type="file" onChange={onUploadChange}/>
+        <PhotoCamera />
+      </IconButton>
+
+        {upload? upload.name: 'Choose image'}
 
         <Button
         component="label"
-        aria-label="upload picture"
         size="small"
+        onClick={AddAvatar}
         >
           Upload
-        <input hidden accept="image/*" type="file" onChange={AddAvatar}/>
         </Button>
+
+        <ConfirmationUpload confirmation={confirmation} setConfirmation={setConfirmation}/>
 
       </CardActions>
     </Card>
