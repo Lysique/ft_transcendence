@@ -10,7 +10,7 @@ import { PhotoCamera } from '@mui/icons-material';
 import PopupAvatars from './PopupAvatars';
 import ConfirmationPopup from '../../ConfirmationPopup';
 
-export default function MediaCard({currentAvatar, user, setCurrentAvatar, setUser}: any) {
+export default function ProfileImage({currentAvatar, user, setCurrentAvatar, setUser}: any) {
 
   //  Add avatar
   const [upload, setUpload] = React.useState<any | null>(null);
@@ -24,7 +24,7 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar, setUse
     }
   }
 
-  //  Upload
+  //  Upload avatar
   const AddAvatar = async () => {
 
       if (!upload) {
@@ -52,7 +52,7 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar, setUse
           size="small"
           onClick={AddAvatar}
           >
-            Upload
+            Upload {upload.name}
         </Button>
         : ""
         }
@@ -60,10 +60,10 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar, setUse
       )
   };
 
-  //  confirmation
+  //  Confirmation
   const [confirmation, setConfirmation] = React.useState(false);
 
-  //  Popup
+  //  Photo list popup
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -94,19 +94,16 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar, setUse
       </ButtonBase>
 
       <CardActions>
-
       <IconButton color="primary" aria-label="upload picture" component="label">
         <input hidden accept="image/*" type="file" onChange={onUploadChange}/>
         <PhotoCamera />
       </IconButton>
 
-        {upload? upload.name : 'Choose image'}
-
         <UploadButton />
 
         <ConfirmationPopup open={confirmation} setOpen={setConfirmation} message="Uploaded !"/>
-
       </CardActions>
+
     </Card>
   );
 }

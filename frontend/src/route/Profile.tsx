@@ -1,6 +1,6 @@
 import React from "react";
 import { UserDto } from "../api/dto/user.dto";
-import MediaCard from "../components/profile/ProfileImage/ProfileImage";
+import ProfileImage from "../components/profile/ProfileImage/ProfileImage";
 
 
 interface ProfileProps {
@@ -19,7 +19,7 @@ export const Profile = ({
 
     return (
         <div>
-            <MediaCard 
+            <ProfileImage 
                 currentAvatar={currentAvatar}
                 user={user}
                 setUser={setUser}
