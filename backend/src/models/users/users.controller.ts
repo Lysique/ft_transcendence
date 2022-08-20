@@ -80,6 +80,16 @@ export class UsersController {
     return avatarDto;
   }
 
+  @Delete('/avatars/:id')
+  @UseGuards(JwtAuthGuard)
+  public async removeAvatar(
+    @Param('id') id: string,
+    @Req() req: Request
+    ) {
+    const user: any = req.user;
+    this.usersService.removeAvatar(+id, user.id);
+  }
+
   @Get()
   public async findAll() {
     const resp = await this.usersService.findAll();

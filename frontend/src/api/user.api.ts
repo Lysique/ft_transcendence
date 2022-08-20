@@ -83,9 +83,9 @@ export class UserAPI {
   }
 
   public static async removeAvatar(id: number) {
-  fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/avatars/${id}`, {
-      credentials: "include",
-      method: "DELETE"
-    })
-  }
+    fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/avatars/${id}`, {
+        credentials: "include",
+        method: "DELETE"
+      })
+    }
 }

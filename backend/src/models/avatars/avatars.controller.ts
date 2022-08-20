@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AvatarsService } from './avatars.service';
 import { CreateAvatarDto } from './dto/create-avatar.dto';
+import { Request } from 'express';
 
 @Controller('avatars')
 export class AvatarsController {
@@ -11,20 +13,5 @@ export class AvatarsController {
     const resp = await this.avatarsService.create(createAvatarDto);
 
     return resp;
-  }
-
-  @Get()
-  findAll() {
-    return this.avatarsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.avatarsService.findOne(+id);
-  }
-
-  @Delete(':id')
-  public async remove(@Param('id') id: string) {
-    this.avatarsService.remove(+id);
   }
 }

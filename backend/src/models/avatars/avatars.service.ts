@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UserDto } from '../users/dto/user.dto';
 import { AvatarDto } from './dto/avatar.dto';
 import { CreateAvatarDto } from './dto/create-avatar.dto';
 import { Avatar } from './entities/avatar.entity';
@@ -8,7 +9,8 @@ import { Avatar } from './entities/avatar.entity';
 @Injectable()
 export class AvatarsService {
   constructor(
-    @InjectRepository(Avatar) private avatarRepository: Repository<Avatar>) {}
+    @InjectRepository(Avatar) private avatarRepository: Repository<Avatar>
+    ) {}
 
   public entityToDto(avatar: Avatar) {
     const avatarDto: AvatarDto = new AvatarDto();
@@ -40,15 +42,7 @@ export class AvatarsService {
     return avatarDto;
   }
 
-  findAll() {
-    return `This action returns all avatars`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} avatar`;
-  }
-
-  public async remove(id: number) {
-    this.avatarRepository.delete({id});
+  public async remove(avatarId: number) {
+    this.avatarRepository.delete({id : avatarId});
   }
 }

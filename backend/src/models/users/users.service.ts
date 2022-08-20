@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
@@ -14,8 +14,8 @@ export class UsersService {
 
   //  This creates a Repository of the User instance for the UsersService class
   constructor(
-    private avatarService: AvatarsService,
     private httpService: HttpService,
+    private avatarService: AvatarsService,
     @InjectRepository(User) private userRepository: Repository<User>,
     ) {}
 
@@ -103,6 +103,25 @@ export class UsersService {
 
     return avatarDto;
   };
+
+  public async removeAvatar(avatarId: number, userId: number) {
+    this.avatarService.remove(avatarId);
+
+    const userDto: UserDto = await this.findOneById(userId);
+
+    if (userDto.currentAvatarId === avatarId) {
+      const user = await this.userRepository.findOneBy({id: userDto.id});
+
+      if (user.avatars.length === 0) {
+        user.currentAvatarId = null;
+      }
+      else {
+        user.currentAvatarId = user.avatars[0].id;
+      }
+  
+      await this.userRepository.save(user);
+    }
+  }
 
   //  Find all users.
   public async findAll() {
