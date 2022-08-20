@@ -79,6 +79,13 @@ export class UserAPI {
     })
     .catch((error) => {
       return null;
-  });
-}
+    });
+  }
+
+  public static async removeAvatar(id: number) {
+  fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/avatars/${id}`, {
+      credentials: "include",
+      method: "DELETE"
+    })
+  }
 }

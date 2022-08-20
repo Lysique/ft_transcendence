@@ -24,7 +24,7 @@ export class AvatarsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.avatarsService.remove(+id);
+  public async remove(@Param('id') id: string) {
+    this.avatarsService.remove(+id);
   }
 }

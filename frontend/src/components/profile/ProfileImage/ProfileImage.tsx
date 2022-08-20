@@ -3,12 +3,12 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
-import defaultAvatar from '../../default_avatar/profile_image.jpeg';
-import { UserAPI } from '../../api/user.api';
+import defaultAvatar from '../../../default_avatar/profile_image.jpeg';
+import { UserAPI } from '../../../api/user.api';
 import { ButtonBase, IconButton } from '@mui/material';
-import Popup from './Popup';
 import { PhotoCamera } from '@mui/icons-material';
-import ConfirmationUpload from './Confirmation';
+import ConfirmationUpload from './ConfirmationUpload';
+import PopupAvatars from './PopupAvatars';
 
 export default function MediaCard({currentAvatar, user, setCurrentAvatar}: any) {
 
@@ -69,7 +69,7 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar}: any) 
           onClick={handleClickOpen}
         />
 
-        <Popup 
+        <PopupAvatars
           handleClose={handleClose}
           open={open}
           user={user}

@@ -4,16 +4,16 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import StandardImageList from './ImageList';
-import { UserDto } from '../../api/dto/user.dto';
+import { UserDto } from '../../../api/dto/user.dto';
+import AvatarList from './AvatarList';
 
-interface DialgProps {
+interface PopupAvatarProps {
     handleClose: any
     open: boolean
     user: UserDto | null
 }
 
-export default function Popup({handleClose, open, user}: DialgProps) {
+export default function PopupAvatars({handleClose, open, user}: PopupAvatarProps) {
 
   return (
     <Dialog
@@ -26,7 +26,7 @@ export default function Popup({handleClose, open, user}: DialgProps) {
     <DialogTitle id="scroll-dialog-title">Photo gallery</DialogTitle>
     <DialogContent dividers={true}>
 
-    <StandardImageList user={user}/>
+    <AvatarList user={user}/>
 
     </DialogContent>
     <DialogActions>

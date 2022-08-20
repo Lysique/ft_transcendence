@@ -48,7 +48,7 @@ export class AvatarsService {
     return `This action returns a #${id} avatar`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} avatar`;
+  public async remove(id: number) {
+    this.avatarRepository.delete({id});
   }
 }

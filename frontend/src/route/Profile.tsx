@@ -1,6 +1,6 @@
 import React from "react";
 import { UserDto } from "../api/dto/user.dto";
-import MediaCard from "../components/profile/ProfileImage";
+import MediaCard from "../components/profile/ProfileImage/ProfileImage";
 
 
 interface ProfileProps {
