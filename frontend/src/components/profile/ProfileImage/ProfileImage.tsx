@@ -7,10 +7,10 @@ import defaultAvatar from '../../../default_avatar/profile_image.jpeg';
 import { UserAPI } from '../../../api/user.api';
 import { ButtonBase, IconButton } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
-import ConfirmationUpload from './ConfirmationUpload';
 import PopupAvatars from './PopupAvatars';
+import ConfirmationPopup from '../../ConfirmationPopup';
 
-export default function MediaCard({currentAvatar, user, setCurrentAvatar}: any) {
+export default function MediaCard({currentAvatar, user, setCurrentAvatar, setUser}: any) {
 
   //  Add avatar
   const [upload, setUpload] = React.useState<any | null>(null);
@@ -40,6 +40,24 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar}: any) 
       }
       setUpload(null);
       setConfirmation(true);
+  };
+
+  const UploadButton = () => {
+
+      return (
+      <div>
+        {upload? 
+        <Button
+          component="label"
+          size="small"
+          onClick={AddAvatar}
+          >
+            Upload
+        </Button>
+        : ""
+        }
+      </div>
+      )
   };
 
   //  confirmation
@@ -73,6 +91,8 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar}: any) 
           handleClose={handleClose}
           open={open}
           user={user}
+          setUser={setUser}
+          setCurrentAvatar={setCurrentAvatar}
         />
       
       </ButtonBase>
@@ -84,17 +104,11 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar}: any) 
         <PhotoCamera />
       </IconButton>
 
-        {upload? upload.name: 'Choose image'}
+        {upload? upload.name : 'Choose image'}
 
-        <Button
-        component="label"
-        size="small"
-        onClick={AddAvatar}
-        >
-          Upload
-        </Button>
+        <UploadButton />
 
-        <ConfirmationUpload confirmation={confirmation} setConfirmation={setConfirmation}/>
+        <ConfirmationPopup open={confirmation} setOpen={setConfirmation} message="Uploaded !"/>
 
       </CardActions>
     </Card>

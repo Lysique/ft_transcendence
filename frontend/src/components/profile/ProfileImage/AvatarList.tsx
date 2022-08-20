@@ -5,7 +5,7 @@ import { UserAPI } from '../../../api/user.api';
 import { Button } from '@mui/material';
 import IconDelete from './IconDelete';
 
-export default function AvatarList({user}: any) {
+export default function AvatarList({user, setCurrentAvatar, setUser}: any) {
 
   // Photo list
   const [photos, setPhotos] = React.useState<any[] | null>(null);
@@ -16,14 +16,14 @@ export default function AvatarList({user}: any) {
       setPhotos(photos);
     };
     fetchUserPhotos();
-  }, []);
+  }, [user]);
 
   // List selection
   const [selected, setSelected] = React.useState<number | null>(null);
 
   const handleSelected = (id: number, test: string) => {
     setSelected(id);
-    console.log(id, test);
+    console.log(id, test, selected);
   };
 
   return (
@@ -37,9 +37,15 @@ export default function AvatarList({user}: any) {
               src={`data:image/jpeg;base64,${item.data}`}
               alt='avatar'
               loading="lazy"
-              onClick={() => handleSelected(item.id, 'photo')} />
+              onClick={() => handleSelected(item.id, 'photo')} 
+            />
 
-            <IconDelete itemId={item.id} />
+            <IconDelete 
+            itemId={item.id}
+            setCurrentAvatar={setCurrentAvatar}
+            setPhotos={setPhotos}
+            setUser={setUser}
+            />
 
           </ImageListItem>
         </Button>

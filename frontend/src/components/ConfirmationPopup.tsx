@@ -4,22 +4,17 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
 
-interface ConfirmationFormProps {
-    open: boolean
-    setOpen: any
-    setConfirmation: any
-    message: string
+interface ConfirmationPopupProps {
+  open: boolean
+  setOpen: any
+  message: string
 }
 
-export default function ConfirmationForm({open, setOpen, setConfirmation, message}: ConfirmationFormProps) {
+
+export default function ConfirmationPopup({open, setOpen, message}: ConfirmationPopupProps) {
 
   const handleClose = () => {
     setOpen(false);
-  };
-
-  const handleConfirmation = (click: boolean) => {
-    setOpen(false);
-    setConfirmation(click);
   };
 
   return (
@@ -34,11 +29,8 @@ export default function ConfirmationForm({open, setOpen, setConfirmation, messag
           {message}
         </DialogTitle>
         <DialogActions>
-            <Button onClick={() => handleConfirmation(true)} autoFocus>
+            <Button onClick={handleClose} autoFocus>
                 ok 
-            </Button>
-            <Button onClick={() => handleConfirmation(false)} autoFocus>
-                cancel 
             </Button>
         </DialogActions>
       </Dialog>

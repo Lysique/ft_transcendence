@@ -8,15 +8,21 @@ interface ProfileProps {
     setUser: any
     currentAvatar: string | null,
     setCurrentAvatar: any
-  }
+}
 
-export const Profile = ({user, currentAvatar, setUser, setCurrentAvatar}: ProfileProps) => {
+export const Profile = ({
+    user, 
+    currentAvatar, 
+    setUser, 
+    setCurrentAvatar,
+}: ProfileProps) => {
 
     return (
         <div>
             <MediaCard 
                 currentAvatar={currentAvatar}
                 user={user}
+                setUser={setUser}
                 setCurrentAvatar={setCurrentAvatar}
             />
         </div>

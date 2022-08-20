@@ -7,8 +7,8 @@ import { RouteHandler } from "./components/RouteHandler";
 
 function App() {
 
-    // Route handler
-    const [route, setRoute] = React.useState('Homepage');
+  // Route handler
+  const [route, setRoute] = React.useState('Homepage');
 
   //  Dark/ligh mode
   const [darkMode, setDarkMode] = useState(false);

@@ -95,7 +95,7 @@ export class UsersService {
   public async getAllAvatars(userDto: UserDto) {
     const user = await this.userRepository.findOneBy({id: userDto.id});
 
-    if (user.currentAvatarId == null) {
+    if (user.avatars.length == 0) {
       return null;
     }
 
@@ -111,14 +111,7 @@ export class UsersService {
 
     if (userDto.currentAvatarId === avatarId) {
       const user = await this.userRepository.findOneBy({id: userDto.id});
-
-      if (user.avatars.length === 0) {
-        user.currentAvatarId = null;
-      }
-      else {
-        user.currentAvatarId = user.avatars[0].id;
-      }
-  
+      user.currentAvatarId = null;
       await this.userRepository.save(user);
     }
   }

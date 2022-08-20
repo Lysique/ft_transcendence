@@ -11,9 +11,11 @@ interface PopupAvatarProps {
     handleClose: any
     open: boolean
     user: UserDto | null
+    setUser: any
+    setCurrentAvatar: any
 }
 
-export default function PopupAvatars({handleClose, open, user}: PopupAvatarProps) {
+export default function PopupAvatars({handleClose, open, user, setCurrentAvatar, setUser}: PopupAvatarProps) {
 
   return (
     <Dialog
@@ -26,7 +28,11 @@ export default function PopupAvatars({handleClose, open, user}: PopupAvatarProps
     <DialogTitle id="scroll-dialog-title">Photo gallery</DialogTitle>
     <DialogContent dividers={true}>
 
-    <AvatarList user={user}/>
+    <AvatarList
+    user={user}
+    setCurrentAvatar={setCurrentAvatar}
+    setUser={setUser}
+    />
 
     </DialogContent>
     <DialogActions>

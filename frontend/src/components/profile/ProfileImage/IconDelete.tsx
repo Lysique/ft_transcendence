@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { ImageListItemBar } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
-import ConfirmationForm from '../../ConfirmationPopup';
 import { UserAPI } from '../../../api/user.api';
+import ValidationPopup from '../../ValidationPopup';
 
-export default function IconDelete({itemId}: any) {
+export default function IconDelete({itemId, setCurrentAvatar, setPhotos, setUser}: any) {
 
     //  Confirmation popup
     const [confirmation, setConfirmation] = React.useState(false);
@@ -15,12 +15,17 @@ export default function IconDelete({itemId}: any) {
         setOpen(true);
     };
 
-    // Delete image if confirmed
+    // Delete image if confirmed and setUser to update photos
     React.useEffect(() => {
-        if (confirmation === true) {
+        const removeAvatar = async () => {
             UserAPI.removeAvatar(itemId)
+            const data = await UserAPI.getUserProfile();
+            setUser(data);
         }
-    }, [confirmation, itemId]);
+        if (confirmation === true) {
+            removeAvatar();
+        }
+    }, [confirmation, itemId, setPhotos, setCurrentAvatar, setUser]);
 
     return (
     <div>
@@ -38,7 +43,7 @@ export default function IconDelete({itemId}: any) {
         actionPosition="left"
         />
 
-        <ConfirmationForm 
+        <ValidationPopup 
             open={open} 
             setOpen={setOpen} 
             setConfirmation={setConfirmation} 

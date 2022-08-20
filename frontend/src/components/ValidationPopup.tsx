@@ -4,26 +4,41 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
 
-export default function ConfirmationUpload({confirmation, setConfirmation}: any) {
+interface ValidationPopupProps {
+    open: boolean
+    setOpen: any
+    setConfirmation: any
+    message: string
+}
+
+export default function ValidationPopup({open, setOpen, setConfirmation, message}: ValidationPopupProps) {
 
   const handleClose = () => {
-    setConfirmation(false);
+    setOpen(false);
+  };
+
+  const handleConfirmation = (click: boolean) => {
+    setOpen(false);
+    setConfirmation(click);
   };
 
   return (
     <div>
       <Dialog
-        open={confirmation}
+        open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Uploaded !"}
+          {message}
         </DialogTitle>
         <DialogActions>
-            <Button onClick={handleClose} autoFocus>
+            <Button onClick={() => handleConfirmation(true)} autoFocus>
                 ok 
+            </Button>
+            <Button onClick={() => handleConfirmation(false)} autoFocus>
+                cancel 
             </Button>
         </DialogActions>
       </Dialog>
