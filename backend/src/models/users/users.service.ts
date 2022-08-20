@@ -112,7 +112,7 @@ export class UsersService {
 
     const userDto: UserDto = await this.findOneById(userId);
 
-    if (userDto.currentAvatarId === avatarId) {
+    if (userDto.currentAvatarId == avatarId) {
       const user = await this.userRepository.findOneBy({id: userDto.id});
       user.currentAvatarId = null;
       await this.userRepository.save(user);

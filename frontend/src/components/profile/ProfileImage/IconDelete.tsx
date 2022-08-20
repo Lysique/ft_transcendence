@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { ImageListItemBar } from '@mui/material';
-import ClearIcon from '@mui/icons-material/Clear';
 import { UserAPI } from '../../../api/user.api';
 import ValidationPopup from '../../ValidationPopup';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 interface IconDeleteInteface {
     itemId: number
@@ -34,16 +34,17 @@ export default function IconDelete({itemId, setUser}: IconDeleteInteface) {
 
     return (
     <div>
+
         <ImageListItemBar
         sx={{
             background:
-            'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, ' +
-            'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
+            'linear-gradient(to bottom, rgba(0,0,0,0) 0%, ' +
+            'rgba(0,0,0,0) 70%, rgba(0,0,0,0) 100%)',
         }}
         position="top"
         onClick={handleClickOpen}
         actionIcon={
-             <ClearIcon style={{ color: 'white' }}/>
+             <CancelIcon style={{ color:"black" }}/>
          }
         actionPosition="left"
         />
