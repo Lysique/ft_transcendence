@@ -2,33 +2,65 @@ import * as React from 'react';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import { UserAPI } from '../../../api/user.api';
-import { Button } from '@mui/material';
+import { Button, ImageListItemBar } from '@mui/material';
 import IconDelete from './IconDelete';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import { UserDto } from '../../../api/dto/user.dto';
+import { AvatarDto } from '../../../api/dto/avatar.dto';
 
-export default function AvatarList({user, setCurrentAvatar, setUser}: any) {
+interface AvatarListProps {
+  user: UserDto | null
+  setUser: any
+  selected: number | null
+  setSelected: any
+}
+
+export default function AvatarList({user, setUser, selected, setSelected}: AvatarListProps) {
 
   // Photo list
-  const [photos, setPhotos] = React.useState<any[] | null>(null);
+  const [photos, setPhotos] = React.useState<AvatarDto[] | null>(null);
 
   React.useEffect(() => {
     const fetchUserPhotos = async () => {
-      const photos = await UserAPI.getAllAvatars();
-      setPhotos(photos);
+      const avatars: AvatarDto[] = await UserAPI.getAllAvatars();
+      setPhotos(avatars);
     };
     fetchUserPhotos();
   }, [user]);
-
+  
   // List selection
-  const [selected, setSelected] = React.useState<number | null>(null);
-
-  const handleSelected = (id: number, test: string) => {
+  const handleSelected = (id: number) => {
     setSelected(id);
-    console.log(id, test, selected);
   };
+  
+  // Show selected image
+  const ShowSelected = ({itemId}: any) => {
+    return (
+      <div>
+        <ImageListItemBar
+        sx={{
+            background:
+            'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, ' +
+            'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
+        }}
+        position="bottom"
+        actionIcon={
+          selected === itemId? 
+          <CheckBoxIcon style={{ color: 'white' }}/>
+          :
+          <CheckBoxOutlineBlankIcon style={{ color: 'white' }}/>
+         }
+        actionPosition="left"
+        onClick={() => handleSelected(itemId)}
+        />
+      </div>
+    )
+  }
 
   return (
   <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
-    {photos? photos.map((item: any) => {
+    {photos? photos.map((item: AvatarDto) => {
       return (
 
         <Button key={item.id}>
@@ -37,14 +69,16 @@ export default function AvatarList({user, setCurrentAvatar, setUser}: any) {
               src={`data:image/jpeg;base64,${item.data}`}
               alt='avatar'
               loading="lazy"
-              onClick={() => handleSelected(item.id, 'photo')} 
+              onClick={() => handleSelected(item.id)} 
             />
 
             <IconDelete 
-            itemId={item.id}
-            setCurrentAvatar={setCurrentAvatar}
-            setPhotos={setPhotos}
-            setUser={setUser}
+              itemId={item.id}
+              setUser={setUser}
+            />
+
+            <ShowSelected 
+              itemId={item.id}
             />
 
           </ImageListItem>

@@ -65,6 +65,24 @@ export class UsersController {
     return avatarDto.data;
   }
 
+  @Post('/avatar/:id')
+  @UseGuards(JwtAuthGuard)
+  public async setCurrentAvatar(
+    @Req() req: Request,
+    @Param('id') id: number
+    ) {
+    const user: any = req.user;
+    const userDto = await this.usersService.findOneById(user.id);
+    
+    const avatarDto: AvatarDto = await this.usersService.updateCurrentAvatar(userDto, id);
+
+    if (avatarDto == null) {
+      return null;
+    }
+
+    return avatarDto.data;
+  }
+
   @Get('/avatars')
   @UseGuards(JwtAuthGuard)
   public async getAllAvatars(@Req() req: Request) {
@@ -80,14 +98,14 @@ export class UsersController {
     return avatarDto;
   }
 
-  @Delete('/avatars/:id')
+  @Delete('/avatar/:id')
   @UseGuards(JwtAuthGuard)
   public async removeAvatar(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Req() req: Request
     ) {
     const user: any = req.user;
-    this.usersService.removeAvatar(+id, user.id);
+    this.usersService.removeAvatar(id, user.id);
   }
 
   @Get()

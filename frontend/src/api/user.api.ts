@@ -83,9 +83,27 @@ export class UserAPI {
   }
 
   public static async removeAvatar(id: number) {
-    fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/avatars/${id}`, {
+    fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/avatar/${id}`, {
         credentials: "include",
         method: "DELETE"
+    })
+  }
+
+  public static async updateAvatar(id: number) {
+    return fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/avatar/${id}`, {
+      credentials: "include",
+      method: "POST"
+    }).then((response) => {
+      if (response.ok) {
+        return response.text();
+      }
+      throw new Error('Something went wrong');
       })
-    }
+      .then((responseText) => {
+        return responseText;
+      })
+      .catch((error) => {
+        return null;
+    });
+  }
 }

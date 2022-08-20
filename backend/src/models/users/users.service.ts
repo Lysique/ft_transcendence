@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
-import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { timeStamp } from 'console';
 import { Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
@@ -70,15 +71,17 @@ export class UsersService {
       data: data.toString('base64')
     });
 
-    await this.addCurrentAvatar(avatarDto, userDto);
+    await this.updateCurrentAvatar(userDto, avatarDto.id);
   }
 
-  public async addCurrentAvatar(avatarDto: AvatarDto, userDto: UserDto) {
+  public async updateCurrentAvatar(userDto: UserDto, avatarId: number) {
+    const avatarDto: AvatarDto = await this.avatarService.findOneById(avatarId);
+
     const user = await this.userRepository.findOneBy({id: userDto.id});
-
     user.currentAvatarId = avatarDto.id;
-
     await this.userRepository.save(user);
+
+    return avatarDto;
   };
 
   public async getCurrentAvatar(userDto: UserDto) {

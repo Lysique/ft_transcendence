@@ -70,10 +70,6 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar, setUse
     setOpen(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   return (
     <Card sx={{ maxWidth: 240, mt: 3, ml: 3 }}>
 
@@ -88,8 +84,8 @@ export default function MediaCard({currentAvatar, user, setCurrentAvatar, setUse
         />
 
         <PopupAvatars
-          handleClose={handleClose}
           open={open}
+          setOpen={setOpen}
           user={user}
           setUser={setUser}
           setCurrentAvatar={setCurrentAvatar}

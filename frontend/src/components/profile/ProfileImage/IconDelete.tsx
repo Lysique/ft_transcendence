@@ -4,7 +4,12 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { UserAPI } from '../../../api/user.api';
 import ValidationPopup from '../../ValidationPopup';
 
-export default function IconDelete({itemId, setCurrentAvatar, setPhotos, setUser}: any) {
+interface IconDeleteInteface {
+    itemId: number
+    setUser: any
+  }
+
+export default function IconDelete({itemId, setUser}: IconDeleteInteface) {
 
     //  Confirmation popup
     const [confirmation, setConfirmation] = React.useState(false);
@@ -25,7 +30,7 @@ export default function IconDelete({itemId, setCurrentAvatar, setPhotos, setUser
         if (confirmation === true) {
             removeAvatar();
         }
-    }, [confirmation, itemId, setPhotos, setCurrentAvatar, setUser]);
+    }, [confirmation, itemId, setUser]);
 
     return (
     <div>

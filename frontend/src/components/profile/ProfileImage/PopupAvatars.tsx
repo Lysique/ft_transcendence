@@ -6,16 +6,38 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { UserDto } from '../../../api/dto/user.dto';
 import AvatarList from './AvatarList';
+import { UserAPI } from '../../../api/user.api';
 
 interface PopupAvatarProps {
-    handleClose: any
+    setOpen: any
     open: boolean
     user: UserDto | null
     setUser: any
     setCurrentAvatar: any
 }
 
-export default function PopupAvatars({handleClose, open, user, setCurrentAvatar, setUser}: PopupAvatarProps) {
+export default function PopupAvatars({open, setOpen, user, setUser, setCurrentAvatar}: PopupAvatarProps) {
+
+  // List selection
+  const [selected, setSelected] = React.useState<number | null>(null);
+
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelected(null);
+  };
+
+  const updateCurrentAvatar = () => {
+    const updateAvatar = async () => {
+      if (selected) {
+        const data: string | null = await UserAPI.updateAvatar(selected)
+        setCurrentAvatar(data);
+      }
+    }
+    updateAvatar();
+    setOpen(false);
+    setSelected(null);
+  };
 
   return (
     <Dialog
@@ -30,14 +52,16 @@ export default function PopupAvatars({handleClose, open, user, setCurrentAvatar,
 
     <AvatarList
     user={user}
-    setCurrentAvatar={setCurrentAvatar}
     setUser={setUser}
+    selected={selected}
+    setSelected={setSelected}
     />
 
     </DialogContent>
     <DialogActions>
       <Button onClick={handleClose}>Cancel</Button>
-      <Button onClick={handleClose}>Subscribe</Button>
+      <div style={{flex: '0.9 0 0'}} />
+      <Button onClick={updateCurrentAvatar}>Set as profile image</Button>
     </DialogActions>
     </Dialog>
   );
