@@ -6,6 +6,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Request } from 'express';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
+import { UserDto } from './dto/user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -19,6 +20,16 @@ export class UsersController {
     return resp;
   }
 
+  // Check if user is logged in and get user profile.
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  async profile(@Req() req: Request) {
+    const user: any = req.user;
+    const userDto: UserDto = await this.usersService.findOneById(user.id);
+    
+    return userDto;
+  }
+
   @Post('/avatar')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image'))
@@ -27,7 +38,7 @@ export class UsersController {
     @Req() req: Request
   ) {
     const user: any = req.user;
-    const userDto = await this.usersService.findOneById(user.id);
+    const userDto: UserDto = await this.usersService.findOneById(user.id);
     await this.usersService.addAvatar(userDto, file.buffer);
 
     const avatarDto: AvatarDto | null = await this.usersService.getCurrentAvatar(userDto);

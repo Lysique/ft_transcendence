@@ -40,16 +40,7 @@ export class AuthController {
       //  Redirect to the frontend
       res.status(302).redirect(`http://${process.env.REACT_HOST}:${process.env.REACT_PORT}`);
     }
-    
-    // Check if user is logged in and get user profile.
-    @UseGuards(JwtAuthGuard)
-    @Get('profile')
-    async profile(@Req() req: Request) {
-      const userDto: UserDto = await this.authService.fetchUser(req.user);
-      
-      return userDto;
-    }
-    
+  
     // User logout
     @UseGuards(JwtAuthGuard)
     @Get('logout')

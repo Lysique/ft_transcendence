@@ -3,7 +3,7 @@ import { UserDto } from "./dto/user.dto";
 export class UserAPI {
     
     public static async getUserProfile(): Promise<UserDto | null> {
-        return fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/auth/profile`, {
+        return fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/profile`, {
             credentials: "include",
             method: "GET"
         }).then((response) => {
