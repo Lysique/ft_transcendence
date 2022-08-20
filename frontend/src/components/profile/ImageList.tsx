@@ -17,10 +17,10 @@ export default function StandardImageList({user}: any) {
 
     return (
     <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
-        {photos? photos.map((item: any, i: number) => (
-            <ImageListItem key={i}>
+        {photos? photos.map((item: any) => (
+            <ImageListItem key={item.id}>
                 <img
-                src={`data:image/jpeg;base64,${item}`}
+                src={`data:image/jpeg;base64,${item.data}`}
                 alt='avatar'
                 loading="lazy"
                 />

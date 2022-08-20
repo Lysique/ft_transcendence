@@ -77,7 +77,7 @@ export class UsersController {
       return null;
     }
 
-    return avatarDto.map(x => x.data);
+    return avatarDto;
   }
 
   @Get()
