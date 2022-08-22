@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Route, Routes } from "react-router-dom";
-import { Profile } from "./route/Profile";
-import { Homepage } from "./route/Homepage";
+import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { UserDto } from "./api/dto/user.dto";
 import { UserAPI } from "./api/user.api";
-import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import ResponsiveAppBar from "./components/AppBar";
+import { RouteHandler } from "./components/RouteHandler";
 
 function App() {
-  /* Dark/light mode */
+	
+	// Route handler
+	const [route, setRoute] = React.useState('Homepage');
+	
+	/* Dark/light mode */
   const [darkMode, setDarkMode] = useState(false);
 
   const theme = createTheme({
@@ -29,32 +31,36 @@ function App() {
     setDarkMode(!darkMode);
   };
 
-  /* User state */
-  const [user, setUser] = React.useState<UserDto | null>();
+  // Check if user is logged and retrieve profile
+  const [user, setUser] = React.useState<UserDto | null>(null);
 
   React.useEffect(() => {
     const fetchProfile = async () => {
       const data = await UserAPI.getUserProfile();
       setUser(data);
-    };
+    }
 
     fetchProfile();
-  }, []);
+  }, [])
 
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <div className="App">
-        <ResponsiveAppBar
-          handleToggle={handleToggle}
-          user={user}
-          setUser={setUser}
-        />
-        <Routes>
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/" element={<Homepage />} />
-        </Routes>
-      </div>
+    <CssBaseline />
+    <div className="App">
+      <ResponsiveAppBar
+        handleToggle={handleToggle}
+        user={user}
+        setUser={setUser}
+        setRoute={setRoute}
+      />
+      <RouteHandler 
+        handleToggle={handleToggle}
+        user={user}
+        setUser={setUser}
+        route={route}
+        setRoute={setRoute}
+      />
+    </div>
     </ThemeProvider>
   );
 }
