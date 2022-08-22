@@ -369,20 +369,20 @@ const Canvas = () => {
   });
 
   return (
-    <div>
+    <>
       {/* <h2>Width before: {dimensions.prevWidth}</h2>
       <h2>Height before: {dimensions.prevHeight}</h2>
       <h2>Width: {dimensions.width}</h2>
       <h2>Height: {dimensions.height}</h2>
       <h2>RatioX: {ratioX}</h2>
       <h2>RatioY: {ratioY}</h2> */}
+		{/* <Fireworks /> */}
       <canvas
         ref={canvasRef}
         width={dimensions.width * 0.5}
         height={dimensions.height * 0.5}
       />
-      {/* <Fireworks /> */}
-    </div>
+    </>
   );
 };
 
