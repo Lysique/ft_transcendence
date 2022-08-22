@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import { Route, Routes } from "react-router-dom";
-import { Profile } from "./route/Profile";
-import { Homepage } from "./route/Homepage";
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { UserDto } from "./api/dto/user.dto";
 import { UserAPI } from "./api/user.api";
 import ResponsiveAppBar from "./components/AppBar";
+import { RouteHandler } from "./components/RouteHandler";
 
 function App() {
 
-  //  Dark/ligh mode
+  // Route handler
+  const [route, setRoute] = React.useState('Homepage');
+
+  // Dark/ligh mode
   const [darkMode, setDarkMode] = useState(false);
 
   const theme = createTheme({
@@ -21,18 +22,18 @@ function App() {
   const handleToggle = () => {
     setDarkMode(!darkMode);
   };
-  
-    //  User state
-    const [user, setUser] = React.useState<UserDto | null>();
-  
-    React.useEffect(() => {
-      const fetchProfile = async () => {
-        const data = await UserAPI.getUserProfile();
-        setUser(data);
-      }
-  
-      fetchProfile();
-    }, [])
+
+  // Check if user is logged and retrieve profile
+  const [user, setUser] = React.useState<UserDto | null>(null);
+
+  React.useEffect(() => {
+    const fetchProfile = async () => {
+      const data = await UserAPI.getUserProfile();
+      setUser(data);
+    }
+
+    fetchProfile();
+  }, [])
 
   return (
     <ThemeProvider theme={theme}>
@@ -42,11 +43,15 @@ function App() {
         handleToggle={handleToggle}
         user={user}
         setUser={setUser}
+        setRoute={setRoute}
       />
-      <Routes>
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/" element={<Homepage />} />
-      </Routes>
+      <RouteHandler 
+        handleToggle={handleToggle}
+        user={user}
+        setUser={setUser}
+        route={route}
+        setRoute={setRoute}
+      />
     </div>
     </ThemeProvider>
   );

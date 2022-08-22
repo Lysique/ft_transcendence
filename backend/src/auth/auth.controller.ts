@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Req, Res, Post, Body, UnauthorizedException, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, Post, Body, UnauthorizedException, Delete, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { FortyTwoAuthGuard } from './guards/42-auth.guard';
@@ -22,10 +22,14 @@ export class AuthController {
       @Req() req: Request,
       @Res({passthrough: true}) res: Response
       ) {
-      
-      // Find user or signup if does not exist
-      const userDto: UserDto = await this.authService.getUser(req.user);
-      
+      //  Find user or signup if does not exist
+      let userDto: UserDto = await this.authService.fetchUser(req.user);
+
+      //  If the user is not registered in our database, we create one.
+      if (!userDto) {
+        userDto = await this.authService.signup(req.user);
+      }
+
       //  Create and store jwt token to enable connection
       const accessToken = await this.authService.generateToken({ 
         sub: userDto.id, 
@@ -33,21 +37,14 @@ export class AuthController {
       });
       res.cookie('jwt', accessToken, { httpOnly: true });
     
+      //  Redirect to the frontend
       res.status(302).redirect(`http://${process.env.REACT_HOST}:${process.env.REACT_PORT}`);
     }
-    
-    // Check if user is logged in and get user profile.
-    @UseGuards(JwtAuthGuard)
-    @Get('profile')
-    async profile(@Req() req: Request) {
-      const userDto: UserDto = await this.authService.getUser(req.user);
-      
-      return userDto;
-    }
-    
+  
     // User logout
     @UseGuards(JwtAuthGuard)
-    @Get('logout')
+    @HttpCode(204)
+    @Delete('logout')
     async logout(@Res({passthrough: true}) response: Response) {
       response.clearCookie('jwt');
     }
@@ -58,7 +55,7 @@ export class AuthController {
     async generate(@Req() req: Request, @Res() res: Response) {
       
       //  Generate a new token // To change so it can verify if the setup is ok
-      const user: UserDto = await this.authService.getUser(req.user);
+      const user: UserDto = await this.authService.fetchUser(req.user);
       const accessToken = await this.authService.generateToken({
         sub: user.id,
         isTwoFactAuth: true
@@ -85,7 +82,7 @@ export class AuthController {
       }
 
       // Find user or signup if does not exist
-      const userDto: UserDto = await this.authService.getUser(req.user);
+      const userDto: UserDto = await this.authService.fetchUser(req.user);
 
       //  Create and store jwt token to enable connection
       const accessToken = await this.authService.generateToken({

@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Avatar } from "src/models/avatars/entities/avatar.entity";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 
 export enum UserStatus {
     Online = 0,
@@ -12,17 +13,23 @@ export class User {
     @PrimaryColumn()
     id: number;
 
-    @Column()
+    @Column({ unique: true })
     name: string;
 
     @Column({ default: UserStatus.Online })
     status: UserStatus;
+    
+    @OneToMany(() => Avatar, (avatar) => avatar.user, { eager: true })
+    avatars: Avatar[];
+
+    @Column({ nullable: true })
+    currentAvatarData: string;
+
+    @Column({ nullable: true })
+    currentAvatarId: number;
 
     @Column()
-    photoUrl: string;
-
-    @Column({ type: 'boolean', default: false })
-    twoFactAuth: boolean = false;
+    twoFactAuth: boolean;
 
     @Column({ nullable: true })
     secret: string;

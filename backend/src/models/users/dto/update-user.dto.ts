@@ -6,6 +6,5 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     name?: string;
     status?: UserStatus;
     secret?: string;
-    photoUrl?: string;
     twoFactAuth?: boolean;
 }
