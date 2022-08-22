@@ -11,16 +11,14 @@ import { AvatarDto } from '../../../api/dto/avatar.dto';
 
 interface AvatarListProps {
   user: UserDto | null
-  currentAvatar: AvatarDto | null
-  setCurrentAvatar: any
+  setUser: any
   selectedId: number | null
   setSelectedId: any
 }
 
 export default function AvatarList({
   user,
-  currentAvatar,
-  setCurrentAvatar,
+  setUser,
   selectedId,
   setSelectedId
 
@@ -82,9 +80,7 @@ export default function AvatarList({
 
             <IconDelete 
               itemId={item.id}
-              currentAvatar={currentAvatar}
-              setCurrentAvatar={setCurrentAvatar}
-              setPhotos={setPhotos}
+              setUser={setUser}
             />
 
             <ShowSelected 

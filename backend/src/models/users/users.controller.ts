@@ -94,7 +94,7 @@ export class UsersController {
     @Req() req: Request
     ) {
     const user: any = req.user;
-    this.usersService.removeAvatar(avatarId, user.id);
+    await this.usersService.removeAvatar(avatarId, user.id);
   }
 
   @Delete(':id')

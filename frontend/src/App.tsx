@@ -4,7 +4,6 @@ import { UserDto } from "./api/dto/user.dto";
 import { UserAPI } from "./api/user.api";
 import ResponsiveAppBar from "./components/AppBar";
 import { RouteHandler } from "./components/RouteHandler";
-import { AvatarDto } from "./api/dto/avatar.dto";
 
 function App() {
 
@@ -36,14 +35,6 @@ function App() {
     fetchProfile();
   }, [])
 
-  // User profile pic -> When user change (useEffect)
-  const [currentAvatar, setCurrentAvatar] = React.useState<AvatarDto | null>(null);
-
-  React.useEffect(() => {
-    setCurrentAvatar(user?.currentAvatar? user.currentAvatar : null);
-
-  }, [user])
-
   return (
     <ThemeProvider theme={theme}>
     <CssBaseline />
@@ -52,7 +43,6 @@ function App() {
         handleToggle={handleToggle}
         user={user}
         setUser={setUser}
-        currentAvatar={currentAvatar}
         setRoute={setRoute}
       />
       <RouteHandler 
@@ -61,8 +51,6 @@ function App() {
         setUser={setUser}
         route={route}
         setRoute={setRoute}
-        currentAvatar={currentAvatar}
-        setCurrentAvatar={setCurrentAvatar}
       />
     </div>
     </ThemeProvider>

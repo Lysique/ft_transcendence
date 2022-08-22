@@ -1,4 +1,3 @@
-import { AvatarDto } from "../api/dto/avatar.dto"
 import { UserDto } from "../api/dto/user.dto"
 import { Homepage } from "../route/Homepage"
 import { Profile } from "../route/Profile"
@@ -9,8 +8,6 @@ interface RouteProps {
     setUser: any
     route: string
     setRoute: any
-    currentAvatar: AvatarDto | null
-    setCurrentAvatar: any
 }
 
 export const RouteHandler = ({
@@ -19,8 +16,6 @@ export const RouteHandler = ({
     setUser,
     route,
     setRoute,
-    currentAvatar,
-    setCurrentAvatar,
 
     }: RouteProps) => {
 
@@ -30,8 +25,6 @@ export const RouteHandler = ({
             <Profile
             user={user}
             setUser={setUser}
-            currentAvatar={currentAvatar}
-            setCurrentAvatar={setCurrentAvatar}
             />
         )
     }

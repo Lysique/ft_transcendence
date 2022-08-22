@@ -3,20 +3,15 @@ import { ImageListItemBar } from '@mui/material';
 import { UserAPI } from '../../../api/user.api';
 import ValidationPopup from '../../ValidationPopup';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { AvatarDto } from '../../../api/dto/avatar.dto';
 
 interface IconDeleteInteface {
     itemId: number
-    currentAvatar: AvatarDto | null
-    setCurrentAvatar: any
-    setPhotos: any
+    setUser: any
   }
 
 export default function IconDelete({
     itemId,
-    currentAvatar,
-    setCurrentAvatar,
-    setPhotos
+    setUser
 
 }: IconDeleteInteface) {
 
@@ -30,25 +25,20 @@ export default function IconDelete({
         setOpen(true);
     };
 
-    // If validation is true ; remove avatar, update photos and update current avatar if changed
+    // If validation is true ; remove avatar and update user
     React.useEffect(() => {
         const removeAvatar = async () => {
             await UserAPI.removeAvatar(itemId);
 
-            const avatars: AvatarDto[] = await UserAPI.getAllAvatars();
-            setPhotos(avatars);
-
-            const data = await UserAPI.getCurrentAvatar();
-            if (data !== currentAvatar) {
-              setCurrentAvatar(data);
-            }
+            const data = await UserAPI.getUserProfile();
+            setUser(data);
         }
 
         if (validation === true) {
             removeAvatar();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [validation, currentAvatar, itemId]);
+    }, [validation, itemId]);
 
     return (
     <div>

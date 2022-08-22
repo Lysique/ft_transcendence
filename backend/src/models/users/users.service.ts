@@ -109,7 +109,7 @@ export class UsersService {
   };
 
   public async removeAvatar(avatarId: number, userId: number) {
-    this.avatarService.remove(avatarId);
+    await this.avatarService.remove(avatarId);
 
     const user = await this.userRepository.findOneBy({id: userId});
 

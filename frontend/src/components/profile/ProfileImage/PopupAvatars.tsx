@@ -7,17 +7,15 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { UserDto } from '../../../api/dto/user.dto';
 import AvatarList from './AvatarList';
 import { UserAPI } from '../../../api/user.api';
-import { AvatarDto } from '../../../api/dto/avatar.dto';
 
 interface PopupAvatarProps {
     open: boolean
     setOpen: any
     user: UserDto | null
-    currentAvatar: AvatarDto | null
-    setCurrentAvatar: any
+    setUser: any
 }
 
-export default function PopupAvatars({open, setOpen, user, currentAvatar, setCurrentAvatar}: PopupAvatarProps) {
+export default function PopupAvatars({open, setOpen, user, setUser}: PopupAvatarProps) {
 
   // Selected avatar
   const [selectedId, setSelectedId] = React.useState<number | null>(null);
@@ -28,12 +26,13 @@ export default function PopupAvatars({open, setOpen, user, currentAvatar, setCur
     setSelectedId(null);
   };
 
-  // Update the current avatar when clicked on the 'Set as profile image' button if one has been selected.
+  // Update the user when clicked on the 'Set as profile image' button if one has been selected.
   const updateCurrentAvatar = () => {
     const updateAvatar = async () => {
-      if (selectedId && (currentAvatar == null || currentAvatar.id !== selectedId)) {
-        const data: AvatarDto | null = await UserAPI.updateAvatar(selectedId)
-        setCurrentAvatar(data);
+      if (selectedId) {
+        await UserAPI.updateAvatar(selectedId);
+        const data = await UserAPI.getUserProfile();
+        setUser(data);
       }
     }
     updateAvatar();
@@ -54,8 +53,7 @@ export default function PopupAvatars({open, setOpen, user, currentAvatar, setCur
 
     <AvatarList
     user={user}
-    currentAvatar={currentAvatar}
-    setCurrentAvatar={setCurrentAvatar}
+    setUser={setUser}
     selectedId={selectedId}
     setSelectedId={setSelectedId}
     />

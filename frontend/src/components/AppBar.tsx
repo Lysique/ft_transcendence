@@ -17,13 +17,11 @@ import { useTheme } from "@mui/material/styles";
 import { UserAPI } from "../api/user.api";
 import { UserDto } from "../api/dto/user.dto";
 import defaultAvatar from '../default_avatar/profile_image.jpeg';
-import { AvatarDto } from "../api/dto/avatar.dto";
 
 interface ResponsiveAppBarProps {
   handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
   user: UserDto | null
   setUser: any
-  currentAvatar: AvatarDto | null
   setRoute: any
 }
 
@@ -31,7 +29,6 @@ const ResponsiveAppBar = ({
   handleToggle,
   user,
   setUser,
-  currentAvatar,
   setRoute,
 }: ResponsiveAppBarProps) => {
 
@@ -254,7 +251,7 @@ const ResponsiveAppBar = ({
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar
                   alt="Remy Sharp"
-                  src={currentAvatar ? `data:image/jpeg;base64,${currentAvatar.data}` : defaultAvatar}
+                  src={user?.currentAvatar ? `data:image/jpeg;base64,${user.currentAvatar.data}` : defaultAvatar}
                 />
               </IconButton>
             </Tooltip>

@@ -10,18 +10,15 @@ import { PhotoCamera } from '@mui/icons-material';
 import PopupAvatars from './PopupAvatars';
 import ConfirmationPopup from '../../ConfirmationPopup';
 import { UserDto } from '../../../api/dto/user.dto';
-import { AvatarDto } from '../../../api/dto/avatar.dto';
 
 interface ProfileImageProps {
   user: UserDto | null
-  currentAvatar: AvatarDto | null
-  setCurrentAvatar: any
+  setUser: any
 }
 
 export default function ProfileImage({
   user,
-  currentAvatar,
-  setCurrentAvatar
+  setUser
 
 }: ProfileImageProps) {
 
@@ -42,16 +39,16 @@ export default function ProfileImage({
     setOpenPhotos(true);
   };
 
-  //  When the upload button is clicked ; upload the file and set the current avatar if changed
+  //  When the upload button is clicked ; upload the file and set the user
   const AddAvatar = async () => {
 
     const formData = new FormData();
     formData.append('image', file, file.name);
 
-    const data = await UserAPI.addAvatar(formData);
-    if (data !== currentAvatar) {
-      setCurrentAvatar(data);
-    }
+    await UserAPI.addAvatar(formData);
+    const data = await UserAPI.getUserProfile();
+    setUser(data);
+  
     setFile(null);
     setConfirmation(true);
   };
@@ -83,7 +80,7 @@ export default function ProfileImage({
         <CardMedia
           component="img"
           height="180"
-          src={currentAvatar ? `data:image/jpeg;base64,${currentAvatar.data}` : defaultAvatar}
+          src={user && user.currentAvatar? `data:image/jpeg;base64,${user.currentAvatar.data}` : defaultAvatar}
           alt="green iguana"
           onClick={handleOpenPhotos}
         />
@@ -92,8 +89,7 @@ export default function ProfileImage({
           open={openPhotos}
           setOpen={setOpenPhotos}
           user={user}
-          currentAvatar={currentAvatar}
-          setCurrentAvatar={setCurrentAvatar}
+          setUser={setUser}
         />
       
       </ButtonBase>
