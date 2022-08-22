@@ -1,3 +1,4 @@
+import { AvatarDto } from "../api/dto/avatar.dto"
 import { UserDto } from "../api/dto/user.dto"
 import { Homepage } from "../route/Homepage"
 import { Profile } from "../route/Profile"
@@ -8,17 +9,17 @@ interface RouteProps {
     setUser: any
     route: string
     setRoute: any
-    currentAvatar: string | null
+    currentAvatar: AvatarDto | null
     setCurrentAvatar: any
 }
 
 export const RouteHandler = ({
-    handleToggle, 
-    user, 
-    setUser, 
-    route, 
-    setRoute, 
-    currentAvatar, 
+    handleToggle,
+    user,
+    setUser,
+    route,
+    setRoute,
+    currentAvatar,
     setCurrentAvatar,
 
     }: RouteProps) => {
@@ -26,7 +27,7 @@ export const RouteHandler = ({
     // Profile
     if (route === 'Profile') {
         return (
-            <Profile 
+            <Profile
             user={user}
             setUser={setUser}
             currentAvatar={currentAvatar}

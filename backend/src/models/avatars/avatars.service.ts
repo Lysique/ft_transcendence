@@ -15,7 +15,6 @@ export class AvatarsService {
     const avatarDto: AvatarDto = new AvatarDto();
     avatarDto.data = avatar.data;
     avatarDto.id = avatar.id;
-    avatarDto.user = avatar.user;
 
     return avatarDto;
   }

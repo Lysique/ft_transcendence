@@ -4,13 +4,14 @@ import { UserDto } from "./api/dto/user.dto";
 import { UserAPI } from "./api/user.api";
 import ResponsiveAppBar from "./components/AppBar";
 import { RouteHandler } from "./components/RouteHandler";
+import { AvatarDto } from "./api/dto/avatar.dto";
 
 function App() {
 
   // Route handler
   const [route, setRoute] = React.useState('Homepage');
 
-  //  Dark/ligh mode
+  // Dark/ligh mode
   const [darkMode, setDarkMode] = useState(false);
 
   const theme = createTheme({
@@ -23,9 +24,7 @@ function App() {
     setDarkMode(!darkMode);
   };
 
-  //  Check if user is logged in to prevent errors
-  
-  //  User state
+  // Check if user is logged and retrieve profile
   const [user, setUser] = React.useState<UserDto | null>(null);
 
   React.useEffect(() => {
@@ -37,20 +36,13 @@ function App() {
     fetchProfile();
   }, [])
 
-  //  User profile pic
-  const [currentAvatar, setCurrentAvatar] = React.useState<string | null>(null);
+  // User profile pic -> When user change (useEffect)
+  const [currentAvatar, setCurrentAvatar] = React.useState<AvatarDto | null>(null);
 
   React.useEffect(() => {
-    const fetchCurrentAvatar = async () => {
-      const data = await UserAPI.getCurrentAvatar();
-      setCurrentAvatar(data);
-    }
+    setCurrentAvatar(user?.currentAvatar? user.currentAvatar : null);
 
-    fetchCurrentAvatar();
   }, [user])
-
-  React.useEffect(() => {
-  }, [currentAvatar])
 
   return (
     <ThemeProvider theme={theme}>

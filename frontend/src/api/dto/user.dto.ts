@@ -1,3 +1,5 @@
+import { AvatarDto } from "./avatar.dto";
+
 export enum UserStatus {
     Online = 0,
     Offline = 1,
@@ -9,5 +11,6 @@ export interface UserDto {
     name: string;
     status: UserStatus;
     secret: string;
+    currentAvatar: AvatarDto;
     twoFactAuth: boolean;
 }

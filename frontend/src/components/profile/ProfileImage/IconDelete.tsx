@@ -3,16 +3,26 @@ import { ImageListItemBar } from '@mui/material';
 import { UserAPI } from '../../../api/user.api';
 import ValidationPopup from '../../ValidationPopup';
 import CancelIcon from '@mui/icons-material/Cancel';
+import { AvatarDto } from '../../../api/dto/avatar.dto';
 
 interface IconDeleteInteface {
     itemId: number
-    setUser: any
+    currentAvatar: AvatarDto | null
+    setCurrentAvatar: any
+    setPhotos: any
   }
 
-export default function IconDelete({itemId, setUser}: IconDeleteInteface) {
+export default function IconDelete({
+    itemId,
+    currentAvatar,
+    setCurrentAvatar,
+    setPhotos
 
-    //  Confirmation popup
-    const [confirmation, setConfirmation] = React.useState(false);
+}: IconDeleteInteface) {
+
+
+    //  Validation popup
+    const [validation, setValidation] = React.useState(false);
 
     const [open, setOpen] = React.useState(false);
 
@@ -20,17 +30,25 @@ export default function IconDelete({itemId, setUser}: IconDeleteInteface) {
         setOpen(true);
     };
 
-    // Delete image if confirmed and setUser to update photos
+    // If validation is true ; remove avatar, update photos and update current avatar if changed
     React.useEffect(() => {
         const removeAvatar = async () => {
-            UserAPI.removeAvatar(itemId)
-            const data = await UserAPI.getUserProfile();
-            setUser(data);
+            await UserAPI.removeAvatar(itemId);
+
+            const avatars: AvatarDto[] = await UserAPI.getAllAvatars();
+            setPhotos(avatars);
+
+            const data = await UserAPI.getCurrentAvatar();
+            if (data !== currentAvatar) {
+              setCurrentAvatar(data);
+            }
         }
-        if (confirmation === true) {
+
+        if (validation === true) {
             removeAvatar();
         }
-    }, [confirmation, itemId, setUser]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [validation, currentAvatar, itemId]);
 
     return (
     <div>
@@ -52,7 +70,7 @@ export default function IconDelete({itemId, setUser}: IconDeleteInteface) {
         <ValidationPopup 
             open={open} 
             setOpen={setOpen} 
-            setConfirmation={setConfirmation} 
+            setValidation={setValidation} 
             message="Delete ?"
         />
     </div>

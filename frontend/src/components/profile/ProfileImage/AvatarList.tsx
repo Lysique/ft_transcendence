@@ -11,14 +11,22 @@ import { AvatarDto } from '../../../api/dto/avatar.dto';
 
 interface AvatarListProps {
   user: UserDto | null
-  setUser: any
-  selected: number | null
-  setSelected: any
+  currentAvatar: AvatarDto | null
+  setCurrentAvatar: any
+  selectedId: number | null
+  setSelectedId: any
 }
 
-export default function AvatarList({user, setUser, selected, setSelected}: AvatarListProps) {
+export default function AvatarList({
+  user,
+  currentAvatar,
+  setCurrentAvatar,
+  selectedId,
+  setSelectedId
 
-  // Photo list
+}: AvatarListProps) {
+
+  // Avatar list ; change when user is modified.
   const [photos, setPhotos] = React.useState<AvatarDto[] | null>(null);
 
   React.useEffect(() => {
@@ -31,7 +39,7 @@ export default function AvatarList({user, setUser, selected, setSelected}: Avata
   
   // List selection
   const handleSelected = (id: number) => {
-    setSelected(id);
+    setSelectedId(id);
   };
   
   // Show selected image
@@ -46,7 +54,7 @@ export default function AvatarList({user, setUser, selected, setSelected}: Avata
         }}
         position="bottom"
         actionIcon={
-          selected === itemId? 
+          selectedId === itemId? 
           <CheckBoxIcon style={{ color: 'white' }}/>
           :
           <CheckBoxOutlineBlankIcon style={{ color: 'white' }}/>
@@ -74,7 +82,9 @@ export default function AvatarList({user, setUser, selected, setSelected}: Avata
 
             <IconDelete 
               itemId={item.id}
-              setUser={setUser}
+              currentAvatar={currentAvatar}
+              setCurrentAvatar={setCurrentAvatar}
+              setPhotos={setPhotos}
             />
 
             <ShowSelected 

@@ -22,7 +22,7 @@ export class UserAPI {
 
     public static async logout() {
         await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/auth/logout`, {
-            method: "GET", 
+            method: "DELETE", 
             credentials: "include",
         })
     }
@@ -34,12 +34,12 @@ export class UserAPI {
         body: formData
     }).then((response) => {
         if (response.ok) {
-          return response.text();
+          return response.json();
         }
         throw new Error('Something went wrong');
       })
-      .then((responseText) => {
-        return responseText;
+      .then((responseJson) => {
+        return responseJson;
       })
       .catch((error) => {
         return null;
@@ -52,12 +52,12 @@ export class UserAPI {
         method: "GET"
     }).then((response) => {
         if (response.ok) {
-          return response.text();
+          return response.json();
         }
         throw new Error('Something went wrong');
       })
-      .then((responseText) => {
-        return responseText;
+      .then((responseJson) => {
+        return responseJson;
       })
       .catch((error) => {
         return null;
@@ -95,12 +95,12 @@ export class UserAPI {
       method: "POST"
     }).then((response) => {
       if (response.ok) {
-        return response.text();
+        return response.json();
       }
       throw new Error('Something went wrong');
       })
-      .then((responseText) => {
-        return responseText;
+      .then((responseJson) => {
+        return responseJson;
       })
       .catch((error) => {
         return null;

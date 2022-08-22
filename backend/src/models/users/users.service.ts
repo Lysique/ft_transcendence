@@ -1,7 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { timeStamp } from 'console';
 import { Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
@@ -26,7 +25,7 @@ export class UsersService {
     userDto.id = user.id;
     userDto.name = user.name;
     userDto.status = user.status;
-    userDto.currentAvatarId = user.currentAvatarId;
+    userDto.currentAvatar = user.currentAvatarId? {id: user.currentAvatarId, data:user.currentAvatarData} : null;
     userDto.twoFactAuth = user.twoFactAuth;
     userDto.secret = user.secret;
 
@@ -41,12 +40,13 @@ export class UsersService {
     user.id = createUserDto.id;
     user.name = createUserDto.name;
     user.twoFactAuth = false;
+    user.avatars = [];
 
     await this.userRepository.save(user);
 
     const userDto = this.entityToDto(user);
     const imageData: Buffer = await this.downloadImage(createUserDto.photoUrl);
-    this.addAvatar(userDto, imageData);
+    await this.addAvatar(userDto, imageData);
 
     return userDto;
   }
@@ -73,24 +73,25 @@ export class UsersService {
 
     await this.updateCurrentAvatar(userDto, avatarDto.id);
   }
+  
+    public async getCurrentAvatar(userDto: UserDto) {
+      const user = await this.userRepository.findOneBy({id: userDto.id});
+  
+      if (user.currentAvatarId == null) {
+        return null;
+      }
+      const avatarDto: AvatarDto = await this.avatarService.findOneById(user.currentAvatarId);
+  
+      return avatarDto;
+    };
 
   public async updateCurrentAvatar(userDto: UserDto, avatarId: number) {
     const avatarDto: AvatarDto = await this.avatarService.findOneById(avatarId);
 
     const user = await this.userRepository.findOneBy({id: userDto.id});
+    user.currentAvatarData = avatarDto.data;
     user.currentAvatarId = avatarDto.id;
     await this.userRepository.save(user);
-
-    return avatarDto;
-  };
-
-  public async getCurrentAvatar(userDto: UserDto) {
-    const user = await this.userRepository.findOneBy({id: userDto.id});
-
-    if (user.currentAvatarId == null) {
-      return null;
-    }
-    const avatarDto: AvatarDto = await this.avatarService.findOneById(user.currentAvatarId);
 
     return avatarDto;
   };
@@ -110,11 +111,11 @@ export class UsersService {
   public async removeAvatar(avatarId: number, userId: number) {
     this.avatarService.remove(avatarId);
 
-    const userDto: UserDto = await this.findOneById(userId);
+    const user = await this.userRepository.findOneBy({id: userId});
 
-    if (userDto.currentAvatarId == avatarId) {
-      const user = await this.userRepository.findOneBy({id: userDto.id});
+    if (user.currentAvatarId == avatarId) {
       user.currentAvatarId = null;
+      user.currentAvatarData = null;
       await this.userRepository.save(user);
     }
   }
@@ -159,7 +160,7 @@ export class UsersService {
   }
 
   //  Delete user.
-  public async remove(id: number) {
+  public async removeUser(id: number) {
     const user: User = await this.userRepository.findOneBy({ id: id});
 
     if (!user) throw new NotFoundException(`User with id ${id} was not found`);

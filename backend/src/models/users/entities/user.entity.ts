@@ -1,5 +1,5 @@
 import { Avatar } from "src/models/avatars/entities/avatar.entity";
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 
 export enum UserStatus {
     Online = 0,
@@ -19,8 +19,11 @@ export class User {
     @Column({ default: UserStatus.Online })
     status: UserStatus;
     
-    @OneToMany(() => Avatar, (avatar) => avatar.user, { nullable: true, eager: true })
+    @OneToMany(() => Avatar, (avatar) => avatar.user, { eager: true })
     avatars: Avatar[];
+
+    @Column({ nullable: true })
+    currentAvatarData: string;
 
     @Column({ nullable: true })
     currentAvatarId: number;

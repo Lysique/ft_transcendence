@@ -7,11 +7,11 @@ import DialogTitle from '@mui/material/DialogTitle';
 interface ValidationPopupProps {
     open: boolean
     setOpen: any
-    setConfirmation: any
+    setValidation: any
     message: string
 }
 
-export default function ValidationPopup({open, setOpen, setConfirmation, message}: ValidationPopupProps) {
+export default function ValidationPopup({open, setOpen, setValidation, message}: ValidationPopupProps) {
 
   const handleClose = () => {
     setOpen(false);
@@ -19,7 +19,7 @@ export default function ValidationPopup({open, setOpen, setConfirmation, message
 
   const handleConfirmation = (click: boolean) => {
     setOpen(false);
-    setConfirmation(click);
+    setValidation(click);
   };
 
   return (

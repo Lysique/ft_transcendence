@@ -7,36 +7,38 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { UserDto } from '../../../api/dto/user.dto';
 import AvatarList from './AvatarList';
 import { UserAPI } from '../../../api/user.api';
+import { AvatarDto } from '../../../api/dto/avatar.dto';
 
 interface PopupAvatarProps {
-    setOpen: any
     open: boolean
+    setOpen: any
     user: UserDto | null
-    setUser: any
+    currentAvatar: AvatarDto | null
     setCurrentAvatar: any
 }
 
-export default function PopupAvatars({open, setOpen, user, setUser, setCurrentAvatar}: PopupAvatarProps) {
+export default function PopupAvatars({open, setOpen, user, currentAvatar, setCurrentAvatar}: PopupAvatarProps) {
 
-  // List selection
-  const [selected, setSelected] = React.useState<number | null>(null);
+  // Selected avatar
+  const [selectedId, setSelectedId] = React.useState<number | null>(null);
 
-
+  // Close the the photo PopupAvatars with the AvatarList when click on cancel
   const handleClose = () => {
     setOpen(false);
-    setSelected(null);
+    setSelectedId(null);
   };
 
+  // Update the current avatar when clicked on the 'Set as profile image' button if one has been selected.
   const updateCurrentAvatar = () => {
     const updateAvatar = async () => {
-      if (selected) {
-        const data: string | null = await UserAPI.updateAvatar(selected)
+      if (selectedId && (currentAvatar == null || currentAvatar.id !== selectedId)) {
+        const data: AvatarDto | null = await UserAPI.updateAvatar(selectedId)
         setCurrentAvatar(data);
       }
     }
     updateAvatar();
     setOpen(false);
-    setSelected(null);
+    setSelectedId(null);
   };
 
   return (
@@ -52,9 +54,10 @@ export default function PopupAvatars({open, setOpen, user, setUser, setCurrentAv
 
     <AvatarList
     user={user}
-    setUser={setUser}
-    selected={selected}
-    setSelected={setSelected}
+    currentAvatar={currentAvatar}
+    setCurrentAvatar={setCurrentAvatar}
+    selectedId={selectedId}
+    setSelectedId={setSelectedId}
     />
 
     </DialogContent>

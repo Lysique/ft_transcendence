@@ -9,50 +9,64 @@ import { ButtonBase, IconButton } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
 import PopupAvatars from './PopupAvatars';
 import ConfirmationPopup from '../../ConfirmationPopup';
+import { UserDto } from '../../../api/dto/user.dto';
+import { AvatarDto } from '../../../api/dto/avatar.dto';
 
-export default function ProfileImage({currentAvatar, user, setCurrentAvatar, setUser}: any) {
+interface ProfileImageProps {
+  user: UserDto | null
+  currentAvatar: AvatarDto | null
+  setCurrentAvatar: any
+}
 
-  //  Add avatar
-  const [upload, setUpload] = React.useState<any | null>(null);
+export default function ProfileImage({
+  user,
+  currentAvatar,
+  setCurrentAvatar
+
+}: ProfileImageProps) {
+
+  //  When a file has been choosen ; set the file with the file but does not download yet
+  const [file, setFile] = React.useState<any | null>(null);
 
   const onUploadChange = (event: any) => {
-    if (!event.target.files[0]) {
-      setUpload(null);
-    }
-    else {
-      setUpload(event.target.files[0]);
-    }
+    setFile(event.target.files[0]);
   }
 
-  //  Upload avatar
+  //  Confirmation popup that the file has been uploaded
+  const [confirmation, setConfirmation] = React.useState(false);
+
+  //  Open the avatar list when true ; when avatar is clicked
+  const [openPhotos, setOpenPhotos] = React.useState(false);
+
+  const handleOpenPhotos = () => {
+    setOpenPhotos(true);
+  };
+
+  //  When the upload button is clicked ; upload the file and set the current avatar if changed
   const AddAvatar = async () => {
 
-      if (!upload) {
-        return ;
-      }
-    
-      const formData = new FormData();
-      formData.append('image', upload, upload.name);
+    const formData = new FormData();
+    formData.append('image', file, file.name);
 
-      const resp = await UserAPI.addAvatar(formData);
-      if (resp) {
-        setCurrentAvatar(resp);
-      }
-      setUpload(null);
-      setConfirmation(true);
+    const data = await UserAPI.addAvatar(formData);
+    if (data !== currentAvatar) {
+      setCurrentAvatar(data);
+    }
+    setFile(null);
+    setConfirmation(true);
   };
 
   const UploadButton = () => {
 
       return (
       <div>
-        {upload? 
+        {file? 
         <Button
           component="label"
           size="small"
           onClick={AddAvatar}
           >
-            Upload {upload.name}
+            Upload {file.name}
         </Button>
         : ""
         }
@@ -60,15 +74,6 @@ export default function ProfileImage({currentAvatar, user, setCurrentAvatar, set
       )
   };
 
-  //  Confirmation
-  const [confirmation, setConfirmation] = React.useState(false);
-
-  //  Photo list popup
-  const [open, setOpen] = React.useState(false);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
 
   return (
     <Card sx={{ maxWidth: 240, mt: 3, ml: 3 }}>
@@ -78,30 +83,32 @@ export default function ProfileImage({currentAvatar, user, setCurrentAvatar, set
         <CardMedia
           component="img"
           height="180"
-          src={currentAvatar ? `data:image/jpeg;base64,${currentAvatar}` : defaultAvatar}
+          src={currentAvatar ? `data:image/jpeg;base64,${currentAvatar.data}` : defaultAvatar}
           alt="green iguana"
-          onClick={handleClickOpen}
+          onClick={handleOpenPhotos}
         />
 
         <PopupAvatars
-          open={open}
-          setOpen={setOpen}
+          open={openPhotos}
+          setOpen={setOpenPhotos}
           user={user}
-          setUser={setUser}
+          currentAvatar={currentAvatar}
           setCurrentAvatar={setCurrentAvatar}
         />
       
       </ButtonBase>
 
       <CardActions>
-      <IconButton color="primary" aria-label="upload picture" component="label">
-        <input hidden accept="image/*" type="file" onChange={onUploadChange}/>
-        <PhotoCamera />
-      </IconButton>
+
+        <IconButton color="primary" aria-label="upload picture" component="label">
+          <input hidden accept="image/*" type="file" onChange={onUploadChange}/>
+          <PhotoCamera />
+        </IconButton>
 
         <UploadButton />
 
         <ConfirmationPopup open={confirmation} setOpen={setConfirmation} message="Uploaded !"/>
+
       </CardActions>
 
     </Card>

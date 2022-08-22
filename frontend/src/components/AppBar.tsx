@@ -17,13 +17,14 @@ import { useTheme } from "@mui/material/styles";
 import { UserAPI } from "../api/user.api";
 import { UserDto } from "../api/dto/user.dto";
 import defaultAvatar from '../default_avatar/profile_image.jpeg';
+import { AvatarDto } from "../api/dto/avatar.dto";
 
 interface ResponsiveAppBarProps {
   handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
   user: UserDto | null
   setUser: any
+  currentAvatar: AvatarDto | null
   setRoute: any
-  currentAvatar: string | null
 }
 
 const ResponsiveAppBar = ({
@@ -31,7 +32,7 @@ const ResponsiveAppBar = ({
   user,
   setUser,
   currentAvatar,
-  setRoute
+  setRoute,
 }: ResponsiveAppBarProps) => {
 
   const theme = useTheme();
@@ -60,32 +61,32 @@ const ResponsiveAppBar = ({
 
   // UserMenu
 
-  const setToProfile = () => {
+  const profileRedirect = () => {
     handleCloseUserMenu();
     setRoute('Profile');
   }
 
-  const ProfileRedirect = () => {
+  const ProfileButton = () => {
     return (
       <MenuItem 
         key="Profile"
-        onClick={setToProfile}
+        onClick={profileRedirect}
       >
         <Typography textAlign="center">Profile</Typography>
       </MenuItem>
    );
   };
 
-  const setToHomepage = () => {
+  const homepageButton = () => {
     handleCloseUserMenu();
     setRoute('Homepage');
   }
 
-  const HomepageRedirect = () => {
+  const HomepageButton = () => {
     return (
       <MenuItem 
         key="Homepage"
-        onClick={setToHomepage}
+        onClick={homepageButton}
       >
         <Typography textAlign="center">Home</Typography>
       </MenuItem>
@@ -127,7 +128,7 @@ const ResponsiveAppBar = ({
     return (
       <div>
       {settings.map((setting) => (
-        setting.onClick
+        setting.button
       ))}
       </div>
     );
@@ -136,21 +137,21 @@ const ResponsiveAppBar = ({
   const pages = ["Play now", "Chat with friends"];
   const loggedInSettings = [{
     name: "Logout",
-    onClick: LogoutButton()
+    button: LogoutButton()
   }, {
     name: "Profile",
-    onClick: ProfileRedirect()
+    button: ProfileButton()
   }, {
     name: "Homepage",
-    onClick: HomepageRedirect()
+    button: HomepageButton()
   }];
 
   const loggedOutSettings = [{
     name: "Login",
-    onClick: LoginButton()
+    button: LoginButton()
   }, {
     name: "Homepage",
-    onClick: HomepageRedirect()
+    button: HomepageButton()
   }];
 
   return (
@@ -253,7 +254,7 @@ const ResponsiveAppBar = ({
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar
                   alt="Remy Sharp"
-                  src={currentAvatar ? `data:image/jpeg;base64,${currentAvatar}` : defaultAvatar}
+                  src={currentAvatar ? `data:image/jpeg;base64,${currentAvatar.data}` : defaultAvatar}
                 />
               </IconButton>
             </Tooltip>

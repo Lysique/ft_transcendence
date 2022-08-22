@@ -1,4 +1,5 @@
 import React from "react";
+import { AvatarDto } from "../api/dto/avatar.dto";
 import { UserDto } from "../api/dto/user.dto";
 import ProfileImage from "../components/profile/ProfileImage/ProfileImage";
 
@@ -6,23 +7,23 @@ import ProfileImage from "../components/profile/ProfileImage/ProfileImage";
 interface ProfileProps {
     user: UserDto | null,
     setUser: any
-    currentAvatar: string | null,
+    currentAvatar: AvatarDto | null,
     setCurrentAvatar: any
 }
 
 export const Profile = ({
     user, 
-    currentAvatar, 
     setUser, 
+    currentAvatar, 
     setCurrentAvatar,
+
 }: ProfileProps) => {
 
     return (
         <div>
             <ProfileImage 
-                currentAvatar={currentAvatar}
                 user={user}
-                setUser={setUser}
+                currentAvatar={currentAvatar}
                 setCurrentAvatar={setCurrentAvatar}
             />
         </div>
