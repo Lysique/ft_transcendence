@@ -1,6 +1,5 @@
 import * as React from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
-import Fireworks from "../components/Fireworks";
 
 /* DRAWING FUNCTIONS */
 /* Draw rectangle */

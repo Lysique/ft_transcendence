@@ -2,7 +2,6 @@ import React from "react";
 
 import ProTip from "../components/ProTip";
 import Copyright from "../components/CopyRight";
-import Canvas from "../components/Canvas";
 
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -18,7 +17,7 @@ export const Homepage = () => {
           </Typography>
         </Box>
         <Box textAlign="center" sx={{ my: 3, py: 3, px: 3 }}>
-          <Canvas />
+          {/* <Canvas /> */}
         </Box>
         <ProTip />
         <Copyright />
