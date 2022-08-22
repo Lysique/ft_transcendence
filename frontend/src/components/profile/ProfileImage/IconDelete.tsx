@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ImageListItemBar } from '@mui/material';
 import { UserAPI } from '../../../api/user.api';
-import ValidationPopup from '../../ValidationPopup';
+import ValidationPopup from '../../utils/ValidationPopup';
 import CancelIcon from '@mui/icons-material/Cancel';
 
 interface IconDeleteInteface {

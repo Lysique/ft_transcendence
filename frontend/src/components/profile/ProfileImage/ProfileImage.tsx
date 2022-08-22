@@ -8,17 +8,19 @@ import { UserAPI } from '../../../api/user.api';
 import { ButtonBase, IconButton } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
 import PopupAvatars from './PopupAvatars';
-import ConfirmationPopup from '../../ConfirmationPopup';
+import ConfirmationPopup from '../../utils/ConfirmationPopup';
 import { UserDto } from '../../../api/dto/user.dto';
 
 interface ProfileImageProps {
   user: UserDto | null
   setUser: any
+  visitor: boolean
 }
 
 export default function ProfileImage({
   user,
-  setUser
+  setUser,
+  visitor
 
 }: ProfileImageProps) {
 
@@ -73,6 +75,20 @@ export default function ProfileImage({
 
 
   return (
+    <>
+    {visitor?
+
+      <Card sx={{ maxWidth: 240, mt: 3, ml: 3 }}>
+        <CardMedia
+        component="img"
+        height="180"
+        src={user && user.currentAvatar? `data:image/jpeg;base64,${user.currentAvatar.data}` : defaultAvatar}
+        alt="green iguana"
+        />
+      </Card>
+      
+    :
+
     <Card sx={{ maxWidth: 240, mt: 3, ml: 3 }}>
 
       <ButtonBase>
@@ -108,5 +124,7 @@ export default function ProfileImage({
       </CardActions>
 
     </Card>
+    }
+    </>
   );
 }

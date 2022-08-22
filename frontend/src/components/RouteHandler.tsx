@@ -25,6 +25,7 @@ export const RouteHandler = ({
             <Profile
             user={user}
             setUser={setUser}
+            visitor={true}
             />
         )
     }

@@ -1,16 +1,18 @@
 import React from "react";
 import { UserDto } from "../api/dto/user.dto";
-import ProfileImage from "../components/profile/ProfileImage/ProfileImage";
+import ProfileImage from "../components/profile/profileImage/ProfileImage";
 
 
 interface ProfileProps {
-    user: UserDto | null,
+    user: UserDto | null
     setUser: any
+    visitor: boolean
 }
 
 export const Profile = ({
     user, 
     setUser,
+    visitor
 
 }: ProfileProps) => {
 
@@ -19,6 +21,7 @@ export const Profile = ({
             <ProfileImage 
                 user={user}
                 setUser={setUser}
+                visitor={visitor}
             />
         </div>
     );
