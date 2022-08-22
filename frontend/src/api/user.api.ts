@@ -106,4 +106,24 @@ export class UserAPI {
         return null;
     });
   }
+
+  public static async updateName(name: string) {
+    return fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/name`, {
+      credentials: "include",
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name})
+    }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error('Something went wrong');
+      })
+      .then((responseJson) => {
+        return responseJson;
+      })
+      .catch((error) => {
+        return null;
+    });
+  }
 }

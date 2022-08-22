@@ -39,9 +39,7 @@ export class UsersController {
   ) {
     const user: any = req.user;
     const userDto: UserDto = await this.usersService.findOneById(user.id);
-    await this.usersService.addAvatar(userDto, file.buffer);
-
-    const avatarDto: AvatarDto | null = await this.usersService.getCurrentAvatar(userDto);
+    const avatarDto: AvatarDto = await this.usersService.addAvatar(userDto, file.buffer);
 
     return avatarDto;
   }
@@ -63,12 +61,12 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   public async updateCurrentAvatar(
     @Req() req: Request,
-    @Param('id') id: number
+    @Param('id') avatarId: number
     ) {
     const user: any = req.user;
     const userDto = await this.usersService.findOneById(user.id);
     
-    const avatarDto: AvatarDto = await this.usersService.updateCurrentAvatar(userDto, id);
+    const avatarDto: AvatarDto = await this.usersService.updateCurrentAvatar(userDto, avatarId);
 
     return avatarDto;
   }
@@ -97,9 +95,16 @@ export class UsersController {
     await this.usersService.removeAvatar(avatarId, user.id);
   }
 
-  @Delete(':id')
-  @HttpCode(204)
-  public async removeUser(@Param('id') id: string) {
-    this.usersService.removeUser(+id);
+  // Update name
+  @Post('/name')
+  @UseGuards(JwtAuthGuard)
+  public async updateName(
+    @Req() req: Request,
+    @Body() body: any
+    ) {
+      const user: any = req.user;
+      const userDto: UserDto | null = await this.usersService.updateName(user.id, body.name);
+
+      return userDto;
   }
 }

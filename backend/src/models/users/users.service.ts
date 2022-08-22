@@ -42,7 +42,13 @@ export class UsersService {
     user.twoFactAuth = false;
     user.avatars = [];
 
-    await this.userRepository.save(user);
+    try {
+      await this.userRepository.save(user);
+    }
+    catch(error) {
+      user.name = null;
+      await this.userRepository.save(user);
+    }
 
     const userDto = this.entityToDto(user);
     const imageData: Buffer = await this.downloadImage(createUserDto.photoUrl);
@@ -72,6 +78,8 @@ export class UsersService {
     });
 
     await this.updateCurrentAvatar(userDto, avatarDto.id);
+
+    return avatarDto;
   }
   
     public async getCurrentAvatar(userDto: UserDto) {
@@ -132,11 +140,28 @@ export class UsersService {
   //  Find one user by id.
   public async findOneById(id: number) {
     const user: User = await this.userRepository.findOneBy({ id: id });
+    
+    if (!user) {
+      return null;
+    }
 
-    if (!user) return null;
-  
     const userDto: UserDto = this.entityToDto(user);
 
+    return userDto;
+  }
+
+  public async updateName(id: number, name: string) {
+    const user: User = await this.userRepository.findOneBy({ id: id });
+
+    user.name = name;
+    try {
+      await this.userRepository.save(user);
+    }
+    catch(error) {
+      return null;
+    }
+
+    const userDto: UserDto = this.entityToDto(user);
     return userDto;
   }
 
@@ -157,14 +182,5 @@ export class UsersService {
     const userDto: UserDto = this.entityToDto(user);
 
     return userDto;
-  }
-
-  //  Delete user.
-  public async removeUser(id: number) {
-    const user: User = await this.userRepository.findOneBy({ id: id});
-
-    if (!user) throw new NotFoundException(`User with id ${id} was not found`);
-
-    await this.userRepository.remove(user);
   }
 }

@@ -1,6 +1,7 @@
 import { UserDto } from "../api/dto/user.dto"
 import { Homepage } from "../route/Homepage"
 import { Profile } from "../route/Profile"
+import { SetName } from "./auth/SetName"
 
 interface RouteProps {
     handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
@@ -18,6 +19,11 @@ export const RouteHandler = ({
     setRoute,
 
     }: RouteProps) => {
+    if (user && user.name == null) {
+        return (
+            <SetName setUser={setUser} />
+        )
+    }
 
     // Profile
     if (route === 'Profile') {
@@ -25,7 +31,7 @@ export const RouteHandler = ({
             <Profile
             user={user}
             setUser={setUser}
-            visitor={true}
+            visitor={false}
             />
         )
     }

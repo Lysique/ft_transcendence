@@ -13,7 +13,7 @@ export class User {
     @PrimaryColumn()
     id: number;
 
-    @Column({ unique: true })
+    @Column({ unique: true, nullable: true })
     name: string;
 
     @Column({ default: UserStatus.Online })
