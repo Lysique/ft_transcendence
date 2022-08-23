@@ -3,15 +3,16 @@ import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { UserDto } from "./api/dto/user.dto";
 import { UserAPI } from "./api/user.api";
 import ResponsiveAppBar from "./components/AppBar";
-import { RouteHandler } from "./components/RouteHandler";
+import { Route, Routes } from "react-router-dom";
+import { Homepage } from "./route/Homepage";
+import { Profile } from "./route/Profile";
 
 export const UserContext = React.createContext<UserDto | null>(null);
 export const SetUserContext = React.createContext<any>(null);
 
 function App() {
   
-  // Route handler
-	const [route, setRoute] = React.useState('Homepage');
+  React.useState('Homepage');
 	
 	/* Dark/light mode */
   const [darkMode, setDarkMode] = useState(false);
@@ -52,15 +53,16 @@ function App() {
     <SetUserContext.Provider value={setUser}>
     <CssBaseline />
     <div className="App">
+
       <ResponsiveAppBar
         handleToggle={handleToggle}
-        setRoute={setRoute}
-      />
-      <RouteHandler 
-        handleToggle={handleToggle}
-        route={route}
-        setRoute={setRoute}
-      />
+        />
+
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+        <Route path="/profile" element={<Profile />} />
+      </Routes>
+
     </div>
     </SetUserContext.Provider>
     </UserContext.Provider>

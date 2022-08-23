@@ -11,16 +11,15 @@ export const Profile = () => {
 
     return (
         <>
-        <Card sx={{ maxWidth: 240, mt: 3, ml: 3 }}>
-            <UserProfileImageDecorator>
-                <ProfileImage
-                    profileImage={user?.currentAvatar}
-                />
-            </UserProfileImageDecorator>
-        </Card>
-        
-        <ProfileName
-        />
+            <Card sx={{ maxWidth: 240, mt: 3, ml: 3 }}>
+                <UserProfileImageDecorator>
+                    <ProfileImage
+                        profileImage={user?.currentAvatar}
+                    />
+                </UserProfileImageDecorator>
+            </Card>
+            
+            <ProfileName/>
         </>
     );
 }

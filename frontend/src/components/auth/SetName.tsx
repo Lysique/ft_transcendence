@@ -1,22 +1,18 @@
 import { Button } from "@mui/material";
 import React from "react";
 import { UserAPI } from "../../api/user.api";
+import { SetUserContext } from "../../App";
 
+export const SetName = () => {
 
-interface ProfileProps {
-    setUser: any
-}
+    const setUser = React.useContext(SetUserContext)
 
-export const SetName = ({
-    setUser,
-
-}: ProfileProps) => {
+    
 
     const setName = async () => {
         const resp = await UserAPI.updateName('jean');
-        console.log(resp);
-        // const data = await UserAPI.getUserProfile();
-        // setUser(data);
+        const data = await UserAPI.getUserProfile();
+        setUser(data);
     };
 
     return (

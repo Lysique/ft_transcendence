@@ -17,15 +17,14 @@ import { useTheme } from "@mui/material/styles";
 import { UserAPI } from "../api/user.api";
 import defaultAvatar from '../default_avatar/profile_image.jpeg';
 import { SetUserContext, UserContext } from "../App";
+import { Link } from "react-router-dom";
 
 interface ResponsiveAppBarProps {
   handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
-  setRoute: any
 }
 
 const ResponsiveAppBar = ({
   handleToggle,
-  setRoute,
 }: ResponsiveAppBarProps) => {
 
   const user = React.useContext(UserContext);
@@ -58,32 +57,26 @@ const ResponsiveAppBar = ({
 
   // UserMenu
 
-  const profileRedirect = () => {
-    handleCloseUserMenu();
-    setRoute('Profile');
-  }
-
   const ProfileButton = () => {
     return (
       <MenuItem 
         key="Profile"
-        onClick={profileRedirect}
+        onClick={handleCloseUserMenu}
+        component={Link}
+        to="profile"
       >
         <Typography textAlign="center">Profile</Typography>
       </MenuItem>
    );
   };
 
-  const homepageButton = () => {
-    handleCloseUserMenu();
-    setRoute('Homepage');
-  }
-
   const HomepageButton = () => {
     return (
       <MenuItem 
         key="Homepage"
-        onClick={homepageButton}
+        onClick={handleCloseUserMenu}
+        component={Link}
+        to=""
       >
         <Typography textAlign="center">Home</Typography>
       </MenuItem>
@@ -113,6 +106,8 @@ const ResponsiveAppBar = ({
       <MenuItem 
         key="Logout" 
         onClick={Logout}
+        component={Link}
+        to=""
       >
         <Typography textAlign="center">Logout</Typography>
       </MenuItem>
@@ -170,6 +165,7 @@ const ResponsiveAppBar = ({
               textDecoration: "none",
             }}
           >
+            PING-PONG
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -224,7 +220,6 @@ const ResponsiveAppBar = ({
               textDecoration: "none",
             }}
           >
-            PING-PONG
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
