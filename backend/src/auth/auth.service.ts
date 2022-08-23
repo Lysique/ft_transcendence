@@ -41,10 +41,10 @@ export class AuthService {
     //  Generate a secret and an url
     async generateTwoFactAuthSecret(user: any): Promise<any> {
         const secret = authenticator.generateSecret();
+        await this.usersService.updateSecret(user.id, secret);
         
         const otpauthUrl = authenticator.keyuri(user.id.toString(), 'ft_transcendence', secret);
-        
-        await this.usersService.update(user.id, { twoFactAuth: true, secret: secret });
+
         return otpauthUrl;
     }
 
@@ -56,5 +56,9 @@ export class AuthService {
     //  Verify qr code scan
     async verifyTwoFactAuth(code: string, user: any) {
         return authenticator.verify({ token: code, secret: user.secret })
+    }
+
+    async turnOnTfa(user: any) {
+        await this.usersService.turnOnTfa(user.id);
     }
 }

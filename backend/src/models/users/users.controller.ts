@@ -1,6 +1,5 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpCode, UseInterceptors, UploadedFile, UseGuards, Req, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, HttpCode, UseInterceptors, UploadedFile, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Request } from 'express';
@@ -32,6 +31,18 @@ export class UsersController {
       const userDto: UserDto | null = await this.usersService.updateName(user.id, body.name);
 
       return userDto;
+  }
+
+  @Post('/turnOffTfa')
+  @UseGuards(JwtAuthGuard)
+  public async turnOffTfa(
+    @Req() req: Request,
+  ) {
+    const user: any = req.user;
+    await this.usersService.turnOffTfa(user.id);
+
+    const userDto: UserDto = await this.usersService.findOneById(user.id);
+    return userDto;
   }
 
   // Create a new avatar for the user

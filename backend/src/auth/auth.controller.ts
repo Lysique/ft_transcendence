@@ -73,7 +73,7 @@ export class AuthController {
       return this.authService.pipeQrCodeStream(res, otpauthUrl);
     }
     
-    // Qr code auth
+    // Qr code auth verification
     @UseGuards(JwtTwoFactAuthGuard)
     @Post('2fa')
     async verifyTwoFactAuth(
@@ -81,14 +81,21 @@ export class AuthController {
       @Body() body, 
       @Res() res: Response
       ) {
-      const isCodeValid = this.authService.verifyTwoFactAuth(body.twoFactAuth, req.user);
+      const user: any = req.user;
+      const isCodeValid = this.authService.verifyTwoFactAuth(body.twoFactAuth, user);
 
       if (!isCodeValid) {
+        if (user.twoFactAuth === false) {
+          return null;
+        }
         throw new UnauthorizedException('Wrong authentication code');
       }
 
-      // Find user or signup if does not exist
-      const userDto: UserDto = await this.authService.fetchUser(req.user);
+      if (user.twoFactAuth == false) {
+        await this.authService.turnOnTfa(user);
+      }
+
+      const userDto: UserDto = await this.authService.fetchUser(user);
 
       //  Create and store jwt token to enable connection
       const accessToken = await this.authService.generateToken({

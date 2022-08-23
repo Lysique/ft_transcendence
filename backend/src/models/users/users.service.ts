@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
 
@@ -81,17 +80,6 @@ export class UsersService {
 
     return avatarDto;
   }
-  
-    public async getCurrentAvatar(userDto: UserDto) {
-      const user = await this.userRepository.findOneBy({id: userDto.id});
-  
-      if (user.currentAvatarId == null) {
-        return null;
-      }
-      const avatarDto: AvatarDto = await this.avatarService.findOneById(user.currentAvatarId);
-  
-      return avatarDto;
-    };
 
   public async updateCurrentAvatar(userDto: UserDto, avatarId: number) {
     const avatarDto: AvatarDto = await this.avatarService.findOneById(avatarId);
@@ -165,22 +153,21 @@ export class UsersService {
     return userDto;
   }
 
-  //  Update user infos.
-  public async update(id: number, updateUserDto: UpdateUserDto) {
-    const user: User = await this.userRepository.findOneBy({ id: id});
+  public async updateSecret(id: number, secret: string) {
+    const user: User = await this.userRepository.findOneBy({ id: id });
+    user.secret = secret;
+    await this.userRepository.save(user); 
+  }
 
-    if (!user) throw new NotFoundException(`User with id ${id} was not found`);
-
-    //  Modify user variables.
-    user.name = updateUserDto.name || user.name;
-    user.status = updateUserDto.status || user.status;
-    user.secret = updateUserDto.secret || user.secret;
-    user.twoFactAuth = updateUserDto.twoFactAuth || user.twoFactAuth;
-
+  public async turnOnTfa(id: number) {
+    const user: User = await this.userRepository.findOneBy({ id: id });
+    user.twoFactAuth = true;
     await this.userRepository.save(user);
+  }
 
-    const userDto: UserDto = this.entityToDto(user);
-
-    return userDto;
+  public async turnOffTfa(id: number) {
+    const user: User = await this.userRepository.findOneBy({ id: id });
+    user.twoFactAuth = false;
+    await this.userRepository.save(user);
   }
 }
