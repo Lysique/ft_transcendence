@@ -37,11 +37,16 @@ function App() {
   
   // Check if user is logged and retrieve profile
   const [user, setUser] = React.useState<UserDto | null>(null);
+
+  const [loggedIn, setLoggedIn] = React.useState(false);
   
   React.useEffect(() => {
     const fetchProfile = async () => {
-      const data = await UserAPI.getUserProfile();
-      setUser(data);
+      const logged = await UserAPI.isLoggedIn();
+      setLoggedIn(logged.loggedIn);
+
+      const user = await UserAPI.getUserProfile();
+      setUser(user);
     }
 
     fetchProfile();

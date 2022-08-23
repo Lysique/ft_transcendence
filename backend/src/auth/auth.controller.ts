@@ -40,6 +40,12 @@ export class AuthController {
       //  Redirect to the frontend
       res.status(302).redirect(`http://${process.env.REACT_HOST}:${process.env.REACT_PORT}`);
     }
+
+    @UseGuards(JwtTwoFactAuthGuard)
+    @Get('isLogged')
+    async isLoggedIn() {
+      return {loggedIn: true};
+    }
   
     // User logout
     @UseGuards(JwtAuthGuard)
