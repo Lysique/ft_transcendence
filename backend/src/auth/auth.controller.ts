@@ -105,6 +105,7 @@ export class AuthController {
 
       res.cookie('jwt', accessToken, { httpOnly: true });
       
-      return userDto;
+      const {secret, ...rest} = userDto;
+      return rest;
     }
   }

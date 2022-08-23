@@ -17,7 +17,9 @@ export class UsersController {
     const user: any = req.user;
     const userDto: UserDto = await this.usersService.findOneById(user.id);
     
-    return userDto;
+    const {secret, ...rest} = userDto;
+
+    return rest;
   }
   
   // Update name
@@ -30,7 +32,9 @@ export class UsersController {
       const user: any = req.user;
       const userDto: UserDto | null = await this.usersService.updateName(user.id, body.name);
 
-      return userDto;
+      const {secret, ...rest} = userDto;
+
+      return rest;
   }
 
   @Post('/turnOffTfa')
@@ -42,7 +46,9 @@ export class UsersController {
     await this.usersService.turnOffTfa(user.id);
 
     const userDto: UserDto = await this.usersService.findOneById(user.id);
-    return userDto;
+    const {secret, ...rest} = userDto;
+
+    return rest;
   }
 
   // Create a new avatar for the user
@@ -57,7 +63,9 @@ export class UsersController {
     const userDto: UserDto = await this.usersService.findOneById(user.id);
     await this.usersService.addAvatar(userDto, file.buffer);
 
-    return userDto;
+    const {secret, ...rest} = userDto;
+
+    return rest;
   }
 
   // Set the current user's avatar
@@ -72,7 +80,9 @@ export class UsersController {
     
     await this.usersService.updateCurrentAvatar(userDto, avatarId);
 
-    return userDto;
+    const {secret, ...rest} = userDto;
+
+    return rest;
   }
 
   // Get all user's avatars
