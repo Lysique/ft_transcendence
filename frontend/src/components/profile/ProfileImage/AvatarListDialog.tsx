@@ -8,12 +8,12 @@ import AvatarList from './AvatarList';
 import { UserAPI } from '../../../api/user.api';
 import { SetUserContext } from '../../../App';
 
-interface PopupAvatarProps {
+interface AvatarListDialogProps {
     open: boolean
     setOpen: any
 }
 
-export default function PopupAvatars({open, setOpen}: PopupAvatarProps) {
+export default function AvatarListDialog({open, setOpen}: AvatarListDialogProps) {
 
   const setUser = React.useContext(SetUserContext);
 
@@ -42,26 +42,28 @@ export default function PopupAvatars({open, setOpen}: PopupAvatarProps) {
 
   return (
     <Dialog
-    open={open}
-    onClose={handleClose}
-    scroll={'paper'}
-    aria-labelledby="scroll-dialog-title"
-    aria-describedby="scroll-dialog-description"
+      open={open}
+      onClose={handleClose}
+      scroll={'paper'}
+      aria-labelledby="scroll-dialog-title"
     >
+    
     <DialogTitle id="scroll-dialog-title">Photo gallery</DialogTitle>
     <DialogContent dividers={true}>
 
     <AvatarList
-    selectedId={selectedId}
-    setSelectedId={setSelectedId}
+      selectedId={selectedId}
+      setSelectedId={setSelectedId}
     />
 
     </DialogContent>
+
     <DialogActions>
       <Button onClick={handleClose}>Cancel</Button>
       <div style={{flex: '0.9 0 0'}} />
       <Button onClick={updateCurrentAvatar}>Set as profile image</Button>
     </DialogActions>
+
     </Dialog>
   );
 }

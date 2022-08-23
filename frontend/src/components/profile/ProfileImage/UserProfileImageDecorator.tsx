@@ -4,15 +4,18 @@ import Button from '@mui/material/Button';
 import { UserAPI } from '../../../api/user.api';
 import { ButtonBase, IconButton } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
-import PopupAvatars from './PopupAvatars';
 import ConfirmationPopup from '../../utils/ConfirmationPopup';
 import { SetUserContext } from '../../../App';
+import AvatarListDialog from './AvatarListDialog';
 
-export default function ProfileImageButtons({
+interface UserProfileImageDecoratorProps {
+  children: JSX.Element
+}
+
+export default function UserProfileImageDecorator({
   children,
-}: {
-  children: JSX.Element,
-}) {
+
+}: UserProfileImageDecoratorProps ) {
 
   const setUser = React.useContext(SetUserContext);
 
@@ -55,7 +58,7 @@ export default function ProfileImageButtons({
         {children}
       </ButtonBase>
 
-      <PopupAvatars
+      <AvatarListDialog
         open={openPhotos}
         setOpen={setOpenPhotos}
       />
