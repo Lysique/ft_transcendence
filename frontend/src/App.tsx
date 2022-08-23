@@ -6,7 +6,7 @@ import ResponsiveAppBar from "./components/AppBar";
 import { Route, Routes } from "react-router-dom";
 import { Homepage } from "./route/Homepage";
 import { Profile } from "./route/Profile";
-import { SetName } from "./components/auth/SetName";
+import { UpdateUserName } from "./components/auth/UpdateUserName";
 
 export const UserContext = React.createContext<UserDto | null>(null);
 export const SetUserContext = React.createContext<any>(null);
@@ -65,13 +65,15 @@ function App() {
       />
 
       {
-        user && !user.name? <SetName /> : ''
-      }
+      user && !user.name?
+        <UpdateUserName /> 
+      : 
 
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/profile" element={<Profile />} />
       </Routes>
+      }
 
     </div>
     </SetUserContext.Provider>
