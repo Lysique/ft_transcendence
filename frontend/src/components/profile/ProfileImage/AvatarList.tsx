@@ -24,7 +24,7 @@ export default function AvatarList({
   const user = React.useContext(UserContext);
   const setUser = React.useContext(SetUserContext);
 
-  // Avatar list ; change when user is modified.
+  // Avatar list ; change when user is modified (user is modified when a photo is deleted)
   const [photos, setPhotos] = React.useState<AvatarDto[] | null>(null);
 
   React.useEffect(() => {
@@ -35,22 +35,26 @@ export default function AvatarList({
     fetchUserPhotos();
   }, [user]);
   
-  // List selection
+  // Change the selected id when an image is clicked
   const handleSelected = (id: number) => {
-    setSelectedId(id);
+    setSelectedId(id===selectedId? null : id);
   };
 
-  //  Validation popup
-  const [validation, setValidation] = React.useState(false);
-
-  const [open, setOpen] = React.useState(false);
-
+  // Change selected id and open validation when delete icon is clicked
   const handleClickOpen = (id: number) => {
       setSelectedId(id)
       setOpen(true);
   };
 
-  // If validation is true ; remove avatar and update user
+  // Props given to the validation popup to see if deletion is validated or not
+  const [validation, setValidation] = React.useState(false);
+
+  // Open validation popup
+  const [open, setOpen] = React.useState(false);
+
+
+  // If validation is true ; remove avatar and update user with the selected id.
+  // Validation can only change when clicking on delete icon
   React.useEffect(() => {
       const removeAvatar = async () => {
           await UserAPI.removeAvatar(selectedId as number);
