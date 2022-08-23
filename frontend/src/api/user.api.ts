@@ -36,15 +36,6 @@ export class UserAPI {
     
   }
 
-    public static async getCurrentAvatar(): Promise<string | null> {
-      const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/avatar`, {
-        credentials: "include",
-        method: "GET"
-      });
-
-      return (resp.ok? resp.json() : null);
-  }
-
   public static async getAllAvatars() {
     const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/avatars`, {
       credentials: "include",
@@ -71,14 +62,13 @@ export class UserAPI {
   }
 
   public static async updateName(name: string) {
-    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/name`, {
+    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/updateName`, {
       credentials: "include",
       method: "POST",
-      headers: { 'Content-Type': 'application/json' },
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ name: name})
     });
     
     return (resp.ok? resp.json() : null);
   }
-
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpCode, UseInterceptors, UploadedFile, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, HttpCode, UseInterceptors, UploadedFile, UseGuards, Req, Patch } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -11,22 +11,27 @@ import { UserDto } from './dto/user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  //  Create a new user
-  @Post()
-  public async create(@Body() createUserDto: CreateUserDto) {
-    const resp = await this.usersService.create(createUserDto);
-
-    return resp;
-  }
-
   // Check if user is logged in and get user profile.
   @UseGuards(JwtAuthGuard)
-  @Get('profile')
+  @Get('/profile')
   async profile(@Req() req: Request) {
     const user: any = req.user;
     const userDto: UserDto = await this.usersService.findOneById(user.id);
     
     return userDto;
+  }
+  
+  // Update name
+  @Post('/updateName')
+  @UseGuards(JwtAuthGuard)
+  public async updateName(
+    @Req() req: Request,
+    @Body() body: any
+    ) {
+      const user: any = req.user;
+      const userDto: UserDto | null = await this.usersService.updateName(user.id, body.name);
+
+      return userDto;
   }
 
   // Create a new avatar for the user
@@ -39,21 +44,9 @@ export class UsersController {
   ) {
     const user: any = req.user;
     const userDto: UserDto = await this.usersService.findOneById(user.id);
-    const avatarDto: AvatarDto = await this.usersService.addAvatar(userDto, file.buffer);
+    await this.usersService.addAvatar(userDto, file.buffer);
 
-    return avatarDto;
-  }
-
-  // Get the current user's avatar
-  @Get('/avatar')
-  @UseGuards(JwtAuthGuard)
-  public async getCurrentAvatar(@Req() req: Request) {
-    const user: any = req.user;
-    const userDto = await this.usersService.findOneById(user.id);
-    
-    const avatarDto: AvatarDto | null = await this.usersService.getCurrentAvatar(userDto);
-
-    return avatarDto;
+    return userDto;
   }
 
   // Set the current user's avatar
@@ -66,9 +59,9 @@ export class UsersController {
     const user: any = req.user;
     const userDto = await this.usersService.findOneById(user.id);
     
-    const avatarDto: AvatarDto = await this.usersService.updateCurrentAvatar(userDto, avatarId);
+    await this.usersService.updateCurrentAvatar(userDto, avatarId);
 
-    return avatarDto;
+    return userDto;
   }
 
   // Get all user's avatars
@@ -78,9 +71,9 @@ export class UsersController {
     const user: any = req.user;
     const userDto = await this.usersService.findOneById(user.id);
     
-    const avatarDto: AvatarDto[] | null = await this.usersService.getAllAvatars(userDto);
+    const avatarDtos: AvatarDto[] | null = await this.usersService.getAllAvatars(userDto);
 
-    return avatarDto;
+    return avatarDtos;
   }
 
   // Remove one avatar. Not in avatar controller to prevent circular depedency.
@@ -93,18 +86,5 @@ export class UsersController {
     ) {
     const user: any = req.user;
     await this.usersService.removeAvatar(avatarId, user.id);
-  }
-
-  // Update name
-  @Post('/name')
-  @UseGuards(JwtAuthGuard)
-  public async updateName(
-    @Req() req: Request,
-    @Body() body: any
-    ) {
-      const user: any = req.user;
-      const userDto: UserDto | null = await this.usersService.updateName(user.id, body.name);
-
-      return userDto;
   }
 }
