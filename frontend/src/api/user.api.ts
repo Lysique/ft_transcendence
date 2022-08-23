@@ -61,7 +61,7 @@ export class UserAPI {
     return (resp.ok? resp.json() : null);
   }
 
-  public static async updateName(name: string) {
+  public static async updateName(name: string): Promise<UserDto | null> {
     const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/updateName`, {
       credentials: "include",
       method: "POST",

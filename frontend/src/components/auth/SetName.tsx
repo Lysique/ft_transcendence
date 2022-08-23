@@ -7,19 +7,26 @@ export const SetName = () => {
 
     const setUser = React.useContext(SetUserContext)
 
-    
+    const [name, setName] = React.useState("");
 
-    const setName = async () => {
-        const resp = await UserAPI.updateName('jean');
-        const data = await UserAPI.getUserProfile();
-        setUser(data);
+    const handleInput = (e: any) => {
+        setName(e.target.value);
+    };
+
+    const updateName = async () => {
+        const resp = await UserAPI.updateName(name);
+        if (resp) {
+            setUser(resp);
+        }
     };
 
     return (
-        <div>
-            <Button onClick={setName}>
-                MyButton
+        <>
+        <h2>A little filou has taken your name ! Please choose an other one.</h2>
+            <input type="text" onChange={handleInput}></input>
+            <Button onClick={updateName}>
+                Choose name
             </Button>
-        </div>
+        </>
     );
 }

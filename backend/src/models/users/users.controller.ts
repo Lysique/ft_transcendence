@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpCode, UseInterceptors, UploadedFile, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, HttpCode, UseInterceptors, UploadedFile, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -31,6 +31,10 @@ export class UsersController {
     ) {
       const user: any = req.user;
       const userDto: UserDto | null = await this.usersService.updateName(user.id, body.name);
+
+      if (!userDto) {
+        throw new UnauthorizedException();
+      }
 
       const {secret, ...rest} = userDto;
 
