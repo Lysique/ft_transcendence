@@ -86,7 +86,7 @@ export class AuthController {
 
       if (!isCodeValid) {
         if (user.twoFactAuth === false) {
-          return null;
+          return {valid: false};
         }
         throw new UnauthorizedException('Wrong authentication code');
       }
@@ -95,17 +95,14 @@ export class AuthController {
         await this.authService.turnOnTfa(user);
       }
 
-      const userDto: UserDto = await this.authService.fetchUser(user);
-
       //  Create and store jwt token to enable connection
       const accessToken = await this.authService.generateToken({
-        sub: userDto.id,
+        sub: user.id,
         isTwoFactAuth: true,
       });
 
       res.cookie('jwt', accessToken, { httpOnly: true });
       
-      const {secret, ...rest} = userDto;
-      return rest;
+      return {valid: true};
     }
   }
