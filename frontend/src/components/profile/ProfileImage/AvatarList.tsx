@@ -6,23 +6,21 @@ import { Button, ImageListItemBar } from '@mui/material';
 import IconDelete from './IconDelete';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import { UserDto } from '../../../api/dto/user.dto';
 import { AvatarDto } from '../../../api/dto/avatar.dto';
+import { UserContext } from '../../../App';
 
 interface AvatarListProps {
-  user: UserDto | null
-  setUser: any
   selectedId: number | null
   setSelectedId: any
 }
 
 export default function AvatarList({
-  user,
-  setUser,
   selectedId,
   setSelectedId
 
 }: AvatarListProps) {
+
+  const user = React.useContext(UserContext);
 
   // Avatar list ; change when user is modified.
   const [photos, setPhotos] = React.useState<AvatarDto[] | null>(null);
@@ -80,7 +78,6 @@ export default function AvatarList({
 
             <IconDelete 
               itemId={item.id}
-              setUser={setUser}
             />
 
             <ShowSelected 

@@ -4,18 +4,18 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { UserDto } from '../../../api/dto/user.dto';
 import AvatarList from './AvatarList';
 import { UserAPI } from '../../../api/user.api';
+import { SetUserContext } from '../../../App';
 
 interface PopupAvatarProps {
     open: boolean
     setOpen: any
-    user: UserDto | null
-    setUser: any
 }
 
-export default function PopupAvatars({open, setOpen, user, setUser}: PopupAvatarProps) {
+export default function PopupAvatars({open, setOpen}: PopupAvatarProps) {
+
+  const setUser = React.useContext(SetUserContext);
 
   // Selected avatar
   const [selectedId, setSelectedId] = React.useState<number | null>(null);
@@ -52,8 +52,6 @@ export default function PopupAvatars({open, setOpen, user, setUser}: PopupAvatar
     <DialogContent dividers={true}>
 
     <AvatarList
-    user={user}
-    setUser={setUser}
     selectedId={selectedId}
     setSelectedId={setSelectedId}
     />

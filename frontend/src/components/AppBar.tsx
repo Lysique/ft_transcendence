@@ -15,24 +15,24 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useTheme } from "@mui/material/styles";
 import { UserAPI } from "../api/user.api";
-import { UserDto } from "../api/dto/user.dto";
 import defaultAvatar from '../default_avatar/profile_image.jpeg';
+import { SetUserContext, UserContext } from "../App";
 
 interface ResponsiveAppBarProps {
   handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
-  user: UserDto | null
-  setUser: any
   setRoute: any
 }
 
 const ResponsiveAppBar = ({
   handleToggle,
-  user,
-  setUser,
   setRoute,
 }: ResponsiveAppBarProps) => {
 
+  const user = React.useContext(UserContext);
+  const setUser = React.useContext(SetUserContext);
+
   const theme = useTheme();
+
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null

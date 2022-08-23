@@ -9,20 +9,17 @@ import { ButtonBase, IconButton } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
 import PopupAvatars from './PopupAvatars';
 import ConfirmationPopup from '../../utils/ConfirmationPopup';
-import { UserDto } from '../../../api/dto/user.dto';
+import { SetUserContext, UserContext } from '../../../App';
 
 interface ProfileImageProps {
-  user: UserDto | null
-  setUser: any
-  visitor: boolean
 }
 
 export default function ProfileImage({
-  user,
-  setUser,
-  visitor
 
 }: ProfileImageProps) {
+
+  const user = React.useContext(UserContext);
+  const setUser = React.useContext(SetUserContext);
 
   //  When a file has been choosen ; set the file with the file but does not download yet
   const [file, setFile] = React.useState<any | null>(null);
@@ -76,19 +73,6 @@ export default function ProfileImage({
 
   return (
     <>
-    {visitor?
-
-      <Card sx={{ maxWidth: 240, mt: 3, ml: 3 }}>
-        <CardMedia
-        component="img"
-        height="180"
-        src={user && user.currentAvatar? `data:image/jpeg;base64,${user.currentAvatar.data}` : defaultAvatar}
-        alt="green iguana"
-        />
-      </Card>
-      
-    :
-
     <Card sx={{ maxWidth: 240, mt: 3, ml: 3 }}>
 
       <ButtonBase>
@@ -104,8 +88,6 @@ export default function ProfileImage({
         <PopupAvatars
           open={openPhotos}
           setOpen={setOpenPhotos}
-          user={user}
-          setUser={setUser}
         />
       
       </ButtonBase>
@@ -124,7 +106,6 @@ export default function ProfileImage({
       </CardActions>
 
     </Card>
-    }
     </>
   );
 }

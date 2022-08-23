@@ -3,18 +3,18 @@ import { ImageListItemBar } from '@mui/material';
 import { UserAPI } from '../../../api/user.api';
 import ValidationPopup from '../../utils/ValidationPopup';
 import CancelIcon from '@mui/icons-material/Cancel';
+import { SetUserContext } from '../../../App';
 
 interface IconDeleteInteface {
     itemId: number
-    setUser: any
   }
 
 export default function IconDelete({
     itemId,
-    setUser
 
 }: IconDeleteInteface) {
 
+    const setUser = React.useContext(SetUserContext);
 
     //  Validation popup
     const [validation, setValidation] = React.useState(false);
