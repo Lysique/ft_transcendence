@@ -57,8 +57,8 @@ export default function AvatarList({
 
           const data = await UserAPI.getUserProfile();
           setUser(data);
+          setValidation(false);
       }
-      console.log(validation)
       if (validation === true) {
           removeAvatar();
       }
