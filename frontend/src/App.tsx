@@ -46,11 +46,11 @@ function App() {
         />
         <Routes>
           <Route path="/profile" element={<Profile />} />
-          {/* <Route path="/" element={<Homepage />} /> */}
+          <Route path="/" element={<Homepage />} />
         </Routes>
-        <WebsocketProvider value={socket}>
+        {/* <WebsocketProvider value={socket}>
           <Websocket />
-        </WebsocketProvider>
+        </WebsocketProvider> */}
       </div>
     </ThemeProvider>
   );

@@ -14,24 +14,24 @@ export const Homepage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
 
-  useEffect(() => {
-    if (canvasRef.current) {
-      const renderCtx = canvasRef.current.getContext("2d");
+//   useEffect(() => {
+//     if (canvasRef.current) {
+//       const renderCtx = canvasRef.current.getContext("2d");
 
-      if (renderCtx) {
-        setContext(renderCtx);
-      }
+//       if (renderCtx) {
+//         setContext(renderCtx);
+//       }
 
-      if (context) {
-        context.beginPath();
-        context.fillStyle = "#ff7f50";
-        context.arc(440, 60, 50, 0, Math.PI * 2, true);
-        context.fill();
-        context.fillStyle = "#000";
-        context.closePath();
-      }
-    }
-  }, [context]);
+//       if (context) {
+//         context.beginPath();
+//         context.fillStyle = "#ff7f50";
+//         context.arc(440, 60, 50, 0, Math.PI * 2, true);
+//         context.fill();
+//         context.fillStyle = "#000";
+//         context.closePath();
+//       }
+//     }
+//   }, [context]);
 
   return (
     <div className="Homepage">

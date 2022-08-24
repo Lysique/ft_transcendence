@@ -8,7 +8,6 @@ class Ball {
   speed: number;
   velocityX: number;
   velocityY: number;
-  color: string;
 
   constructor() {
     this.x = (500 * 0.5) / 2;
@@ -17,7 +16,6 @@ class Ball {
     this.speed = 500 / 200;
     this.velocityX = 500 / 150;
     this.velocityY = 500 / 150;
-    this.color = 'black';
   }
 }
 
@@ -27,14 +25,12 @@ class Player1 {
   y: number;
   width: number;
   height: number;
-  color: string;
 
   constructor() {
     this.x = 0;
     this.y = (500 * 0.5 - 500 * 0.1) / 2;
     this.width = 10;
     this.height = 500 * 0.1;
-    this.color = 'black';
   }
 }
 
@@ -44,14 +40,12 @@ class Player2 {
   y: number;
   width: number;
   height: number;
-  color: string;
 
   constructor() {
     this.x = 500 * 0.5 - 10;
     this.y = (500 * 0.5 - 500 * 0.1) / 2;
     this.width = 10;
     this.height = 500 * 0.1;
-    this.color = 'black';
   }
 }
 
@@ -68,10 +62,70 @@ class Game {
   }
 }
 
+/* Collision detection */
+function collision(ball: Ball, player: any) {
+  let ballTop = ball.y - ball.radius;
+  let ballBottom = ball.y + ball.radius;
+  let ballLeft = ball.x - ball.radius;
+  let ballRight = ball.x + ball.radius;
+
+  player.top = player.y;
+  player.bottom = player.y + player.height;
+  player.left = player.x;
+  player.right = player.x + player.width;
+
+  return (
+    player.left < ballRight &&
+    player.top < ballBottom &&
+    player.right > ballLeft &&
+    player.bottom > ballTop
+  );
+}
+
 @Injectable()
 export class GameService {
-  setUpGame() {
+  setUpGame(): Game {
     const game = new Game();
-    console.log('This action adds a new game');
+    return game;
+  }
+
+  updateGame(game: Game): Game {
+    game.ball.x += game.ball.velocityX; // * ratioX
+    game.ball.y += game.ball.velocityY; // * ratioY
+
+    /* Computer paddle */
+    let computerLevel: number = 0.1;
+    game.player2.y +=
+      (game.ball.y - (game.player2.y + game.player2.height / 2)) *
+      computerLevel;
+
+    if (
+      game.ball.y + game.ball.radius > 500 ||
+      game.ball.y - game.ball.radius < 0
+    ) {
+      game.ball.velocityY = -game.ball.velocityY;
+    }
+
+    /* Player paddle */
+    let player =
+      game.ball.x + game.ball.radius < 500 / 2 ? game.player1 : game.player2;
+
+    if (collision(game.ball, player) === true) {
+      let collidePoint = game.ball.y - (player.y + player.height / 2);
+      collidePoint = collidePoint / (player.height / 2);
+
+      /* Calculate angle in Radian */
+      let angleRad = (collidePoint * Math.PI) / 4;
+
+      /* X direction  of ball when hit */
+      let direction = game.ball.x + game.ball.radius < 500 / 2 ? 1 : -1;
+
+      /* Change velocity */
+      game.ball.velocityX = direction * game.ball.speed * Math.cos(angleRad);
+      game.ball.velocityY = game.ball.speed * Math.sin(angleRad);
+
+      game.ball.speed += 0.1;
+    }
+    return game;
   }
 }

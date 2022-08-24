@@ -14,23 +14,23 @@ export const Websocket = () => {
     socket.on("connect", () => {
       console.log("Connected");
     });
-    socket.on("onMessage", (data: MessagePayload) => {
-      console.log("onMessage event received");
+    socket.on("gameLaunched", (data: MessagePayload) => {
+      console.log("Game launched");
       console.log(data);
     });
     return () => {
       console.log("unregistering Events...");
       socket.off("connect");
-      socket.off("onMessage");
+      socket.off("gameLaunched");
     };
-  }, []);
+  }, [socket]);
 
   const onSubmit = () => {
     socket.emit("events", value);
 	setValue('');
   };
   const launchGame = () => {
-    socket.emit("createGame");
+    socket.emit("launchGame");
   };
 
   return (
