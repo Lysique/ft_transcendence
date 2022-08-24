@@ -53,6 +53,12 @@ function App() {
     fetchProfile();
   }, [])
 
+  // 
+  const handleCloseUpdateUsername = async () => {
+    await UserAPI.logout();
+    setUser(null);
+  }
+
   return (
     <ThemeProvider theme={theme}>
     <UserContext.Provider value={user}>
@@ -66,7 +72,11 @@ function App() {
 
       {
       user && !user.name?
-        <UpdateUserName /> 
+        <UpdateUserName 
+          open={true}
+          handleClose={handleCloseUpdateUsername}
+          message={'A little filou has taken your intra username! :shokedface: Please choose an other one.'}
+        /> 
       : 
 
       <Routes>

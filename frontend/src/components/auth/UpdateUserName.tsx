@@ -9,7 +9,13 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { SetUserContext } from '../../App';
 import { UserAPI } from '../../api/user.api';
 
-export const UpdateUserName = () => {
+interface UpdateUserNameProps {
+    handleClose: any
+    open: boolean
+    message: string
+}
+
+export const UpdateUserName = ({open, handleClose, message} : UpdateUserNameProps) => {
 
     const setUser = React.useContext(SetUserContext)
 
@@ -34,19 +40,14 @@ export const UpdateUserName = () => {
             setError('Already taken')
         }
     };
-  
-    const handleCancel = () => {
-      setUser(null);
-    };
 
     return (
         <>
-            <Dialog open={true}>
+            <Dialog open={open}>
                 <DialogTitle>Subscribe</DialogTitle>
                 <DialogContent>
                 <DialogContentText>
-                    A little filou has taken your intra username! :shokedface:
-                    Please choose an other one.
+                    {message}
                 </DialogContentText>
                 <TextField
                     autoFocus
@@ -60,7 +61,7 @@ export const UpdateUserName = () => {
                 />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCancel}>Cancel</Button>
+                    <Button onClick={handleClose}>Cancel</Button>
                     <Button onClick={updateName}>Set name</Button>
                 </DialogActions>
             </Dialog>
