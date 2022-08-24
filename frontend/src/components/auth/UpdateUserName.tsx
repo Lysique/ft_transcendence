@@ -15,14 +15,23 @@ export const UpdateUserName = () => {
 
     const [name, setName] = React.useState("");
 
+    const [error, setError] = React.useState<string | null>(null);
+
     const handleInput = (e: any) => {
         setName(e.target.value);
     };
 
     const updateName = async () => {
+        if (name === "") {
+            setError('Empty field')
+            return ;
+        }
         const resp = await UserAPI.updateName(name);
         if (resp) {
             setUser(resp);
+        }
+        else {
+            setError('Already taken')
         }
     };
   
@@ -46,6 +55,8 @@ export const UpdateUserName = () => {
                     fullWidth
                     variant="standard"
                     onChange={handleInput}
+                    error={error!=null}
+                    helperText={error}
                 />
                 </DialogContent>
                 <DialogActions>
