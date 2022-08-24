@@ -6,16 +6,17 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { SetUserContext } from '../../App';
-import { UserAPI } from '../../api/user.api';
+import { SetUserContext } from '../../../App';
+import { UserAPI } from '../../../api/user.api';
 
 interface UpdateUserNameProps {
     handleClose: any
     open: boolean
+    handleCancel?: any
     message: string
 }
 
-export const UpdateUserName = ({open, handleClose, message} : UpdateUserNameProps) => {
+export const UpdateUserName = ({open, handleClose, handleCancel, message} : UpdateUserNameProps) => {
 
     const setUser = React.useContext(SetUserContext)
 
@@ -35,6 +36,8 @@ export const UpdateUserName = ({open, handleClose, message} : UpdateUserNameProp
         const resp = await UserAPI.updateName(name);
         if (resp) {
             setUser(resp);
+            setError(null);
+            handleClose();
         }
         else {
             setError('Already taken')
@@ -61,7 +64,7 @@ export const UpdateUserName = ({open, handleClose, message} : UpdateUserNameProp
                 />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button onClick={handleCancel? handleCancel : handleClose}>Cancel</Button>
                     <Button onClick={updateName}>Set name</Button>
                 </DialogActions>
             </Dialog>

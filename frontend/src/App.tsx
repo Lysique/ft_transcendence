@@ -6,7 +6,7 @@ import ResponsiveAppBar from "./components/AppBar";
 import { Route, Routes } from "react-router-dom";
 import { Homepage } from "./route/Homepage";
 import { Profile } from "./route/Profile";
-import { UpdateUserName } from "./components/auth/UpdateUserName";
+import UsernameTaken from "./components/auth/UsernameTaken";
 
 export const UserContext = React.createContext<UserDto | null>(null);
 export const SetUserContext = React.createContext<any>(null);
@@ -53,12 +53,6 @@ function App() {
     fetchProfile();
   }, [])
 
-  // 
-  const handleCloseUpdateUsername = async () => {
-    await UserAPI.logout();
-    setUser(null);
-  }
-
   return (
     <ThemeProvider theme={theme}>
     <UserContext.Provider value={user}>
@@ -72,12 +66,8 @@ function App() {
 
       {
       user && !user.name?
-        <UpdateUserName 
-          open={true}
-          handleClose={handleCloseUpdateUsername}
-          message={'A little filou has taken your intra username! :shokedface: Please choose an other one.'}
-        /> 
-      : 
+        <UsernameTaken />
+      :
 
       <Routes>
         <Route path="/" element={<Homepage />} />
