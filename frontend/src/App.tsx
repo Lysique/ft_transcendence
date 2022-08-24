@@ -4,6 +4,8 @@ import { UserDto } from "./api/dto/user.dto";
 import { UserAPI } from "./api/user.api";
 import ResponsiveAppBar from "./components/AppBar";
 import { RouteHandler } from "./components/RouteHandler";
+import { socket, WebsocketProvider } from "./contexts/WebsocketContext";
+import { Websocket } from "./components/Websockets";
 
 function App() {
 	
@@ -11,6 +13,7 @@ function App() {
 	const [route, setRoute] = React.useState('Homepage');
 	
 	/* Dark/light mode */
+
   const [darkMode, setDarkMode] = useState(false);
 
   const theme = createTheme({
@@ -39,7 +42,6 @@ function App() {
       const data = await UserAPI.getUserProfile();
       setUser(data);
     }
-
     fetchProfile();
   }, [])
 
