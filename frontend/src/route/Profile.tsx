@@ -21,7 +21,7 @@ export const Profile = () => {
     return (
         <>  
 
-        <Stack direction="row">
+        <Stack direction="row" alignItems={'center'}>
 
         <Card sx={{ maxWidth: 240, mt: 3, ml: 3 }} >
             <UserProfileImageDecorator>
@@ -36,7 +36,7 @@ export const Profile = () => {
         </Typography>
 
         </Stack>
-        <Stack spacing={5} width={240} sx={{ mt: 5 }}>
+        <Stack spacing={5} width={240} sx={{ mt: 5, ml: 3}}>
 
         <Item>
         <ProfileName />

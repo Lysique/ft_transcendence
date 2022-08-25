@@ -8,6 +8,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import {  Stack } from '@mui/material';
 import TfaInput from './TfaInput';
 import { UserAPI } from '../../../api/user.api';
+import { SetUserContext } from '../../../App';
+import { AuthCodeRef } from 'react-auth-code-input';
 
 
 interface TfaEnableProps {
@@ -18,19 +20,25 @@ interface TfaEnableProps {
 
 export default function TfaEnable({open, setOpen, qrCode} : TfaEnableProps) {
 
+  const setUser = React.useContext(SetUserContext);
+  
   const [result, setResult] = React.useState("");
+  const [error, setError] = React.useState(false);
+  const AuthInputRef = React.useRef<AuthCodeRef>(null);
+  
 
   React.useEffect(() => {
     const enableTfa = async () => {
       const resp = await UserAPI.validateTfa(result);
       if (resp.valid === true) {
-        console.log(resp);
+        const user = await UserAPI.getUserProfile();
+        setUser(user);
       }
       else {
-        console.log('prout');
+        setError(true);
       }
+      AuthInputRef.current?.clear()
     }
-
     if (result.length === 6) {
       enableTfa();
     }
@@ -45,6 +53,7 @@ export default function TfaEnable({open, setOpen, qrCode} : TfaEnableProps) {
     <div>
       <Dialog
         open={open}
+        maxWidth={false}
       >
         <DialogTitle>
           {"Two factor authentification setup"}
@@ -65,7 +74,11 @@ export default function TfaEnable({open, setOpen, qrCode} : TfaEnableProps) {
             />
 
 
-          <TfaInput setResult={setResult}/>
+          <TfaInput
+            setResult={setResult}
+            error={error}
+            AuthInputRef={AuthInputRef}
+          />
 
         </Stack>
 

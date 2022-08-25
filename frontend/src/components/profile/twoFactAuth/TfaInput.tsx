@@ -1,15 +1,28 @@
+import { FormControl, FormHelperText } from '@mui/material';
 import * as React from 'react';
 import AuthCode from 'react-auth-code-input';
 import "./styles.css";
 
 
-export default function TfaInput({setResult}: any) {
+export default function TfaInput({setResult, error, AuthInputRef}: any) {
 
-  const handleOnChange = (res: string) => {
+
+const handleOnChange = (res: string) => {
     setResult(res);
-  };
+};
 
   return (
-    <AuthCode allowedCharacters='numeric' onChange={handleOnChange} containerClassName="container" inputClassName="input"/>
+    <>
+    <FormControl sx={{ m: 3 }} error={true} variant="standard">
+    <AuthCode
+        allowedCharacters='numeric'
+        onChange={handleOnChange}
+        containerClassName="container"
+        inputClassName="input"
+        ref={AuthInputRef}
+    />
+        {error? <FormHelperText>Code invalid</FormHelperText>: ''}
+    </FormControl>
+    </>
   )
 }

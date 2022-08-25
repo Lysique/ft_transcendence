@@ -68,7 +68,7 @@ export default function TfaToggle() {
 
     return (
         <>
-        <Box>
+        <Box >
         <Typography variant="h6" display="flex" >
             Two factor authentification
         </Typography>

@@ -45,7 +45,7 @@ export class AuthService {
         
         const otpauthUrl = authenticator.keyuri(user.id.toString(), 'ft_transcendence', secret);
 
-        return secret;
+        return otpauthUrl;
     }
 
     //  Url to qr code
