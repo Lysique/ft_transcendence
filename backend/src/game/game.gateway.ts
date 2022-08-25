@@ -49,24 +49,34 @@ export class GameGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() window: WindowInfo,
   ) {
-    const gameInfo = this.gameService.setUpGame(window);
+    const gameInfo = this.gameService.setUpGame(client, window);
     client.emit('gameLaunched', gameInfo);
+    setInterval(() => {
+      this.gameService.updateGame(gameInfo, window);
+      client.emit('gameUpdate', gameInfo);
+    }, 1000 / 60);
   }
 
-  //   @SubscribeMessage('events')
-  //   handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
-  //     console.log('Message body: ' + data);
+  @SubscribeMessage('paddleDown')
+  paddleDown(@ConnectedSocket() client: Socket) {
+    this.gameService.updatePaddle(client, game, 'down');
+  }
 
-  //     /* Send response to client only */
-  //     client.emit('onMessage', {
-  //       msg: 'Test Message only you can see',
-  //       content: data,
-  //     });
-
-  //     /* Send response to everyone */
-  //     this.server.emit('onMessage', {
-  //       msg: 'New Message everyone can see',
-  //       content: data,
-  //     });
-  //   }
+  @SubscribeMessage('paddleUp')
+  paddleUp(@ConnectedSocket() client: Socket) {
+    this.gameService.updatePaddle(client, game, 'up');
+  }
 }
+
+//     /* Send response to client only */
+//     client.emit('onMessage', {
+//       msg: 'Test Message only you can see',
+//       content: data,
+//     });
+
+//     /* Send response to everyone */
+//     this.server.emit('onMessage', {
+//       msg: 'New Message everyone can see',
+//       content: data,
+//     });
+//   }

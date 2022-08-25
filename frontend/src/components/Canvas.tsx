@@ -137,6 +137,15 @@ const Canvas = () => {
     };
   }, [socket]);
 
+  useEffect(() => {
+    socket.on("gameUpdate", (data: Game) => {
+      setGameState(data);
+    });
+    return () => {
+      socket.off("gameUpdate");
+    };
+  });
+
   /* Send info to Websocket server */
   const launchGame = () => {
     socket.emit("launchGame", {
