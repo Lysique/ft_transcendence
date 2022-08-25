@@ -18,7 +18,7 @@ export default function ConfirmationPopup({open, setOpen, message}: Confirmation
   };
 
   return (
-    <div>
+    <>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -34,6 +34,6 @@ export default function ConfirmationPopup({open, setOpen, message}: Confirmation
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 }

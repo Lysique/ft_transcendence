@@ -48,7 +48,7 @@ export class AuthController {
     }
   
     // User logout
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtTwoFactAuthGuard)
     @HttpCode(204)
     @Delete('logout')
     async logout(@Res({passthrough: true}) response: Response) {

@@ -3,8 +3,18 @@ import * as React from 'react';
 import AuthCode from 'react-auth-code-input';
 import "./styles.css";
 
+interface TfaInputProps {
+    setResult: any
+    error: boolean
+    AuthInputRef: any
+  }
 
-export default function TfaInput({setResult, error, AuthInputRef}: any) {
+export default function TfaInput({
+    setResult,
+    error,
+    AuthInputRef
+    
+}: TfaInputProps) {
 
 
 const handleOnChange = (res: string) => {

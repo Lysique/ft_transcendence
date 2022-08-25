@@ -66,6 +66,8 @@ export default function TfaToggle() {
         // eslint-disable-next-line
     }, [validation]);
 
+
+
     return (
         <>
         <Box >
@@ -74,11 +76,11 @@ export default function TfaToggle() {
         </Typography>
         <FormControlLabel 
             control={<Switch 
-                checked={user?.twoFactAuth}
+                checked={user?.twoFactAuth? true: false}
                 onChange={handleChange}
             />}
             sx={{ ml: 3, mt: 2 }}
-            label="Label"
+            label={user?.twoFactAuth? "enabled" : "disabled"}
         />
         </Box>
 
@@ -88,13 +90,13 @@ export default function TfaToggle() {
             setValidation={setValidation} 
             title={message.title}
             message={message.message}
-          />
+        />
 
-          <TfaEnable 
+        <TfaEnable 
             open={openTfaEnable}
             setOpen={setOpenTfaEnable}
             qrCode={qrCode}
-          />
+        />
           
         </>
     );

@@ -7,6 +7,7 @@ import { Route, Routes } from "react-router-dom";
 import { Homepage } from "./route/Homepage";
 import { Profile } from "./route/Profile";
 import UsernameTaken from "./components/auth/UsernameTaken";
+import TwoFactAuth from "./components/auth/TwoFactAuth";
 
 export const UserContext = React.createContext<UserDto | null>(null);
 export const SetUserContext = React.createContext<any>(null);
@@ -43,15 +44,21 @@ function App() {
   
   React.useEffect(() => {
     const fetchProfile = async () => {
-      const logged = await UserAPI.isLoggedIn();
-      setLoggedIn(logged.loggedIn);
-
       const user = await UserAPI.getUserProfile();
       setUser(user);
     }
 
     fetchProfile();
   }, [])
+
+  React.useEffect(() => {
+    const isLoggedIn = async () => {
+      const logged = await UserAPI.isLoggedIn();
+      setLoggedIn(logged.loggedIn);
+    }
+
+    isLoggedIn();
+  }, [user])
 
   return (
     <ThemeProvider theme={theme}>
@@ -66,10 +73,16 @@ function App() {
 
       {
       user && !user.name?
+
         <UsernameTaken />
+
+      : loggedIn && !user?
+
+      <TwoFactAuth setLoggedIn={setLoggedIn}/>
+
       :
 
-      <Routes>
+      <Routes >
         <Route path="/" element={<Homepage />} />
         <Route path="/profile" element={<Profile />} />
       </Routes>

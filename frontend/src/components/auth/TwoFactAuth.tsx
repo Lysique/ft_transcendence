@@ -5,23 +5,18 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import {  Stack } from '@mui/material';
-import TfaInput from './TfaInput';
-import { UserAPI } from '../../../api/user.api';
-import { SetUserContext } from '../../../App';
 import { AuthCodeRef } from 'react-auth-code-input';
+import { SetUserContext } from '../../App';
+import { UserAPI } from '../../api/user.api';
+import TfaInput from '../profile/twoFactAuth/TfaInput';
 
-interface TfaEnableProps {
-  open: boolean
-  setOpen: any
-  qrCode: string
+interface TwoFactAuthProps {
+  setLoggedIn: any
 }
 
-export default function TfaEnable({
-  open,
-  setOpen,
-  qrCode,
-} : TfaEnableProps) {
+export default function TwoFactAuth({
+  setLoggedIn
+} : TwoFactAuthProps) {
 
   const setUser = React.useContext(SetUserContext);
   
@@ -31,10 +26,9 @@ export default function TfaEnable({
   const AuthInputRef = React.useRef<AuthCodeRef>(null);
   
   React.useEffect(() => {
-    const enableTfa = async () => {
+    const checkTfa = async () => {
       const resp = await UserAPI.validateTfa(result);
-      if (resp.valid === true) {
-        handleClose();
+      if (resp) {
         const user = await UserAPI.getUserProfile();
         setUser(user);
       }
@@ -44,47 +38,37 @@ export default function TfaEnable({
       AuthInputRef.current?.clear()
     }
     if (result.length === 6) {
-      enableTfa();
+      checkTfa();
     }
     // eslint-disable-next-line
   }, [result])
 
   const handleClose = () => {
-    setOpen(false);
+    UserAPI.logout();
+    setLoggedIn(false);
   };
 
   return (
     <>
       <Dialog
-        open={open}
+        open={true}
         maxWidth={false}
       >
         <DialogTitle>
-          {"Two factor authentification setup"}
+          {"Two factor authentification login"}
         </DialogTitle>
 
         <DialogContent>
 
           <DialogContentText>
-            Please scan the qr code with the google authenticator app and enter the received code.
+            Enter google auth code to login
           </DialogContentText>
-
-          <Stack direction="row">
-
-          <img
-              src={qrCode}
-              alt='qrCode'
-              loading="lazy"
-            />
-
 
           <TfaInput
             setResult={setResult}
             error={error}
             AuthInputRef={AuthInputRef}
           />
-
-        </Stack>
 
         </DialogContent>
         <DialogActions>

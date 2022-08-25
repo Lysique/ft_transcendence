@@ -95,9 +95,9 @@ const ResponsiveAppBar = ({
    );
   };
 
-  async function Logout(props: any) {
+  async function Logout() {
     handleCloseUserMenu();
-    UserAPI.logout();
+    await UserAPI.logout();
     setUser(null);
   }
 
