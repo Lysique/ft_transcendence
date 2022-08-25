@@ -50,11 +50,7 @@ export class AuthService {
 
     //  Url to qr code
     async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
-        return toFileStream(stream, otpauthUrl, {
-            type: 'png',
-            width: 200,
-            errorCorrectionLevel: 'H'
-        });
+        return toFileStream(stream, otpauthUrl);
     }
 
     //  Verify qr code scan

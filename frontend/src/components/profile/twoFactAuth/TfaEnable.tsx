@@ -5,6 +5,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import {  Stack } from '@mui/material';
+import TfaInput from './TfaInput';
+import { UserAPI } from '../../../api/user.api';
+
 
 interface TfaEnableProps {
   open: boolean
@@ -13,6 +17,25 @@ interface TfaEnableProps {
 }
 
 export default function TfaEnable({open, setOpen, qrCode} : TfaEnableProps) {
+
+  const [result, setResult] = React.useState("");
+
+  React.useEffect(() => {
+    const enableTfa = async () => {
+      const resp = await UserAPI.validateTfa(result);
+      if (resp.valid === true) {
+        console.log(resp);
+      }
+      else {
+        console.log('prout');
+      }
+    }
+
+    if (result.length === 6) {
+      enableTfa();
+    }
+  }, [result])
+
 
   const handleClose = () => {
     setOpen(false);
@@ -33,14 +56,20 @@ export default function TfaEnable({open, setOpen, qrCode} : TfaEnableProps) {
             Please scan the qr code with the google authenticator app and enter the received code.
           </DialogContentText>
 
+          <Stack direction="row">
+
           <img
               src={qrCode}
               alt='qrCode'
               loading="lazy"
             />
 
-        </DialogContent>
 
+          <TfaInput setResult={setResult}/>
+
+        </Stack>
+
+        </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
           <Button onClick={handleClose}>Submit</Button>

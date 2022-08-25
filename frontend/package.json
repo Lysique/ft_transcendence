@@ -17,6 +17,8 @@
     "@types/react-dom": "^18.0.6",
     "dotenv": "^16.0.1",
     "react": "^18.2.0",
+    "react-auth-code-input": "^3.2.1",
+    "react-code-input": "^3.10.1",
     "react-dom": "^18.2.0",
     "react-particles": "^2.2.2",
     "react-scripts": "5.0.1",
@@ -49,6 +51,8 @@
     ]
   },
   "devDependencies": {
-    "react-router-dom": "^6.3.0"
+    "css-loader": "^6.7.1",
+    "react-router-dom": "^6.3.0",
+    "style-loader": "^3.3.1"
   }
 }

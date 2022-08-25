@@ -71,14 +71,14 @@ export class AuthController {
     
     // Qr code auth verification
     @UseGuards(JwtTwoFactAuthGuard)
-    @Post('2fa')
+    @Post('2fa/validate')
     async verifyTwoFactAuth(
       @Req() req: Request, 
       @Body() body, 
-      @Res() res: Response
+      @Res({ passthrough: true }) res: Response
       ) {
       const user: any = req.user;
-      const isCodeValid = this.authService.verifyTwoFactAuth(body.twoFactAuth, user);
+      const isCodeValid = await this.authService.verifyTwoFactAuth(body.code, user);
 
       if (!isCodeValid) {
         if (user.twoFactAuth === false) {
@@ -86,7 +86,7 @@ export class AuthController {
         }
         throw new UnauthorizedException('Wrong authentication code');
       }
-
+      
       if (user.twoFactAuth == false) {
         await this.authService.turnOnTfa(user);
       }
@@ -96,9 +96,9 @@ export class AuthController {
         sub: user.id,
         isTwoFactAuth: true,
       });
-
-      res.cookie('jwt', accessToken, { httpOnly: true });
       
+      res.cookie('jwt', accessToken, { httpOnly: true });
+
       return {valid: true};
     }
   }

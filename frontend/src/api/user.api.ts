@@ -89,4 +89,14 @@ export class UserAPI {
 
     return (resp.ok? resp.blob() : null);
   }
+
+  public static async validateTfa(code: string) {
+    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/auth/2fa/validate`, {
+      credentials: "include",
+      method: "POST",
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ code: code})
+    });
+    return (resp.ok? resp.json() : null);
+  }
 }
