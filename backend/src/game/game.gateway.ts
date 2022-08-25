@@ -57,16 +57,16 @@ export class GameGateway
     }, 1000 / 60);
   }
 
-  @SubscribeMessage('paddleDown')
-  paddleDown(@ConnectedSocket() client: Socket) {
-    this.gameService.updatePaddle(client, game, 'down');
-  }
+//   @SubscribeMessage('paddleDown')
+//   paddleDown(@ConnectedSocket() client: Socket) {
+//     this.gameService.updatePaddle(client, game, 'down');
+//   }
 
-  @SubscribeMessage('paddleUp')
-  paddleUp(@ConnectedSocket() client: Socket) {
-    this.gameService.updatePaddle(client, game, 'up');
-  }
-}
+//   @SubscribeMessage('paddleUp')
+//   paddleUp(@ConnectedSocket() client: Socket) {
+//     this.gameService.updatePaddle(client, game, 'up');
+//   }
+// }
 
 //     /* Send response to client only */
 //     client.emit('onMessage', {
@@ -79,4 +79,4 @@ export class GameGateway
 //       msg: 'New Message everyone can see',
 //       content: data,
 //     });
-//   }
+   }
