@@ -40,9 +40,15 @@ export class AuthController {
       //  Redirect to the frontend
       res.status(302).redirect(`http://${process.env.REACT_HOST}:${process.env.REACT_PORT}`);
     }
+
+    @UseGuards(JwtTwoFactAuthGuard)
+    @Get('isLogged')
+    async isLoggedIn() {
+      return {loggedIn: true};
+    }
   
     // User logout
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtTwoFactAuthGuard)
     @HttpCode(204)
     @Delete('logout')
     async logout(@Res({passthrough: true}) response: Response) {
@@ -55,43 +61,44 @@ export class AuthController {
     async generate(@Req() req: Request, @Res() res: Response) {
       
       //  Generate a new token // To change so it can verify if the setup is ok
-      const user: UserDto = await this.authService.fetchUser(req.user);
-      const accessToken = await this.authService.generateToken({
-        sub: user.id,
-        isTwoFactAuth: true
-      });
-      res.cookie('jwt', accessToken, { httpOnly: true });
-      
+      const user: any = req.user;
+
       //  Generate the secret for the user and the qrCode
-      const otpauthUrl = await this.authService.generateTwoFactAuthSecret(req.user);
-      return this.authService.pipeQrCodeStream(res, otpauthUrl);
+      const otpauthUrl = await this.authService.generateTwoFactAuthSecret(user);
+      const qrCode = await this.authService.pipeQrCodeStream(res, otpauthUrl);
+      return qrCode;
     }
     
-    // Qr code auth
+    // Qr code auth verification
     @UseGuards(JwtTwoFactAuthGuard)
-    @Post('2fa')
+    @Post('2fa/validate')
     async verifyTwoFactAuth(
       @Req() req: Request, 
       @Body() body, 
-      @Res() res: Response
+      @Res({ passthrough: true }) res: Response
       ) {
-      const isCodeValid = this.authService.verifyTwoFactAuth(body.twoFactAuth, req.user);
+      const user: any = req.user;
+      const isCodeValid = await this.authService.verifyTwoFactAuth(body.code, user);
 
       if (!isCodeValid) {
+        if (user.twoFactAuth === false) {
+          return {valid: false};
+        }
         throw new UnauthorizedException('Wrong authentication code');
       }
-
-      // Find user or signup if does not exist
-      const userDto: UserDto = await this.authService.fetchUser(req.user);
+      
+      if (user.twoFactAuth == false) {
+        await this.authService.turnOnTfa(user);
+      }
 
       //  Create and store jwt token to enable connection
       const accessToken = await this.authService.generateToken({
-        sub: userDto.id,
+        sub: user.id,
         isTwoFactAuth: true,
       });
-
-      res.cookie('jwt', accessToken, { httpOnly: true });
       
-      return userDto;
+      res.cookie('jwt', accessToken, { httpOnly: true });
+
+      return {valid: true};
     }
   }

@@ -15,24 +15,23 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useTheme } from "@mui/material/styles";
 import { UserAPI } from "../api/user.api";
-import { UserDto } from "../api/dto/user.dto";
 import defaultAvatar from '../default_avatar/profile_image.jpeg';
+import { SetUserContext, UserContext } from "../App";
+import { Link } from "react-router-dom";
 
 interface ResponsiveAppBarProps {
   handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
-  user: UserDto | null
-  setUser: any
-  setRoute: any
 }
 
 const ResponsiveAppBar = ({
   handleToggle,
-  user,
-  setUser,
-  setRoute,
 }: ResponsiveAppBarProps) => {
 
+  const user = React.useContext(UserContext);
+  const setUser = React.useContext(SetUserContext);
+
   const theme = useTheme();
+
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
@@ -58,32 +57,26 @@ const ResponsiveAppBar = ({
 
   // UserMenu
 
-  const profileRedirect = () => {
-    handleCloseUserMenu();
-    setRoute('Profile');
-  }
-
   const ProfileButton = () => {
     return (
       <MenuItem 
         key="Profile"
-        onClick={profileRedirect}
+        onClick={handleCloseUserMenu}
+        component={Link}
+        to="profile"
       >
         <Typography textAlign="center">Profile</Typography>
       </MenuItem>
    );
   };
 
-  const homepageButton = () => {
-    handleCloseUserMenu();
-    setRoute('Homepage');
-  }
-
   const HomepageButton = () => {
     return (
       <MenuItem 
         key="Homepage"
-        onClick={homepageButton}
+        onClick={handleCloseUserMenu}
+        component={Link}
+        to=""
       >
         <Typography textAlign="center">Home</Typography>
       </MenuItem>
@@ -102,9 +95,9 @@ const ResponsiveAppBar = ({
    );
   };
 
-  async function Logout(props: any) {
+  async function Logout() {
     handleCloseUserMenu();
-    UserAPI.logout();
+    await UserAPI.logout();
     setUser(null);
   }
 
@@ -113,6 +106,8 @@ const ResponsiveAppBar = ({
       <MenuItem 
         key="Logout" 
         onClick={Logout}
+        component={Link}
+        to=""
       >
         <Typography textAlign="center">Logout</Typography>
       </MenuItem>
@@ -224,7 +219,6 @@ const ResponsiveAppBar = ({
               textDecoration: "none",
             }}
           >
-            PING-PONG
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (

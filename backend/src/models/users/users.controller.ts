@@ -1,6 +1,5 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpCode, UseInterceptors, UploadedFile, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, HttpCode, UseInterceptors, UploadedFile, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Request } from 'express';
@@ -11,22 +10,49 @@ import { UserDto } from './dto/user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  //  Create a new user
-  @Post()
-  public async create(@Body() createUserDto: CreateUserDto) {
-    const resp = await this.usersService.create(createUserDto);
-
-    return resp;
-  }
-
   // Check if user is logged in and get user profile.
   @UseGuards(JwtAuthGuard)
-  @Get('profile')
+  @Get('/profile')
   async profile(@Req() req: Request) {
     const user: any = req.user;
     const userDto: UserDto = await this.usersService.findOneById(user.id);
     
-    return userDto;
+    const {secret, ...rest} = userDto;
+
+    return rest;
+  }
+  
+  // Update name
+  @Post('/updateName')
+  @UseGuards(JwtAuthGuard)
+  public async updateName(
+    @Req() req: Request,
+    @Body() body: any
+    ) {
+      const user: any = req.user;
+      const userDto: UserDto | null = await this.usersService.updateName(user.id, body.name);
+
+      if (!userDto) {
+        throw new UnauthorizedException();
+      }
+
+      const {secret, ...rest} = userDto;
+
+      return rest;
+  }
+
+  @Post('/turnOffTfa')
+  @UseGuards(JwtAuthGuard)
+  public async turnOffTfa(
+    @Req() req: Request,
+  ) {
+    const user: any = req.user;
+    await this.usersService.turnOffTfa(user.id);
+
+    const userDto: UserDto = await this.usersService.findOneById(user.id);
+    const {secret, ...rest} = userDto;
+
+    return rest;
   }
 
   // Create a new avatar for the user
@@ -41,21 +67,9 @@ export class UsersController {
     const userDto: UserDto = await this.usersService.findOneById(user.id);
     await this.usersService.addAvatar(userDto, file.buffer);
 
-    const avatarDto: AvatarDto | null = await this.usersService.getCurrentAvatar(userDto);
+    const {secret, ...rest} = userDto;
 
-    return avatarDto;
-  }
-
-  // Get the current user's avatar
-  @Get('/avatar')
-  @UseGuards(JwtAuthGuard)
-  public async getCurrentAvatar(@Req() req: Request) {
-    const user: any = req.user;
-    const userDto = await this.usersService.findOneById(user.id);
-    
-    const avatarDto: AvatarDto | null = await this.usersService.getCurrentAvatar(userDto);
-
-    return avatarDto;
+    return rest;
   }
 
   // Set the current user's avatar
@@ -63,14 +77,16 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   public async updateCurrentAvatar(
     @Req() req: Request,
-    @Param('id') id: number
+    @Param('id') avatarId: number
     ) {
     const user: any = req.user;
     const userDto = await this.usersService.findOneById(user.id);
     
-    const avatarDto: AvatarDto = await this.usersService.updateCurrentAvatar(userDto, id);
+    await this.usersService.updateCurrentAvatar(userDto, avatarId);
 
-    return avatarDto;
+    const {secret, ...rest} = userDto;
+
+    return rest;
   }
 
   // Get all user's avatars
@@ -80,9 +96,9 @@ export class UsersController {
     const user: any = req.user;
     const userDto = await this.usersService.findOneById(user.id);
     
-    const avatarDto: AvatarDto[] | null = await this.usersService.getAllAvatars(userDto);
+    const avatarDtos: AvatarDto[] | null = await this.usersService.getAllAvatars(userDto);
 
-    return avatarDto;
+    return avatarDtos? avatarDtos : [];
   }
 
   // Remove one avatar. Not in avatar controller to prevent circular depedency.
@@ -95,11 +111,5 @@ export class UsersController {
     ) {
     const user: any = req.user;
     await this.usersService.removeAvatar(avatarId, user.id);
-  }
-
-  @Delete(':id')
-  @HttpCode(204)
-  public async removeUser(@Param('id') id: string) {
-    this.usersService.removeUser(+id);
   }
 }
