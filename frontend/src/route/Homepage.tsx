@@ -1,4 +1,5 @@
 import React from "react";
+import { useState, useEffect, useRef } from "react";
 
 import ProTip from "../components/ProTip";
 import Copyright from "../components/CopyRight";
@@ -8,6 +9,9 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
 export const Homepage = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
+
   return (
     <div className="Homepage">
       <Container maxWidth="lg">

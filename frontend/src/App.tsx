@@ -3,6 +3,8 @@ import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { UserDto } from "./api/dto/user.dto";
 import { UserAPI } from "./api/user.api";
 import ResponsiveAppBar from "./components/AppBar";
+import { socket, WebsocketProvider } from "./contexts/WebsocketContext";
+import { Websocket } from "./components/Websockets";
 import { Route, Routes } from "react-router-dom";
 import { Homepage } from "./route/Homepage";
 import { Profile } from "./route/Profile";
@@ -17,6 +19,7 @@ function App() {
   React.useState('Homepage');
 	
 	/* Dark/light mode */
+
   const [darkMode, setDarkMode] = useState(false);
   
   const theme = createTheme({
@@ -47,7 +50,6 @@ function App() {
       const user = await UserAPI.getUserProfile();
       setUser(user);
     }
-
     fetchProfile();
   }, [])
 
