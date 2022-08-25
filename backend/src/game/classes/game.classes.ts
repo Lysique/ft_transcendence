@@ -1,5 +1,4 @@
 import { WindowInfo } from '../interfaces/game.interfaces';
-import { Socket } from 'socket.io';
 
 export class Ball {
   x: number;
@@ -24,7 +23,7 @@ export class Player1 {
   y: number;
   width: number;
   height: number;
-  socketID: Socket;
+  socketID: string;
 
   constructor(window: WindowInfo) {
     this.x = 0;
@@ -39,7 +38,7 @@ export class Player2 {
   y: number;
   width: number;
   height: number;
-  socketID: Socket;
+  socketID: string;
 
   constructor(window: WindowInfo) {
     this.x = window.width * 0.5 - 10;

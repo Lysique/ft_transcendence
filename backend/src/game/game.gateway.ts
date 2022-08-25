@@ -12,6 +12,7 @@ import { Server, Socket } from 'socket.io';
 import { Inject, Logger } from '@nestjs/common';
 import { GameService } from './game.service';
 import { WindowInfo } from './interfaces/game.interfaces';
+import { Game } from './classes/game.classes';
 
 @WebSocketGateway({
   cors: {
@@ -21,9 +22,14 @@ import { WindowInfo } from './interfaces/game.interfaces';
 export class GameGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(@Inject(GameService) private gameService: GameService) {}
+  private gameSessions: Map<string, Game>;
+  private windowInfo: WindowInfo;
+  private logger: Logger;
 
-  private logger: Logger = new Logger('GameGateay');
+  constructor(@Inject(GameService) private gameService: GameService) {
+    this.gameSessions = new Map();
+    this.logger = new Logger('GameGateway');
+  }
 
   @WebSocketServer()
   server: Server;
@@ -35,11 +41,11 @@ export class GameGateway
     });
   }
 
-  handleConnection(client: Socket, ...args: any[]) {
+  handleConnection(@ConnectedSocket() client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
   }
 
-  handleDisconnect(client: Socket) {
+  handleDisconnect(@ConnectedSocket() client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
@@ -49,23 +55,51 @@ export class GameGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() window: WindowInfo,
   ) {
-    const gameInfo = this.gameService.setUpGame(client, window);
+    this.windowInfo = window;
+    // TODO: Only call setUpGame if two players ready to play
+    const gameInfo = this.gameService.setUpGame(client, this.windowInfo);
+    this.gameSessions[client.id] = gameInfo;
     client.emit('gameLaunched', gameInfo);
-    setInterval(() => {
-      this.gameService.updateGame(gameInfo, window);
-      client.emit('gameUpdate', gameInfo);
-    }, 1000 / 60);
+
+    // TODO: Decide where to call setInterval()
+    // const myInterval = setInterval(() => {
+    //   this.gameService.updateGame(gameInfo, window);
+    //   client.emit('gameUpdate', gameInfo);
+    // }, 1000 / 60);
   }
 
   @SubscribeMessage('paddleDown')
-  paddleDown(@ConnectedSocket() client: Socket) {
-    this.gameService.updatePaddle(client, game, 'down');
+  paddleDown(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() keyPress: boolean,
+  ) {
+    this.gameService.updatePaddle(
+      client.id,
+      this.gameSessions[client.id],
+      'down',
+      this.windowInfo,
+      keyPress,
+    );
   }
 
   @SubscribeMessage('paddleUp')
-  paddleUp(@ConnectedSocket() client: Socket) {
-    this.gameService.updatePaddle(client, game, 'up');
+  paddleUp(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() keyPress: boolean,
+  ) {
+    this.gameService.updatePaddle(
+      client.id,
+      this.gameSessions[client.id],
+      'up',
+      this.windowInfo,
+      keyPress,
+    );
   }
+
+  //   @SubscribeMessage('stopGame')
+  //   stopGame(@ConnectedSocket() client: Socket) {
+  //     clearInterval(myInterval);
+  //   }
 }
 
 //     /* Send response to client only */

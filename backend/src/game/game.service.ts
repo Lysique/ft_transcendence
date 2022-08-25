@@ -9,7 +9,7 @@ import { collision } from './utils/game.utils';
 export class GameService {
   setUpGame(@ConnectedSocket() client: Socket, window: WindowInfo): Game {
     const game = new Game(window);
-    game.player1.socketID = client;
+    game.player1.socketID = client.id;
     return game;
   }
 
@@ -20,24 +20,20 @@ export class GameService {
   //     ball.speed = window.width / 200;
   //   }
 
-  updatePaddle(
-    @ConnectedSocket() client: Socket,
-    game: Game,
-    upOrDown: string,
-  ) {
-    if (client == game.player1.socketID) {
-    //   if (downPressed.current) {
-    //     user1.y += 7;
-    //     if (user1.y + user1.height > height) {
-    //       user1.y = height - user1.height;
-    //     }
-    //   } else if (upPressed.current) {
-    //     user1.y -= 7;
-    //     if (user1.y < 0) {
-    //       user1.y = 0;
-    //     }
-    //   }
-    } else if (client == game.player2.socketID) {
+  updatePaddle(clientID: string, game: Game, upOrDown: string, window: WindowInfo, keyPress: boolean) {
+    if (clientID == game.player1.socketID) {
+      if (upOrDown == 'down' && keyPress == true) {
+        game.player1.y += 7;
+        if (game.player1.y + game.player1.height > window.height) {
+          game.player1.y = window.height - game.player1.height;
+        }
+      } else if (upOrDown == 'up' && keyPress == true) {
+        game.player1.y -= 7;
+        if (game.player1.y < 0) {
+          game.player1.y = 0;
+        }
+      }
+    } else if (clientID == game.player2.socketID) {
       // if (downPressed.current) {
       //   user1.y += 7;
       //   if (user1.y + user1.height > height) {
