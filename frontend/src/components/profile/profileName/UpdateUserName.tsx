@@ -5,7 +5,6 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import { SetUserContext } from '../../../App';
 import { UserAPI } from '../../../api/user.api';
 
@@ -64,7 +63,7 @@ export const UpdateUserName = ({open, handleClose, handleCancel, message} : Upda
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCancel? handleCancel : handleClose}>Cancel</Button>
-                    <Button onClick={updateName}>Set name</Button>
+                    <Button onClick={updateName} >Set name</Button>
                 </DialogActions>
             </Dialog>
         </>

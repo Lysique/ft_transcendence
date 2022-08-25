@@ -25,7 +25,8 @@ export default function UsernameTaken() {
             open={open}
             handleClose={handleClose}
             handleCancel={handleCancel}
-            message={'A little filou has taken your intra username! :shokedface: Please choose an other one.'}
+            message={`A little filou has taken your intra username! 😱
+                    Choose an other username to continue.`}
         />
 
     </>

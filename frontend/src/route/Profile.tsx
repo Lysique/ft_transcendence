@@ -16,7 +16,7 @@ export const Profile = () => {
         padding: theme.spacing(1),
         textAlign: 'center',
         color: theme.palette.text.secondary,
-      }));
+    }));
 
     return (
         <>  
@@ -39,11 +39,11 @@ export const Profile = () => {
         <Stack spacing={5} width={240} sx={{ mt: 5, ml: 3}}>
 
         <Item>
-        <ProfileName />
+            <ProfileName />
         </Item>
 
         <Item>
-        <TfaToggle />
+            <TfaToggle />
         </Item>
 
         </Stack>
