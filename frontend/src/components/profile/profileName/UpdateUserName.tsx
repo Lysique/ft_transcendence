@@ -47,7 +47,6 @@ export const UpdateUserName = ({open, handleClose, handleCancel, message} : Upda
     return (
         <>
             <Dialog open={open}>
-                <DialogTitle>Subscribe</DialogTitle>
                 <DialogContent>
                 <DialogContentText>
                     {message}

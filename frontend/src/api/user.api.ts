@@ -71,4 +71,22 @@ export class UserAPI {
     
     return (resp.ok? resp.json() : null);
   }
+
+  public static async disableTfa(): Promise<UserDto | null> {
+    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/turnOffTfa`, {
+      credentials: "include",
+      method: "POST",
+    });
+    
+    return (resp.ok? resp.json() : null);
+  }
+
+  public static async generateQrCode(): Promise<Blob | null> {
+    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/auth/2fa/generate`, {
+      credentials: "include",
+      method: "GET",
+    });
+
+    return (resp.ok? resp.blob() : null);
+  }
 }

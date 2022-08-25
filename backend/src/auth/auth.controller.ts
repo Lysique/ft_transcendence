@@ -62,15 +62,11 @@ export class AuthController {
       
       //  Generate a new token // To change so it can verify if the setup is ok
       const user: any = req.user;
-      const accessToken = await this.authService.generateToken({
-        sub: user.id,
-        isTwoFactAuth: true
-      });
-      res.cookie('jwt', accessToken, { httpOnly: true });
-      
+
       //  Generate the secret for the user and the qrCode
       const otpauthUrl = await this.authService.generateTwoFactAuthSecret(user);
-      return this.authService.pipeQrCodeStream(res, otpauthUrl);
+      const qrCode = await this.authService.pipeQrCodeStream(res, otpauthUrl);
+      return qrCode;
     }
     
     // Qr code auth verification

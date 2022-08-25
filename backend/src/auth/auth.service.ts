@@ -45,12 +45,16 @@ export class AuthService {
         
         const otpauthUrl = authenticator.keyuri(user.id.toString(), 'ft_transcendence', secret);
 
-        return otpauthUrl;
+        return secret;
     }
 
     //  Url to qr code
     async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
-        return toFileStream(stream, otpauthUrl);
+        return toFileStream(stream, otpauthUrl, {
+            type: 'png',
+            width: 200,
+            errorCorrectionLevel: 'H'
+        });
     }
 
     //  Verify qr code scan

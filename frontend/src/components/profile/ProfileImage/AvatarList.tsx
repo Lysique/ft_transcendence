@@ -71,7 +71,7 @@ export default function AvatarList({
 
   return (
   <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
-    {photos? photos.map((item: AvatarDto) => {
+    {photos && photos.length > 0 ? photos.map((item: AvatarDto) => {
       return (
 
         <Button key={item.id}>
@@ -101,7 +101,8 @@ export default function AvatarList({
             open={open} 
             setOpen={setOpen} 
             setValidation={setValidation} 
-            message="Delete ?"
+            title="Delete ?"
+            message="Your photo will be deleted from our database."
           />
 
           <ImageListItemBar

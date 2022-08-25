@@ -98,7 +98,7 @@ export class UsersController {
     
     const avatarDtos: AvatarDto[] | null = await this.usersService.getAllAvatars(userDto);
 
-    return avatarDtos;
+    return avatarDtos? avatarDtos : [];
   }
 
   // Remove one avatar. Not in avatar controller to prevent circular depedency.
