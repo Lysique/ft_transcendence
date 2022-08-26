@@ -1,4 +1,4 @@
-import { Card, Paper, Stack, styled, Typography } from "@mui/material";
+import { Box, Card, Divider, Grid, Paper, styled, Typography } from "@mui/material";
 import React from "react";
 import { UserContext } from "../App";
 import ProfileImage from "../components/profile/profileImage/ProfileImage";
@@ -19,35 +19,53 @@ export const Profile = () => {
     }));
 
     return (
-        <>  
+        <>
 
-        <Stack direction="row" alignItems={'center'}>
+        <Grid container spacing={3} sx={{ml:1, mt:1}}>
 
-        <Card sx={{ maxWidth: 240, mt: 3, ml: 3 }} >
-            <UserProfileImageModificator>
-                <ProfileImage
-                    profileImage={user?.currentAvatar}
-                />
-            </UserProfileImageModificator>
-        </Card>
+            <Grid item xs={12} container spacing={3} alignItems={'center'}>
 
-        <Typography variant="h2" display="flex" sx={{ ml: 5 }}>
-            {user?.name}'s profile
-        </Typography>
+                <Grid item xs={3} >
 
-        </Stack>
-        
-        <Stack spacing={5} width={240} sx={{ mt: 5, ml: 3}}>
+                    <Card >
+                        <UserProfileImageModificator>
+                            <ProfileImage
+                                profileImage={user?.currentAvatar}
+                            />
+                        </UserProfileImageModificator>
+                    </Card>
 
-        <Item>
-            <ProfileName />
-        </Item>
+                </Grid>
 
-        <Item>
-            <TfaToggle />
-        </Item>
+                <Grid item xs={9}>
+                    <Typography variant="h2" display="flex" >
+                        {user?.name}'s profile
+                    </Typography>
+                </Grid>
 
-        </Stack>
+            </Grid>
+
+            <Grid item xs={3} container spacing={3} direction={'column'}>
+
+                <Grid item >
+                    <Item>
+                        <ProfileName />
+                    </Item>
+                </Grid>
+
+                <Grid item >
+                    <Item>
+                        <TfaToggle />
+                    </Item>
+                </Grid>
+
+            </Grid>
+
+            <Grid item xs={9} container spacing={3} direction={'column'}>
+                
+            </Grid>
+
+        </Grid>
 
         </>
     );

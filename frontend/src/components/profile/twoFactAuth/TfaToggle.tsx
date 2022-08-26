@@ -1,5 +1,4 @@
 import { FormControlLabel, Switch, Typography } from '@mui/material';
-import { Box } from '@mui/system';
 import * as React from 'react';
 import { UserAPI } from '../../../api/user.api';
 import { SetUserContext, UserContext } from '../../../App';
@@ -70,7 +69,6 @@ export default function TfaToggle() {
 
     return (
         <>
-        <Box >
         <Typography variant="h6" display="flex" >
             Two factor authentification
         </Typography>
@@ -82,7 +80,6 @@ export default function TfaToggle() {
             sx={{ ml: 3, mt: 2 }}
             label={user?.twoFactAuth? "enabled" : "disabled"}
         />
-        </Box>
 
         <ValidationPopup 
             open={openValidaton} 

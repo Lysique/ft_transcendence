@@ -15,7 +15,6 @@ export default function ProfileImage({
   return (
       <CardMedia
         component="img"
-        height="180"
         src={profileImage? `data:image/jpeg;base64,${profileImage.data}` : defaultAvatar}
         alt="green iguana"
       />
