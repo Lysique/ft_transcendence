@@ -1,4 +1,4 @@
-import { Box, Card, Divider, Grid, Paper, styled, Typography } from "@mui/material";
+import { Card, Grid, Paper, styled, Typography } from "@mui/material";
 import React from "react";
 import { UserContext } from "../App";
 import ProfileImage from "../components/profile/profileImage/ProfileImage";

@@ -8,6 +8,7 @@ import { Homepage } from "./route/Homepage";
 import { Profile } from "./route/Profile";
 import HomeProtect from "./components/auth/HomeProtect";
 import RouteProtect from "./components/auth/RouteProtect";
+import { VisitorProfile } from "./route/VisitorProfile";
 
 export const UserContext = React.createContext<UserDto | null>(null);
 export const SetUserContext = React.createContext<any>(null);
@@ -81,6 +82,11 @@ function App() {
           <RouteProtect >
             <Profile />
           </RouteProtect>
+        } />
+        <Route path="/profile/:id" element={
+          // <RouteProtect >
+            <VisitorProfile />
+          // </RouteProtect>
         } />
       </Routes>
 

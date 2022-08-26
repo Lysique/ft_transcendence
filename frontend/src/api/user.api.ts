@@ -27,6 +27,15 @@ export class UserAPI {
       return (resp.ok? resp.json() : null);
     }
 
+  public static async getVisitorProfile(id: string): Promise<UserDto | null> {
+    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/profile/${id}`, {
+        credentials: "include",
+        method: "GET"
+      });
+      
+      return (resp.ok? resp.json() : null);
+    }
+
     public static async addAvatar(formData: FormData) {
       await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/avatar`, {
         credentials: "include",

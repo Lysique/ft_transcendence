@@ -21,6 +21,19 @@ export class UsersController {
 
     return rest;
   }
+
+  // Set the current user's avatar
+  @Get('/profile/:id')
+  @UseGuards(JwtAuthGuard)
+  public async getOne(
+    @Param('id') userId: number
+    ) {
+    const userDto = await this.usersService.findOneById(userId);
+
+    const {secret, ...rest} = userDto;
+
+    return rest;
+  }
   
   // Update name
   @Post('/updateName')
