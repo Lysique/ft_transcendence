@@ -11,7 +11,6 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Inject, Logger } from '@nestjs/common';
 import { GameService } from './game.service';
-import { WindowInfo } from './interfaces/game.interfaces';
 import { Game } from './classes/game.classes';
 
 @WebSocketGateway({
@@ -23,7 +22,6 @@ export class GameGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   private gameSessions: Map<string, Game>;
-  private windowInfo: WindowInfo;
   private logger: Logger;
 
   constructor(@Inject(GameService) private gameService: GameService) {
@@ -50,22 +48,14 @@ export class GameGateway
   }
 
   /* Subscribe to incoming messages */
+  /* TODO: Add decorator @guard */
   @SubscribeMessage('launchGame')
-  launchGame(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() window: WindowInfo,
-  ) {
-    this.windowInfo = window;
+  launchGame(@ConnectedSocket() client: Socket) {
     // TODO: Only call setUpGame if two players ready to play
-    const gameInfo = this.gameService.setUpGame(client, this.windowInfo);
+    const gameInfo = this.gameService.setUpGame(client);
     this.gameSessions[client.id] = gameInfo;
     client.emit('gameLaunched', gameInfo);
-
-    // TODO: Decide where to call setInterval()
-    // const myInterval = setInterval(() => {
-    //   this.gameService.updateGame(gameInfo, window);
-    //   client.emit('gameUpdate', gameInfo);
-    // }, 1000 / 60);
+    this.gameService.serverLoop(client, this.gameSessions[client.id]);
   }
 
   @SubscribeMessage('paddleDown')
@@ -73,13 +63,14 @@ export class GameGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() keyPress: boolean,
   ) {
-    this.gameService.updatePaddle(
-      client.id,
-      this.gameSessions[client.id],
-      'down',
-      this.windowInfo,
-      keyPress,
-    );
+    if (this.gameSessions[client.id]) {
+      this.gameService.updatePaddle(
+        client.id,
+        this.gameSessions[client.id],
+        'down',
+        keyPress,
+      );
+    }
   }
 
   @SubscribeMessage('paddleUp')
@@ -91,7 +82,6 @@ export class GameGateway
       client.id,
       this.gameSessions[client.id],
       'up',
-      this.windowInfo,
       keyPress,
     );
   }

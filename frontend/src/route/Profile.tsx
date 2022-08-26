@@ -1,8 +1,8 @@
 import { Card, Paper, Stack, styled, Typography } from "@mui/material";
 import React from "react";
 import { UserContext } from "../App";
-import UserProfileImageDecorator from "../components/profile/profileImage/UserProfileImageDecorator";
-import ProfileImage from "../components/profile/profileImage/ProfileImage";
+import ProfileImage from "../components/profile/ProfileImage/ProfileImage";
+import UserProfileImageDecorator from "../components/profile/ProfileImage/UserProfileImageDecorator";
 import ProfileName from "../components/profile/profileName/ProfileName";
 import TfaToggle from "../components/profile/twoFactAuth/TfaToggle";
 
