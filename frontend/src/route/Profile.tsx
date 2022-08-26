@@ -1,10 +1,10 @@
 import { Card, Paper, Stack, styled, Typography } from "@mui/material";
 import React from "react";
 import { UserContext } from "../App";
-import UserProfileImageDecorator from "../components/profile/profileImage/UserProfileImageDecorator";
 import ProfileImage from "../components/profile/profileImage/ProfileImage";
 import ProfileName from "../components/profile/profileName/ProfileName";
 import TfaToggle from "../components/profile/twoFactAuth/TfaToggle";
+import UserProfileImageModificator from "../components/profile/profileImage/UserProfileImageModificator";
 
 export const Profile = () => {
 
@@ -24,11 +24,11 @@ export const Profile = () => {
         <Stack direction="row" alignItems={'center'}>
 
         <Card sx={{ maxWidth: 240, mt: 3, ml: 3 }} >
-            <UserProfileImageDecorator>
+            <UserProfileImageModificator>
                 <ProfileImage
                     profileImage={user?.currentAvatar}
                 />
-            </UserProfileImageDecorator>
+            </UserProfileImageModificator>
         </Card>
 
         <Typography variant="h2" display="flex" sx={{ ml: 5 }}>
@@ -36,6 +36,7 @@ export const Profile = () => {
         </Typography>
 
         </Stack>
+        
         <Stack spacing={5} width={240} sx={{ mt: 5, ml: 3}}>
 
         <Item>

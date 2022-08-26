@@ -6,7 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import {  Stack } from '@mui/material';
-import TfaInput from './TfaInput';
+import TfaInput from '../../auth/TfaInput';
 import { UserAPI } from '../../../api/user.api';
 import { SetUserContext } from '../../../App';
 import { AuthCodeRef } from 'react-auth-code-input';

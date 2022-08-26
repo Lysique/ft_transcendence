@@ -8,7 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { AuthCodeRef } from 'react-auth-code-input';
 import { SetUserContext } from '../../App';
 import { UserAPI } from '../../api/user.api';
-import TfaInput from '../profile/twoFactAuth/TfaInput';
+import TfaInput from './TfaInput';
 
 interface TwoFactAuthProps {
   setLoggedIn: any
