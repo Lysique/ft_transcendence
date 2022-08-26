@@ -91,8 +91,8 @@ export const render = (
   /* Draw paddle 2 */
   drawRect(
     context,
-    gameState.player2.x,
-    gameState.player2.y,
+    gameState.player2.x * ratioX,
+    gameState.player2.y * ratioY,
     gameState.player2.width * ratioX,
     gameState.player2.height * ratioY,
     "black"
