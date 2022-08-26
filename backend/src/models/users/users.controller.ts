@@ -5,6 +5,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Request } from 'express';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
 import { UserDto } from './dto/user.dto';
+import { isNumber } from 'class-validator';
 
 @Controller('users')
 export class UsersController {
@@ -17,22 +18,56 @@ export class UsersController {
     const user: any = req.user;
     const userDto: UserDto = await this.usersService.findOneById(user.id);
     
-    const {secret, ...rest} = userDto;
+    const rest = this.usersService.dtoToReturn(userDto);
 
     return rest;
   }
 
   // Set the current user's avatar
-  @Get('/profile/:id')
+  @Get('/:id')
   @UseGuards(JwtAuthGuard)
-  public async getOne(
-    @Param('id') userId: number
+  public async getOneById(
+    @Param('id') userId: string
     ) {
-    const userDto = await this.usersService.findOneById(userId);
 
-    const {secret, ...rest} = userDto;
+    if (!isNumber(+userId)) {
+      return {};
+    }
+
+    const userDto = await this.usersService.findOneById(+userId);
+
+    if (!userDto) {
+      return {};
+    }
+
+    const rest = this.usersService.dtoToReturn(userDto);
 
     return rest;
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  public async getAll() {
+    const userDtos: UserDto[] = await this.usersService.findAll();
+
+    const rest = userDtos.map(x => this.usersService.dtoToReturn(x));
+
+    return rest;
+  }
+
+  // Update name
+  @Post('/friend')
+  @UseGuards(JwtAuthGuard)
+  public async addFriend(
+    @Req() req: Request,
+    @Body() body: any
+    ) {
+      const user: any = req.user;
+      const userDto: UserDto = await this.usersService.addFriend(user.id, body.id);
+
+      const rest = this.usersService.dtoToReturn(userDto);
+
+      return rest;
   }
   
   // Update name
@@ -49,7 +84,7 @@ export class UsersController {
         throw new UnauthorizedException();
       }
 
-      const {secret, ...rest} = userDto;
+      const rest = this.usersService.dtoToReturn(userDto);
 
       return rest;
   }
@@ -63,7 +98,7 @@ export class UsersController {
     await this.usersService.turnOffTfa(user.id);
 
     const userDto: UserDto = await this.usersService.findOneById(user.id);
-    const {secret, ...rest} = userDto;
+    const rest = this.usersService.dtoToReturn(userDto);
 
     return rest;
   }
@@ -80,7 +115,7 @@ export class UsersController {
     const userDto: UserDto = await this.usersService.findOneById(user.id);
     await this.usersService.addAvatar(userDto, file.buffer);
 
-    const {secret, ...rest} = userDto;
+    const rest = this.usersService.dtoToReturn(userDto);
 
     return rest;
   }
@@ -97,7 +132,7 @@ export class UsersController {
     
     await this.usersService.updateCurrentAvatar(userDto, avatarId);
 
-    const {secret, ...rest} = userDto;
+    const rest = this.usersService.dtoToReturn(userDto);
 
     return rest;
   }

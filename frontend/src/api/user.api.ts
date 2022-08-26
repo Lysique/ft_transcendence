@@ -28,7 +28,16 @@ export class UserAPI {
     }
 
   public static async getVisitorProfile(id: string): Promise<UserDto | null> {
-    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/profile/${id}`, {
+    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/${id}`, {
+        credentials: "include",
+        method: "GET"
+      });
+      
+      return (resp.ok? resp.json() : null);
+    }
+
+  public static async getAllUsers(): Promise<UserDto[] | null> {
+    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/`, {
         credentials: "include",
         method: "GET"
       });
@@ -106,6 +115,17 @@ export class UserAPI {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ code: code})
     });
+    return (resp.ok? resp.json() : null);
+  }
+
+  public static async addFriend(friendId: number) {
+    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/friend`, {
+      credentials: "include",
+      method: "POST",
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ id: friendId})
+    });
+
     return (resp.ok? resp.json() : null);
   }
 }

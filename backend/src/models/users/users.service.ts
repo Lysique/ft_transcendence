@@ -24,11 +24,18 @@ export class UsersService {
     userDto.id = user.id;
     userDto.name = user.name;
     userDto.status = user.status;
+    userDto.friendsId = user.friendsId;
     userDto.currentAvatar = user.currentAvatarId? {id: user.currentAvatarId, data:user.currentAvatarData} : null;
     userDto.twoFactAuth = user.twoFactAuth;
     userDto.secret = user.secret;
 
     return userDto;
+  }
+
+  public dtoToReturn(userDto: UserDto): any {
+    const {secret, ...rest} = userDto;
+
+    return rest;
   }
 
   //  Create a user.
@@ -40,6 +47,7 @@ export class UsersService {
     user.name = createUserDto.name;
     user.twoFactAuth = false;
     user.avatars = [];
+    user.friendsId = [];
 
     try {
       await this.userRepository.save(user);
@@ -52,19 +60,86 @@ export class UsersService {
     const userDto = this.entityToDto(user);
     const imageData: Buffer = await this.downloadImage(createUserDto.photoUrl);
     await this.addAvatar(userDto, imageData);
+    
+    return userDto;
+  }
+  
+  public async downloadImage(url : string) {
+    
+    const response = await this.httpService.axiosRef({
+      url: url,
+      method: 'GET',
+      responseType: 'arraybuffer'
+    });
+    
+    return Buffer.from(response.data, 'binary');
+  }
+  
+  //  Find all users.
+  public async findAll() {
+    const users: User[] = await this.userRepository.find();
+
+    const usersDto: UserDto[] = users.map(x => this.entityToDto(x));
+
+    return usersDto;
+  }
+  
+  //  Find one user by id.
+  public async findOneById(id: number) {
+    const user: User = await this.userRepository.findOneBy({ id: id });
+    
+    if (!user) {
+      return null;
+    }
+
+    const userDto: UserDto = this.entityToDto(user);
 
     return userDto;
   }
 
-  public async downloadImage(url : string) {
+  public async updateName(id: number, name: string) {
+    const user: User = await this.userRepository.findOneBy({ id: id });
 
-  const response = await this.httpService.axiosRef({
-        url: url,
-        method: 'GET',
-        responseType: 'arraybuffer'
-    });
+    user.name = name;
+    try {
+      await this.userRepository.save(user);
+    }
+    catch(error) {
+      return null;
+    }
 
-    return Buffer.from(response.data, 'binary');
+    const userDto: UserDto = this.entityToDto(user);
+    return userDto;
+  }
+
+  public async addFriend(userId: number, friendId: number) {
+    const user: User = await this.userRepository.findOneBy({ id: userId });
+
+    if (user.id !== friendId && user.friendsId.indexOf(friendId) === -1) {
+      user.friendsId.push(friendId);
+      await this.userRepository.save(user);
+    }
+
+    const userDto: UserDto = this.entityToDto(user);
+    return userDto;
+  }
+
+  public async updateSecret(id: number, secret: string) {
+    const user: User = await this.userRepository.findOneBy({ id: id });
+    user.secret = secret;
+    await this.userRepository.save(user); 
+  }
+
+  public async turnOnTfa(id: number) {
+    const user: User = await this.userRepository.findOneBy({ id: id });
+    user.twoFactAuth = true;
+    await this.userRepository.save(user);
+  }
+
+  public async turnOffTfa(id: number) {
+    const user: User = await this.userRepository.findOneBy({ id: id });
+    user.twoFactAuth = false;
+    await this.userRepository.save(user);
   }
 
   public async addAvatar(userDto: UserDto, data: Buffer)
@@ -116,58 +191,4 @@ export class UsersService {
     }
   }
 
-  //  Find all users.
-  public async findAll() {
-    const users: User[] = await this.userRepository.find();
-
-    const usersDto: UserDto[] = users.map(x => this.entityToDto(x));
-
-    return usersDto;
-  }
-  
-  //  Find one user by id.
-  public async findOneById(id: number) {
-    const user: User = await this.userRepository.findOneBy({ id: id });
-    
-    if (!user) {
-      return null;
-    }
-
-    const userDto: UserDto = this.entityToDto(user);
-
-    return userDto;
-  }
-
-  public async updateName(id: number, name: string) {
-    const user: User = await this.userRepository.findOneBy({ id: id });
-
-    user.name = name;
-    try {
-      await this.userRepository.save(user);
-    }
-    catch(error) {
-      return null;
-    }
-
-    const userDto: UserDto = this.entityToDto(user);
-    return userDto;
-  }
-
-  public async updateSecret(id: number, secret: string) {
-    const user: User = await this.userRepository.findOneBy({ id: id });
-    user.secret = secret;
-    await this.userRepository.save(user); 
-  }
-
-  public async turnOnTfa(id: number) {
-    const user: User = await this.userRepository.findOneBy({ id: id });
-    user.twoFactAuth = true;
-    await this.userRepository.save(user);
-  }
-
-  public async turnOffTfa(id: number) {
-    const user: User = await this.userRepository.findOneBy({ id: id });
-    user.twoFactAuth = false;
-    await this.userRepository.save(user);
-  }
 }

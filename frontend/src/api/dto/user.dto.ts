@@ -10,7 +10,7 @@ export interface UserDto {
     id: number;
     name: string;
     status: UserStatus;
-    secret: string;
+    friendsId: number[];
     currentAvatar: AvatarDto;
     twoFactAuth: boolean;
 }

@@ -70,6 +70,7 @@ function App() {
 
       <ResponsiveAppBar
         handleToggle={handleToggle}
+        setLoggedIn={setLoggedIn}
       />
 
       <Routes >
@@ -84,9 +85,9 @@ function App() {
           </RouteProtect>
         } />
         <Route path="/profile/:id" element={
-          // <RouteProtect >
+          <RouteProtect >
             <VisitorProfile />
-          // </RouteProtect>
+          </RouteProtect>
         } />
       </Routes>
 

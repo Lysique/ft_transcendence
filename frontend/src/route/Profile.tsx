@@ -6,17 +6,18 @@ import ProfileName from "../components/profile/profileName/ProfileName";
 import TfaToggle from "../components/profile/twoFactAuth/TfaToggle";
 import UserProfileImageModificator from "../components/profile/profileImage/UserProfileImageModificator";
 
+export const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+}));
+
 export const Profile = () => {
 
     const user = React.useContext(UserContext);
 
-    const Item = styled(Paper)(({ theme }) => ({
-        backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-        ...theme.typography.body2,
-        padding: theme.spacing(1),
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
-    }));
 
     return (
         <>

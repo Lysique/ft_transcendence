@@ -1,23 +1,28 @@
 import { Card, Grid, Typography } from "@mui/material";
 import React from "react";
-import { UserContext } from "../App";
 import ProfileImage from "../components/profile/profileImage/ProfileImage";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { UserDto } from "../api/dto/user.dto";
 import { UserAPI } from "../api/user.api";
+import { Item } from "./Profile";
+import { AddFriendButton } from "../components/profile/AddFriendButton";
 
 export const VisitorProfile = () => {
 
-    const user = React.useContext(UserContext);
     const [visited, setVisited] = React.useState<UserDto | null>(null);
     const { id } = useParams<"id">();
+    const navigate = useNavigate();
 
     React.useEffect(() => {
         const fetchProfile = async () => {
             const resp = await UserAPI.getVisitorProfile(id? id: "");
+            if (!resp ||  Object.keys(resp).length === 0) {
+                navigate('/');
+            }
             setVisited(resp);
         }
         fetchProfile();
+        // eslint-disable-next-line
       }, [id])
 
     return (
@@ -45,7 +50,13 @@ export const VisitorProfile = () => {
 
             </Grid>
 
-            <Grid item xs={3} container spacing={3} direction={'column'}>
+            <Grid item xs={3} container spacing={3} direction={'column'} sx={{ mt:5 }}>
+
+                <Grid item >
+                    <Item>
+                        <AddFriendButton visited={visited}/>
+                    </Item>
+                </Grid>
 
             </Grid>
 
