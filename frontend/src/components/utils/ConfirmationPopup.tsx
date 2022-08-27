@@ -6,10 +6,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 interface ConfirmationPopupProps {
   open: boolean
-  setOpen: any
+  setOpen: Function
   message: string
 }
-
 
 export default function ConfirmationPopup({open, setOpen, message}: ConfirmationPopupProps) {
 

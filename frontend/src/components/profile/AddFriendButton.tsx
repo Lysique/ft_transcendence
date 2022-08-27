@@ -1,15 +1,20 @@
 import { Button } from "@mui/material";
 import React from "react";
+import { UserDto } from "../../api/dto/user.dto";
 import { UserAPI } from "../../api/user.api";
 import { SetUserContext } from "../../App";
 import ValidationPopup from "../utils/ValidationPopup";
 
-export const AddFriendButton = ({visited}: any) => {
+interface AddFriendButtonProps {
+    visited: UserDto | null
+}
 
-    const setUser = React.useContext(SetUserContext);
+export const AddFriendButton = ({visited}: AddFriendButtonProps) => {
 
-    const [openValidation, setOpenValidation] = React.useState(false);
-    const [validation, setValidation] = React.useState(false);
+    const setUser: Function = React.useContext(SetUserContext);
+
+    const [openValidation, setOpenValidation] = React.useState<boolean>(false);
+    const [validation, setValidation] = React.useState<boolean>(false);
 
     const handleOpenValidation = () => {
         setOpenValidation(true);
@@ -17,9 +22,11 @@ export const AddFriendButton = ({visited}: any) => {
 
     React.useEffect(() => {
         const addToFriend = async () => {
-            const resp = await UserAPI.addFriend(visited.id);
-            setValidation(false);
-            setUser(resp);
+            if (visited) {
+                const resp: UserDto | null = await UserAPI.addFriend(visited.id);
+                setValidation(false);
+                setUser(resp);
+            }
         }
         if (validation === true) {
             addToFriend();

@@ -9,17 +9,21 @@ import { SetUserContext } from '../../../App';
 import { UserAPI } from '../../../api/user.api';
 
 interface UpdateUserNameProps {
-    handleClose: any
+    handleClose: Function
     open: boolean
     handleCancel?: any
     message: string
 }
 
-export const UpdateUserName = ({open, handleClose, handleCancel, message} : UpdateUserNameProps) => {
+export const UpdateUserName = ({open,
+    handleClose,
+    handleCancel,
+    message
+} : UpdateUserNameProps) => {
 
     const setUser = React.useContext(SetUserContext)
 
-    const [name, setName] = React.useState("");
+    const [name, setName] = React.useState<string>("");
 
     const [error, setError] = React.useState<string | null>(null);
 

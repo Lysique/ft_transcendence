@@ -1,14 +1,19 @@
 import React from "react";
+import { UserDto } from "../../api/dto/user.dto";
 import { UserContext } from "../../App";
 
-const RouteProtect = ({ children }: any) => {
+interface RouteProtectProps {
+    children: JSX.Element
+}
 
-    const user = React.useContext(UserContext);
+const RouteProtect = ({ children }: RouteProtectProps) => {
+
+    const user: UserDto | null = React.useContext(UserContext);
 
     if (!user) {
-        return '';
+        return <>''</>;
     }
-    return children;
+    return <>{children}</>;
 };
 
 export default RouteProtect;

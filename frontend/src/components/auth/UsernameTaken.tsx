@@ -5,7 +5,7 @@ import { UpdateUserName } from '../profile/profileName/UpdateUserName';
 
 export default function UsernameTaken() {
 
-    const setUser = React.useContext(SetUserContext);
+    const setUser: Function = React.useContext(SetUserContext);
 
     const [open, setOpen] = React.useState(true);
 
@@ -25,7 +25,7 @@ export default function UsernameTaken() {
             open={open}
             handleClose={handleClose}
             handleCancel={handleCancel}
-            message={`A little filou has taken your intra username! 😱
+            message={`Oh no! Looks like a little filou has taken your intra username! 😱
                     Choose an other username to continue.`}
         />
 

@@ -1,10 +1,11 @@
-import { Button, Card, Grid, Paper, styled, Typography } from "@mui/material";
+import { Card, Grid, Paper, styled, Typography } from "@mui/material";
 import React from "react";
 import { UserContext } from "../App";
 import ProfileImage from "../components/profile/profileImage/ProfileImage";
 import ProfileName from "../components/profile/profileName/ProfileName";
 import TfaToggle from "../components/profile/twoFactAuth/TfaToggle";
 import UserProfileImageModificator from "../components/profile/profileImage/UserProfileImageModificator";
+import { UserDto } from "../api/dto/user.dto";
 
 export const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -16,7 +17,7 @@ export const Item = styled(Paper)(({ theme }) => ({
 
 export const Profile = () => {
 
-    const user = React.useContext(UserContext);
+    const user: UserDto | null = React.useContext(UserContext);
 
     return (
         <>

@@ -1,5 +1,4 @@
 import { AvatarDto } from "./avatar.dto";
-import { FriendDto } from "./friend.dto";
 
 export enum UserStatus {
     Online = 0,
@@ -7,11 +6,9 @@ export enum UserStatus {
     InGame = 2,
 }
 
-export interface UserDto {
+export interface FriendDto {
     id: number;
     name: string;
     status: UserStatus;
-    friends?: FriendDto[];
     currentAvatar?: AvatarDto;
-    twoFactAuth: boolean;
 }

@@ -1,5 +1,6 @@
 import { FormControlLabel, Switch, Typography } from '@mui/material';
 import * as React from 'react';
+import { UserDto } from '../../../api/dto/user.dto';
 import { UserAPI } from '../../../api/user.api';
 import { SetUserContext, UserContext } from '../../../App';
 import ValidationPopup from '../../utils/ValidationPopup';
@@ -7,14 +8,14 @@ import TfaEnable from './TfaEnable';
 
 export default function TfaToggle() {
 
-    const user = React.useContext(UserContext);
-    const setUser = React.useContext(SetUserContext);
+    const user: UserDto | null = React.useContext(UserContext);
+    const setUser: Function = React.useContext(SetUserContext);
 
-    const [openValidaton, setOpenValidation] = React.useState(false);
-    const [openTfaEnable, setOpenTfaEnable] = React.useState(false);
-    const [validation, setValidation] = React.useState(false);
-    const [message, setMessage] = React.useState({title: "", message: ""});
-    const [qrCode, setQrCode] = React.useState("");
+    const [openValidaton, setOpenValidation] = React.useState<boolean>(false);
+    const [openTfaEnable, setOpenTfaEnable] = React.useState<boolean>(false);
+    const [validation, setValidation] = React.useState<boolean>(false);
+    const [message, setMessage] = React.useState<{title:string, message:string}>({title: "", message: ""});
+    const [qrCode, setQrCode] = React.useState<string>("");
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked === false) {

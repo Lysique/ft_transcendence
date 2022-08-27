@@ -19,10 +19,11 @@ import defaultAvatar from '../default_avatar/profile_image.jpeg';
 import { SetUserContext, UserContext } from "../App";
 import { Link } from "react-router-dom";
 import SearchFriendInput from "./appbar/SearchFriendBar";
+import { UserDto } from "../api/dto/user.dto";
 
 interface ResponsiveAppBarProps {
   handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
-  setLoggedIn: any
+  setLoggedIn: Function
 }
 
 const ResponsiveAppBar = ({
@@ -30,8 +31,8 @@ const ResponsiveAppBar = ({
   setLoggedIn
 }: ResponsiveAppBarProps) => {
 
-  const user = React.useContext(UserContext);
-  const setUser = React.useContext(SetUserContext);
+  const user: UserDto | null = React.useContext(UserContext);
+  const setUser: Function = React.useContext(SetUserContext);
 
   const theme = useTheme();
 

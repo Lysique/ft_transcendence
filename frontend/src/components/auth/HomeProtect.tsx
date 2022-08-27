@@ -1,11 +1,22 @@
 import React from "react";
+import { UserDto } from "../../api/dto/user.dto";
 import { UserContext } from "../../App";
 import TwoFactAuth from "./TwoFactAuth";
 import UsernameTaken from "./UsernameTaken";
 
-const HomeProtect = ({ loggedIn, setLoggedIn, children }: any) => {
+interface HomeProtectProps {
+    loggedIn: boolean
+    setLoggedIn: Function
+    children: JSX.Element
+}
 
-    const user = React.useContext(UserContext);
+const HomeProtect = ({
+    loggedIn,
+    setLoggedIn,
+    children
+ }: HomeProtectProps) => {
+
+    const user: UserDto | null = React.useContext(UserContext);
 
     return (
         <>

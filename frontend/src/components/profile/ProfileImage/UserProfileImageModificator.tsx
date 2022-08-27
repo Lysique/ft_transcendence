@@ -17,7 +17,7 @@ export default function UserProfileImageModificator({
 
 }: UserProfileImageModificatorProps ) {
 
-  const setUser = React.useContext(SetUserContext);
+  const setUser: Function = React.useContext(SetUserContext);
 
   //  When a file has been choosen ; set the file with the file but does not download yet
   const [file, setFile] = React.useState<any | null>(null);

@@ -14,7 +14,7 @@ export class AuthController {
     // This function is used to login thanks to the guard.
     @UseGuards(FortyTwoAuthGuard)
     @Get('login')
-    async login(@Req() req: Request) {}
+    async login() {}
     
     // Function called by 42 strategy
     @UseGuards(FortyTwoAuthGuard)
@@ -36,6 +36,7 @@ export class AuthController {
         sub: userDto.id, 
         IsTwoFactAuth: false
       });
+
       res.cookie('jwt', accessToken, { httpOnly: true });
     
       //  Redirect to the frontend

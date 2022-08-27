@@ -9,10 +9,11 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import { AvatarDto } from '../../../api/dto/avatar.dto';
 import { SetUserContext, UserContext } from '../../../App';
 import ValidationPopup from '../../utils/ValidationPopup';
+import { UserDto } from '../../../api/dto/user.dto';
 
 interface AvatarListProps {
   selectedId: number | null
-  setSelectedId: any
+  setSelectedId: Function
 }
 
 export default function AvatarList({
@@ -21,15 +22,15 @@ export default function AvatarList({
 
 }: AvatarListProps) {
 
-  const user = React.useContext(UserContext);
-  const setUser = React.useContext(SetUserContext);
+  const user: UserDto | null = React.useContext(UserContext);
+  const setUser: Function = React.useContext(SetUserContext);
 
   // Avatar list ; change when user is modified (user is modified when a photo is deleted)
   const [photos, setPhotos] = React.useState<AvatarDto[] | null>(null);
 
   React.useEffect(() => {
     const fetchUserPhotos = async () => {
-      const avatars: AvatarDto[] = await UserAPI.getAllAvatars();
+      const avatars: AvatarDto[] | null = await UserAPI.getAllAvatars();
       setPhotos(avatars);
     };
     fetchUserPhotos();
@@ -47,10 +48,10 @@ export default function AvatarList({
   };
 
   // Props given to the validation popup to see if deletion is validated or not
-  const [validation, setValidation] = React.useState(false);
+  const [validation, setValidation] = React.useState<boolean>(false);
 
   // Open validation popup
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState<boolean>(false);
 
 
   // If validation is true ; remove avatar and update user with the selected id.
@@ -59,7 +60,7 @@ export default function AvatarList({
       const removeAvatar = async () => {
           await UserAPI.removeAvatar(selectedId as number);
 
-          const data = await UserAPI.getUserProfile();
+          const data: UserDto | null = await UserAPI.getUserProfile();
           setUser(data);
           setValidation(false);
       }
