@@ -11,7 +11,7 @@ const RouteProtect = ({ children }: RouteProtectProps) => {
     const user: UserDto | null = React.useContext(UserContext);
 
     if (!user) {
-        return <>''</>;
+        return <></>;
     }
     return <>{children}</>;
 };

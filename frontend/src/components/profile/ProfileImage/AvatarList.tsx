@@ -24,17 +24,6 @@ export default function AvatarList({
 
   const user: UserDto | null = React.useContext(UserContext);
   const setUser: Function = React.useContext(SetUserContext);
-
-  // Avatar list ; change when user is modified (user is modified when a photo is deleted)
-  const [photos, setPhotos] = React.useState<AvatarDto[] | null>(null);
-
-  React.useEffect(() => {
-    const fetchUserPhotos = async () => {
-      const avatars: AvatarDto[] | null = await UserAPI.getAllAvatars();
-      setPhotos(avatars);
-    };
-    fetchUserPhotos();
-  }, [user]);
   
   // Change the selected id when an image is clicked
   const handleSelected = (id: number) => {
@@ -58,11 +47,13 @@ export default function AvatarList({
   // Validation can only change when clicking on delete icon
   React.useEffect(() => {
       const removeAvatar = async () => {
-          await UserAPI.removeAvatar(selectedId as number);
+        if (selectedId) {
+          await UserAPI.removeAvatar(selectedId);
 
           const data: UserDto | null = await UserAPI.getUserProfile();
           setUser(data);
           setValidation(false);
+        }
       }
       if (validation === true) {
           removeAvatar();
@@ -72,7 +63,7 @@ export default function AvatarList({
 
   return (
   <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
-    {photos && photos.length > 0 ? photos.map((item: AvatarDto) => {
+    {user?.avatars && user?.avatars.length > 0 ? user?.avatars.map((item: AvatarDto) => {
       return (
 
         <Button key={item.id}>

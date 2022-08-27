@@ -1,9 +1,9 @@
 import { Button } from "@mui/material";
 import React from "react";
-import { UserDto } from "../../api/dto/user.dto";
-import { UserAPI } from "../../api/user.api";
-import { SetUserContext } from "../../App";
-import ValidationPopup from "../utils/ValidationPopup";
+import { UserDto } from "../../../api/dto/user.dto";
+import { UserAPI } from "../../../api/user.api";
+import { SetUserContext } from "../../../App";
+import ValidationPopup from "../../utils/ValidationPopup";
 
 interface AddFriendButtonProps {
     visited: UserDto | null

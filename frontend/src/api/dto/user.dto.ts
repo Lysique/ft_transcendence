@@ -13,5 +13,6 @@ export interface UserDto {
     status: UserStatus;
     friends?: FriendDto[];
     currentAvatar?: AvatarDto;
+    avatars?: AvatarDto[];
     twoFactAuth: boolean;
 }

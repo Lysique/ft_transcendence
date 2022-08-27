@@ -23,7 +23,10 @@ export class User {
     @JoinTable()
     friends: User[];
 
-    @ManyToMany(() => User, (user) => user.friends)
+    @ManyToMany(() => User, (user) => user.friends, {
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+    })
     follower: User[];
     
     @OneToMany(() => Avatar, (avatar) => avatar.user, { eager: true })

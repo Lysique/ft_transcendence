@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { UserDto } from "../api/dto/user.dto";
 import { UserAPI } from "../api/user.api";
 import { Item } from "./Profile";
-import { AddFriendButton } from "../components/profile/AddFriendButton";
+import { AddFriendButton } from "../components/profile/profileFriends/AddFriendButton";
 
 export const VisitorProfile = () => {
 
