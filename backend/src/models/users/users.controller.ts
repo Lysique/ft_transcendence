@@ -17,10 +17,8 @@ export class UsersController {
   async profile(@Req() req: Request) {
     const user: any = req.user;
     const userDto: UserDto = await this.usersService.findOneById(user.id);
-    
-    const rest = this.usersService.dtoToReturn(userDto);
 
-    return rest;
+    return userDto;
   }
 
   // Set the current user's avatar
@@ -40,9 +38,7 @@ export class UsersController {
       return {};
     }
 
-    const rest = this.usersService.dtoToReturn(userDto);
-
-    return rest;
+    return userDto;
   }
 
   @Get()
@@ -50,9 +46,7 @@ export class UsersController {
   public async getAll() {
     const userDtos: UserDto[] = await this.usersService.findAll();
 
-    const rest = userDtos.map(x => this.usersService.dtoToReturn(x));
-
-    return rest;
+    return userDtos;
   }
 
   // Update name
@@ -65,9 +59,7 @@ export class UsersController {
       const user: any = req.user;
       const userDto: UserDto = await this.usersService.addFriend(user.id, body.id);
 
-      const rest = this.usersService.dtoToReturn(userDto);
-
-      return rest;
+      return userDto;
   }
   
   // Update name
@@ -84,9 +76,7 @@ export class UsersController {
         throw new UnauthorizedException();
       }
 
-      const rest = this.usersService.dtoToReturn(userDto);
-
-      return rest;
+      return userDto;
   }
 
   @Post('/turnOffTfa')
@@ -98,9 +88,8 @@ export class UsersController {
     await this.usersService.turnOffTfa(user.id);
 
     const userDto: UserDto = await this.usersService.findOneById(user.id);
-    const rest = this.usersService.dtoToReturn(userDto);
 
-    return rest;
+    return userDto;
   }
 
   // Create a new avatar for the user
@@ -115,9 +104,7 @@ export class UsersController {
     const userDto: UserDto = await this.usersService.findOneById(user.id);
     await this.usersService.addAvatar(userDto, file.buffer);
 
-    const rest = this.usersService.dtoToReturn(userDto);
-
-    return rest;
+    return userDto;
   }
 
   // Set the current user's avatar
@@ -132,9 +119,7 @@ export class UsersController {
     
     await this.usersService.updateCurrentAvatar(userDto, avatarId);
 
-    const rest = this.usersService.dtoToReturn(userDto);
-
-    return rest;
+    return userDto;
   }
 
   // Get all user's avatars

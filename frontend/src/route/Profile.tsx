@@ -1,4 +1,4 @@
-import { Card, Grid, Paper, styled, Typography } from "@mui/material";
+import { Button, Card, Grid, Paper, styled, Typography } from "@mui/material";
 import React from "react";
 import { UserContext } from "../App";
 import ProfileImage from "../components/profile/profileImage/ProfileImage";
@@ -17,7 +17,6 @@ export const Item = styled(Paper)(({ theme }) => ({
 export const Profile = () => {
 
     const user = React.useContext(UserContext);
-
 
     return (
         <>

@@ -8,7 +8,8 @@ import { JwtTwoFactAuthGuard } from './guards/jwt-2fa.guard';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+
+  constructor(private readonly authService: AuthService) {}
 
     // This function is used to login thanks to the guard.
     @UseGuards(FortyTwoAuthGuard)
@@ -20,7 +21,7 @@ export class AuthController {
     @Get('42/callback')
     async fortyTwoAuthCallback(
       @Req() req: Request,
-      @Res({passthrough: true}) res: Response
+      @Res({passthrough: true}) res: Response,
       ) {
       //  Find user or signup if does not exist
       let userDto: UserDto = await this.authService.fetchUser(req.user);
@@ -38,7 +39,7 @@ export class AuthController {
       res.cookie('jwt', accessToken, { httpOnly: true });
     
       //  Redirect to the frontend
-      res.status(302).redirect(`http://${process.env.REACT_HOST}:${process.env.REACT_PORT}`);
+      res.redirect(req.headers.referer);
     }
 
     @UseGuards(JwtTwoFactAuthGuard)

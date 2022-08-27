@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { FriendDto } from './dto/friend.dto';
 import { UserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
 
@@ -18,24 +19,29 @@ export class UsersService {
     @InjectRepository(User) private userRepository: Repository<User>,
     ) {}
 
+  private entityToFriendDto(user: User) {
+    const friendDto = new FriendDto();
+
+    friendDto.id = user.id;
+    friendDto.name = user.name;
+    friendDto.status = user.status;
+    friendDto.currentAvatar = user.currentAvatarId? {id: user.currentAvatarId, data:user.currentAvatarData} : null;
+
+    return friendDto;
+  }
+
   //  Utility method to get dto object from entity
   private entityToDto(user: User): UserDto {
     const userDto = new UserDto();
+
     userDto.id = user.id;
     userDto.name = user.name;
     userDto.status = user.status;
-    userDto.friendsId = user.friendsId;
+    userDto.friends = user.friends? user.friends.map(x => this.entityToFriendDto(x)): [];
     userDto.currentAvatar = user.currentAvatarId? {id: user.currentAvatarId, data:user.currentAvatarData} : null;
     userDto.twoFactAuth = user.twoFactAuth;
-    userDto.secret = user.secret;
 
     return userDto;
-  }
-
-  public dtoToReturn(userDto: UserDto): any {
-    const {secret, ...rest} = userDto;
-
-    return rest;
   }
 
   //  Create a user.
@@ -45,9 +51,6 @@ export class UsersService {
     const user: User = new User();
     user.id = createUserDto.id;
     user.name = createUserDto.name;
-    user.twoFactAuth = false;
-    user.avatars = [];
-    user.friendsId = [];
 
     try {
       await this.userRepository.save(user);
@@ -114,9 +117,15 @@ export class UsersService {
 
   public async addFriend(userId: number, friendId: number) {
     const user: User = await this.userRepository.findOneBy({ id: userId });
+    const friend: User = await this.userRepository.findOneBy({ id: friendId });
 
-    if (user.id !== friendId && user.friendsId.indexOf(friendId) === -1) {
-      user.friendsId.push(friendId);
+    if (userId !== friendId) {
+      if (user.friends) {
+        user.friends.push(friend);
+      }
+      else {
+        user.friends = [friend];
+      }
       await this.userRepository.save(user);
     }
 
@@ -128,6 +137,11 @@ export class UsersService {
     const user: User = await this.userRepository.findOneBy({ id: id });
     user.secret = secret;
     await this.userRepository.save(user); 
+  }
+
+  public async getSecret(id: number) {
+    const user: User = await this.userRepository.findOneBy({ id: id });
+    return user.secret;
   }
 
   public async turnOnTfa(id: number) {
