@@ -14,7 +14,7 @@ export default function ProfileImage({
 }: ProfileImageProps) {
 
   return (
-    <CardContent >
+    <CardContent>
       <CardMedia
         component="img"
         src={profileImage? `data:image/jpeg;base64,${profileImage.data}` : defaultAvatar}

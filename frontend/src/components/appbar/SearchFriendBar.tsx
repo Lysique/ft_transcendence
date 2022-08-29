@@ -34,7 +34,7 @@ const SearchFriendInput = () => {
     return (
         <RouteProtect>
             <Autocomplete
-                sx={{  width:180 }}
+                sx={{  width:180, mr:2 }}
                 disableClearable
                 freeSolo
                 options={users? users.map(x => x.name) : []}

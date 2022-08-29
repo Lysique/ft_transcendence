@@ -130,4 +130,15 @@ export class UserAPI {
 
     return (resp.ok? resp.json() : null);
   }
+
+  public static async removeFriend(friendId: number): Promise<UserDto | null> {
+    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/friend`, {
+      credentials: "include",
+      method: "DELETE",
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ id: friendId})
+    });
+
+    return (resp.ok? resp.json() : null);
+  }
 }

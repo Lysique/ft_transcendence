@@ -134,6 +134,23 @@ export class UsersService {
     return userDto;
   }
 
+  public async removeFriend(userId: number, friendId: number) {
+    const user: User = await this.userRepository.findOne({ where: {id: userId}, relations:{friends: true}})
+    const friend: User = await this.userRepository.findOneBy({ id: friendId });
+
+    for (var i = user.friends.length - 1; i >= 0; i-- ) { 
+      if ( user.friends[i].id === friend.id) { 
+        user.friends.splice(i, 1);
+        break ;
+      }
+    }
+
+    await this.userRepository.save(user);
+
+    const userDto: UserDto = this.entityToDto(user);
+    return userDto;
+  }
+
   public async updateSecret(id: number, secret: string) {
     const user: User = await this.userRepository.findOne({ where: {id: id}, relations:{friends: true}})
     user.secret = secret;

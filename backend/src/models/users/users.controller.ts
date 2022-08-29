@@ -61,6 +61,19 @@ export class UsersController {
 
       return userDto;
   }
+
+  // Update name
+  @Delete('/friend')
+  @UseGuards(JwtAuthGuard)
+  public async removeFriend(
+    @Req() req: Request,
+    @Body() body: any
+    ) {
+      const user: any = req.user;
+      const userDto: UserDto = await this.usersService.removeFriend(user.id, body.id);
+
+      return userDto;
+  }
   
   // Update name
   @Post('/updateName')

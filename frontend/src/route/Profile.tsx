@@ -1,12 +1,12 @@
 import { Card, Grid, Paper, styled, Typography } from "@mui/material";
 import React from "react";
 import { UserContext } from "../App";
-import ProfileImage from "../components/profile/profileImage/ProfileImage";
 import ProfileName from "../components/profile/profileName/ProfileName";
 import TfaToggle from "../components/profile/twoFactAuth/TfaToggle";
-import UserProfileImageModificator from "../components/profile/profileImage/UserProfileImageModificator";
 import { UserDto } from "../api/dto/user.dto";
-import { FriendList } from "../components/profile/profileFriends/friendList";
+import { FriendBar } from "../components/profile/profileFriends/FriendBar";
+import UserProfileImageModificator from "components/profile/ProfileImage/UserProfileImageModificator";
+import ProfileImage from "components/profile/ProfileImage/ProfileImage";
 
 export const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -27,7 +27,7 @@ export const Profile = () => {
 
             <Grid item xs={12} container spacing={3} alignItems={'center'}>
 
-                <Grid item xs={6} sm={4}>
+                <Grid item xs={4}>
 
                     <Card >
                         <UserProfileImageModificator>
@@ -41,7 +41,7 @@ export const Profile = () => {
 
                 <Grid item xs={1}></Grid>
 
-                <Grid item xs={5} sm={7}>
+                <Grid item xs={7}>
                     <Typography variant="h2" display="flex" >
                         {user?.name}'s profile
                     </Typography>
@@ -70,7 +70,7 @@ export const Profile = () => {
             <Grid item xs={7} container spacing={3} direction={'column'}>
 
                 <Grid item >
-                    <FriendList />
+                    <FriendBar />
                 </Grid>
                 
             </Grid>

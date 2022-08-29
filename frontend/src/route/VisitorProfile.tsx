@@ -1,11 +1,11 @@
 import { Card, Grid, Typography } from "@mui/material";
 import React from "react";
-import ProfileImage from "../components/profile/profileImage/ProfileImage";
 import { useNavigate, useParams } from "react-router-dom";
 import { UserDto } from "../api/dto/user.dto";
 import { UserAPI } from "../api/user.api";
 import { Item } from "./Profile";
 import { AddFriendButton } from "../components/profile/profileFriends/AddFriendButton";
+import ProfileImage from "components/profile/ProfileImage/ProfileImage";
 
 export const VisitorProfile = () => {
 
