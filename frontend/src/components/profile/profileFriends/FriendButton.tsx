@@ -75,7 +75,7 @@ export const FriendButton = ({friend, children}: FriendButtonProps) => {
             'aria-labelledby': 'basic-button',
         }}
     >
-    <MenuItem onClick={visitProfile}>Profile</MenuItem>
+    <MenuItem onClick={visitProfile}>See profile</MenuItem>
     <MenuItem onClick={removeFriend}>Remove friend</MenuItem>
     </Menu>
 

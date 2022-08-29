@@ -19,15 +19,13 @@ export class User {
     @Column({ default: UserStatus.Online })
     status: UserStatus;
 
-    @ManyToMany(() => User, (user) => user.follower)
+    @ManyToMany(() => User)
     @JoinTable()
     friends: User[];
 
-    @ManyToMany(() => User, (user) => user.friends, {
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
-    })
-    follower: User[];
+    @ManyToMany(() => User)
+    @JoinTable()
+    blocked: User[];
     
     @OneToMany(() => Avatar, (avatar) => avatar.user, { eager: true })
     avatars: Avatar[];

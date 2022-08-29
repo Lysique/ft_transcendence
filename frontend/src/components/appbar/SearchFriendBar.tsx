@@ -11,15 +11,22 @@ const SearchFriendInput = () => {
     const navigate: NavigateFunction = useNavigate();
 
     const [users, setUsers] = React.useState<UserDto[] | null>(null);
-
+    
     React.useEffect(() => {
         const fetchUsers = async() => {
             const resp: UserDto[] = await UserAPI.getAllUsers();
             setUsers(resp);
         }
-
+        
         fetchUsers();
     }, []);
+    
+    const handleClick = (event: any, value: string, reason: any) => {
+        const user = users?.find(x => x.name === value);
+        if (user) {
+            navigate(`/profile/${user.id}`, { replace: true });
+        }
+    }
 
     const keyPress = (event: any): void => {
         if (event.keyCode === 13)
@@ -37,6 +44,7 @@ const SearchFriendInput = () => {
                 sx={{  width:180, mr:2 }}
                 disableClearable
                 freeSolo
+                onChange={handleClick}
                 options={users? users.map(x => x.name) : []}
                 renderInput={(params) => (
                     <>
