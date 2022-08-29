@@ -8,16 +8,16 @@ import ConfirmationPopup from '../../utils/ConfirmationPopup';
 import { SetUserContext } from '../../../App';
 import AvatarListDialog from './AvatarListDialog';
 
-interface UserProfileImageDecoratorProps {
+interface UserProfileImageModificatorProps {
   children: JSX.Element
 }
 
-export default function UserProfileImageDecorator({
+export default function UserProfileImageModificator({
   children,
 
-}: UserProfileImageDecoratorProps ) {
+}: UserProfileImageModificatorProps ) {
 
-  const setUser = React.useContext(SetUserContext);
+  const setUser: Function = React.useContext(SetUserContext);
 
   //  When a file has been choosen ; set the file with the file but does not download yet
   const [file, setFile] = React.useState<any | null>(null);

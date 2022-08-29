@@ -10,12 +10,12 @@ import { SetUserContext } from '../../../App';
 
 interface AvatarListDialogProps {
     open: boolean
-    setOpen: any
+    setOpen: Function
 }
 
 export default function AvatarListDialog({open, setOpen}: AvatarListDialogProps) {
 
-  const setUser = React.useContext(SetUserContext);
+  const setUser: Function = React.useContext(SetUserContext);
 
   // Selected avatar
   const [selectedId, setSelectedId] = React.useState<number | null>(null);

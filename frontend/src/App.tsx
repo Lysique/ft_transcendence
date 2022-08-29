@@ -3,13 +3,12 @@ import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { UserDto } from "./api/dto/user.dto";
 import { UserAPI } from "./api/user.api";
 import ResponsiveAppBar from "./components/AppBar";
-import { socket, WebsocketProvider } from "./contexts/WebsocketContext";
-import { Websocket } from "./components/Websockets";
 import { Route, Routes } from "react-router-dom";
 import { Homepage } from "./route/Homepage";
 import { Profile } from "./route/Profile";
-import UsernameTaken from "./components/auth/UsernameTaken";
-import TwoFactAuth from "./components/auth/TwoFactAuth";
+import HomeProtect from "./components/auth/HomeProtect";
+import RouteProtect from "./components/auth/RouteProtect";
+import { VisitorProfile } from "./route/VisitorProfile";
 
 export const UserContext = React.createContext<UserDto | null>(null);
 export const SetUserContext = React.createContext<any>(null);
@@ -47,8 +46,8 @@ function App() {
   
   React.useEffect(() => {
     const fetchProfile = async () => {
-      const user = await UserAPI.getUserProfile();
-      setUser(user);
+      const resp = await UserAPI.getUserProfile();
+      setUser(resp);
     }
     fetchProfile();
   }, [])
@@ -71,24 +70,26 @@ function App() {
 
       <ResponsiveAppBar
         handleToggle={handleToggle}
+        setLoggedIn={setLoggedIn}
       />
 
-      {
-      user && !user.name?
-
-        <UsernameTaken />
-
-      : loggedIn && !user?
-
-      <TwoFactAuth setLoggedIn={setLoggedIn}/>
-
-      :
-
       <Routes >
-        <Route path="/" element={<Homepage />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/" element={
+        <HomeProtect loggedIn={loggedIn} setLoggedIn={setLoggedIn}>
+          <Homepage />
+        </HomeProtect>
+        } />
+        <Route path="/profile" element={
+          <RouteProtect >
+            <Profile />
+          </RouteProtect>
+        } />
+        <Route path="/profile/:id" element={
+          <RouteProtect >
+            <VisitorProfile />
+          </RouteProtect>
+        } />
       </Routes>
-      }
 
     </div>
     </SetUserContext.Provider>

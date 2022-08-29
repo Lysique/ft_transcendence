@@ -7,8 +7,8 @@ import { DialogContent, DialogContentText } from '@mui/material';
 
 interface ValidationPopupProps {
     open: boolean
-    setOpen: any
-    setValidation: any
+    setOpen: Function
+    setValidation: Function
     title: string 
     message: string
 }

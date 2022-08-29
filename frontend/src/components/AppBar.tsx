@@ -18,17 +18,21 @@ import { UserAPI } from "../api/user.api";
 import defaultAvatar from '../default_avatar/profile_image.jpeg';
 import { SetUserContext, UserContext } from "../App";
 import { Link } from "react-router-dom";
+import SearchFriendInput from "./appbar/SearchFriendBar";
+import { UserDto } from "../api/dto/user.dto";
 
 interface ResponsiveAppBarProps {
   handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
+  setLoggedIn: Function
 }
 
 const ResponsiveAppBar = ({
   handleToggle,
+  setLoggedIn
 }: ResponsiveAppBarProps) => {
 
-  const user = React.useContext(UserContext);
-  const setUser = React.useContext(SetUserContext);
+  const user: UserDto | null = React.useContext(UserContext);
+  const setUser: Function = React.useContext(SetUserContext);
 
   const theme = useTheme();
 
@@ -99,6 +103,7 @@ const ResponsiveAppBar = ({
     handleCloseUserMenu();
     await UserAPI.logout();
     setUser(null);
+    setLoggedIn(false);
   }
 
   function LogoutButton() {
@@ -150,22 +155,6 @@ const ResponsiveAppBar = ({
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="/"
-            sx={{
-              mr: 2,
-              display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-          </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
@@ -178,6 +167,7 @@ const ResponsiveAppBar = ({
             >
               <MenuIcon />
             </IconButton>
+            
             <Menu
               id="menu-appbar"
               anchorEl={anchorElNav}
@@ -203,23 +193,6 @@ const ResponsiveAppBar = ({
               ))}
             </Menu>
           </Box>
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href=""
-            sx={{
-              mr: 2,
-              display: { xs: "flex", md: "none" },
-              flexGrow: 1,
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-          </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
               <Button
@@ -230,6 +203,9 @@ const ResponsiveAppBar = ({
                 {page}
               </Button>
             ))}
+          </Box>
+          <Box >
+          <SearchFriendInput />
           </Box>
           <Box textAlign="center">
             <IconButton sx={{ mr: 3 }} onClick={handleToggle} color="inherit">

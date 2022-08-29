@@ -8,27 +8,27 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { AuthCodeRef } from 'react-auth-code-input';
 import { SetUserContext } from '../../App';
 import { UserAPI } from '../../api/user.api';
-import TfaInput from '../profile/twoFactAuth/TfaInput';
+import TfaInput from './TfaInput';
 
 interface TwoFactAuthProps {
-  setLoggedIn: any
+  setLoggedIn: Function
 }
 
 export default function TwoFactAuth({
   setLoggedIn
 } : TwoFactAuthProps) {
 
-  const setUser = React.useContext(SetUserContext);
+  const setUser: Function = React.useContext(SetUserContext);
   
   // Tfa Input
-  const [result, setResult] = React.useState("");
-  const [error, setError] = React.useState(false);
+  const [result, setResult] = React.useState<string>("");
+  const [error, setError] = React.useState<boolean>(false);
   const AuthInputRef = React.useRef<AuthCodeRef>(null);
   
   React.useEffect(() => {
     const checkTfa = async () => {
-      const resp = await UserAPI.validateTfa(result);
-      if (resp) {
+      const resp: {valid: boolean} = await UserAPI.validateTfa(result);
+      if (resp.valid) {
         const user = await UserAPI.getUserProfile();
         setUser(user);
       }
@@ -43,8 +43,8 @@ export default function TwoFactAuth({
     // eslint-disable-next-line
   }, [result])
 
-  const handleClose = () => {
-    UserAPI.logout();
+  const handleClose = async () => {
+    await UserAPI.logout();
     setLoggedIn(false);
   };
 
