@@ -1,46 +1,10 @@
 import * as React from "react";
 import { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { WebsocketContext } from "../contexts/WebsocketContext";
-import { Game } from "../interfaces/gameInterfaces";
+import { Dimensions, Game, Ratio } from "../interfaces/gameInterfaces";
 import { render } from "../utils/game.draw";
-import { debounce } from "../utils/game.resize";
 
-export const CANVAS_WIDTH = 500;
-export const CANVAS_HEIGHT = 500;
-
-const Canvas = () => {
-  /* Capture window resize */
-  const [dimensions, setDimensions] = useState({
-    height: window.innerHeight,
-    width: window.innerWidth,
-  });
-
-  useEffect(() => {
-    const debouncedHandleResize = debounce(function handleResize() {
-      setDimensions({
-        height: window.innerHeight,
-        width: window.innerWidth,
-      });
-    }, 300); // check for window resize every 300ms
-    window.addEventListener("resize", debouncedHandleResize);
-    return () => {
-      window.removeEventListener("resize", debouncedHandleResize);
-    };
-  });
-
-  const [ratioX, setRatioX] = useState(dimensions.width * 0.5);
-  const [ratioY, setRatioY] = useState(dimensions.height * 0.5);
-  console.log('ratioX ' + ratioX);
-  console.log('ratioY ' + ratioY);
-
-  useEffect(() => {
-    setRatioX(dimensions.width * 0.5 / CANVAS_WIDTH);
-  }, [dimensions]);
-
-  useEffect(() => {
-    setRatioY(dimensions.height * 0.5 / CANVAS_HEIGHT);
-  }, [dimensions]);
-
+const GameScreen = (props: Dimensions & Ratio) => {
   /* Initialize Canvas */
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const context = useRef<CanvasRenderingContext2D | null>();
@@ -130,37 +94,16 @@ const Canvas = () => {
     };
   }, [keyUpHandler]);
 
-  // useEffect(() => {
-  //   const movePaddle = (evt: MouseEvent) => {
-  // 	if (canvasRef.current) {
-  // 		const relativeY = evt.clientY - canvasRef.current.offsetTop;
-  // 		if (relativeY > 0 && relativeY < canvasRef.current.height) {
-  // 		  user1.y = relativeY - user1.height / 2;
-  // 		}
-  // 	}
-  //   };
-  //   if (canvasRef.current) {
-  //     canvasRef.current.addEventListener("mousemove", movePaddle);
-  //   }
-  //   return () => {
-  //     if (canvasRef.current) {
-  //       canvasRef.current.removeEventListener("mousemove", movePaddle);
-  //     }
-  //   };
-  // });
-
   /* Render next frame */
   const renderFrame = () => {
     if (!canvasRef.current || !context.current) return;
-    // update(canvas.width, canvas.height); // get update from websocket server instead
     if (gameState) {
-      render(context.current, canvasRef.current, gameOn, gameState, ratioX, ratioY);
+      render(context.current, canvasRef.current, gameOn, gameState, props.x, props.y);
     }
   };
 
   const requestIdRef = useRef<number>(0);
   const tick = () => {
-    // if (!canvasRef.current) return;
     renderFrame();
     if (requestIdRef.current) {
       requestIdRef.current = requestAnimationFrame(tick);
@@ -177,14 +120,13 @@ const Canvas = () => {
 
   return (
     <>
-      {/* <Fireworks /> */}
-      <canvas ref={canvasRef} width={dimensions.width * 0.5} height={dimensions.height * 0.5} />
+      <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} />
       <button onClick={launchGame}>Launch game</button>
     </>
   );
 };
 
-export default Canvas;
+export default GameScreen;
 
 /* Helpful doc:
 - https://tinyurl.com/yc34ta38

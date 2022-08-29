@@ -11,8 +11,8 @@ export class Ball {
   constructor() {
     this.x = CANVAS_WIDTH / 2;
     this.y = CANVAS_HEIGHT / 2;
-    this.radius = CANVAS_WIDTH / 100;
-    this.speed = CANVAS_WIDTH / 200;
+    this.radius = CANVAS_WIDTH / 50;
+    this.speed = CANVAS_WIDTH / 100;
     this.velocityX = CANVAS_WIDTH / 150;
     this.velocityY = CANVAS_WIDTH / 150;
   }
@@ -30,9 +30,9 @@ export class Player1 {
 
   constructor() {
     this.x = 0;
-    this.y = (CANVAS_HEIGHT - CANVAS_HEIGHT / 10) / 2;
-    this.width = CANVAS_WIDTH / 100;
-    this.height = CANVAS_HEIGHT / 10;
+    this.y = (CANVAS_HEIGHT - CANVAS_HEIGHT / 5) / 2;
+    this.width = CANVAS_WIDTH / 50;
+    this.height = CANVAS_HEIGHT / 5;
     this.arrowDown = false;
     this.arrowUp = false;
     this.score = 0;
@@ -50,10 +50,10 @@ export class Player2 {
   score: number;
 
   constructor() {
-    this.x = CANVAS_WIDTH - CANVAS_WIDTH / 100;
-    this.y = (CANVAS_HEIGHT - CANVAS_HEIGHT / 10) / 2;
-    this.width = CANVAS_WIDTH / 100;
-    this.height = CANVAS_HEIGHT / 10;
+    this.x = CANVAS_WIDTH - CANVAS_WIDTH / 50;
+    this.y = (CANVAS_HEIGHT - CANVAS_HEIGHT / 5) / 2;
+    this.width = CANVAS_WIDTH / 50;
+    this.height = CANVAS_HEIGHT / 5;
     this.arrowDown = false;
     this.arrowUp = false;
   }

@@ -1,7 +1,4 @@
-/* DRAWING FUNCTIONS */
-
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from "../components/Canvas";
-import { Game } from "../interfaces/gameInterfaces";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, Game } from "../interfaces/gameInterfaces";
 
 /* Draw rectangle */
 export function drawRect(
@@ -51,9 +48,9 @@ export function drawText(
 }
 
 /* Draw net */
-export function drawNet(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+export function drawNet(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, color: string) {
   for (let i = 0; i <= canvas.height; i += 15) {
-    drawRect(context, (canvas.width - 2) / 2, i, 2, 10, "black");
+    drawRect(context, (canvas.width - 2) / 2, i, 2, 10, color);
   }
 }
 
@@ -64,15 +61,15 @@ export const render = (
   gameOn: boolean,
   gameState: Game,
   ratioX: number,
-  ratioY: number
+  ratioY: number,
 ) => {
   if (!gameOn) return;
   /* Clear the canvas */
   context.clearRect(0, 0, CANVAS_WIDTH * ratioX, CANVAS_HEIGHT * ratioY);
-  drawRect(context, 0, 0, CANVAS_WIDTH * ratioX, CANVAS_HEIGHT * ratioY, "#E0E0E1");
+  drawRect(context, 0, 0, CANVAS_WIDTH * ratioX, CANVAS_HEIGHT * ratioY, "aliceblue");
 
   /* Draw net */
-  drawNet(canvas, context);
+  drawNet(canvas, context, "black");
 
   /* Draw score */
   // drawText(context, user1.score, canvas.width / 4, canvas.height / 6, "black");
