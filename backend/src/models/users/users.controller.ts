@@ -49,7 +49,6 @@ export class UsersController {
     return userDtos;
   }
 
-  // Update name
   @Post('/friend')
   @UseGuards(JwtAuthGuard)
   public async addFriend(
@@ -62,7 +61,6 @@ export class UsersController {
       return userDto;
   }
 
-  // Update name
   @Delete('/friend')
   @UseGuards(JwtAuthGuard)
   public async removeFriend(
@@ -71,6 +69,30 @@ export class UsersController {
     ) {
       const user: any = req.user;
       const userDto: UserDto = await this.usersService.removeFriend(user.id, body.id);
+
+      return userDto;
+  }
+
+  @Post('/blocked')
+  @UseGuards(JwtAuthGuard)
+  public async addBlocked(
+    @Req() req: Request,
+    @Body() body: any
+    ) {
+      const user: any = req.user;
+      const userDto: UserDto = await this.usersService.addBlocked(user.id, body.id);
+
+      return userDto;
+  }
+
+  @Delete('/blocked')
+  @UseGuards(JwtAuthGuard)
+  public async removeBlocked(
+    @Req() req: Request,
+    @Body() body: any
+    ) {
+      const user: any = req.user;
+      const userDto: UserDto = await this.usersService.removeBlocked(user.id, body.id);
 
       return userDto;
   }

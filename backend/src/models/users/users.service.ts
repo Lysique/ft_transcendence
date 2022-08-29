@@ -116,6 +116,41 @@ export class UsersService {
     return userDto;
   }
 
+  public async addBlocked(userId: number, blockedId: number) {
+    const user: User = await this.userRepository.findOne({ where: {id: userId}, relations:{blocked: true}})
+    const blocked: User = await this.userRepository.findOneBy({ id: blockedId });
+
+    if (userId !== blockedId) {
+      if (user.blocked) {
+        user.blocked.push(blocked);
+      }
+      else {
+        user.blocked = [blocked];
+      }
+      await this.userRepository.save(user);
+    }
+
+    const userDto: UserDto = this.entityToDto(user);
+    return userDto;
+  }
+
+  public async removeBlocked(userId: number, blockedId: number) {
+    const user: User = await this.userRepository.findOne({ where: {id: userId}, relations:{blocked: true}})
+    const blocked: User = await this.userRepository.findOneBy({ id: blockedId });
+
+    for (var i = user.blocked.length - 1; i >= 0; i-- ) { 
+      if ( user.blocked[i].id === blocked.id) { 
+        user.blocked.splice(i, 1);
+        break ;
+      }
+    }
+
+    await this.userRepository.save(user);
+
+    const userDto: UserDto = this.entityToDto(user);
+    return userDto;
+  }
+
   public async addFriend(userId: number, friendId: number) {
     const user: User = await this.userRepository.findOne({ where: {id: userId}, relations:{friends: true}})
     const friend: User = await this.userRepository.findOneBy({ id: friendId });

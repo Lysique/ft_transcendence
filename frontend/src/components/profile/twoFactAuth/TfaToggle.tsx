@@ -18,15 +18,14 @@ export default function TfaToggle() {
     const [qrCode, setQrCode] = React.useState<string>("");
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setOpenValidation(true);
         if (event.target.checked === false) {
-            setOpenValidation(true);
             setMessage({
                 title: "Disable two factor authentification ?",
                 message: "Your qr code will be invalidated and your data will be vulnerable."
             })
         }
         else {
-            setOpenValidation(true);
             setMessage({
                 title: "Enable two factor authentification ?",
                 message: `We will provide you a qr code to scan with the google authenticator application. 
