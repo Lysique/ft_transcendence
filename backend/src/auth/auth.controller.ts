@@ -37,7 +37,7 @@ export class AuthController {
         IsTwoFactAuth: false
       });
 
-      res.cookie('jwt', accessToken, { httpOnly: true });
+      res.cookie('jwt', accessToken, { httpOnly: true, sameSite: 'strict' });
     
       //  Redirect to the frontend
       res.redirect(req.headers.referer);
@@ -99,7 +99,7 @@ export class AuthController {
         isTwoFactAuth: true,
       });
       
-      res.cookie('jwt', accessToken, { httpOnly: true });
+      res.cookie('jwt', accessToken, { httpOnly: true, sameSite: 'strict' });
 
       return {valid: true};
     }

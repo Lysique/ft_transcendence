@@ -11,6 +11,7 @@ import { UserAPI } from '../../../api/user.api';
 import { SetUserContext } from '../../../App';
 import { AuthCodeRef } from 'react-auth-code-input';
 import { UserDto } from '../../../api/dto/user.dto';
+import ConfirmationPopup from 'components/utils/ConfirmationPopup';
 
 interface TfaEnableProps {
   open: boolean
@@ -29,6 +30,8 @@ export default function TfaEnable({
   // Tfa Input
   const [result, setResult] = React.useState<string>("");
   const [error, setError] = React.useState<boolean>(false);
+  const [confirmation, setConfirmation] = React.useState(false);
+
   const AuthInputRef = React.useRef<AuthCodeRef>(null);
   
   React.useEffect(() => {
@@ -38,6 +41,7 @@ export default function TfaEnable({
         handleClose();
         const user: UserDto | null = await UserAPI.getUserProfile();
         setUser(user);
+        setConfirmation(true);
       }
       else {
         setError(true);
@@ -91,7 +95,10 @@ export default function TfaEnable({
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
         </DialogActions>
+
       </Dialog>
+      
+      <ConfirmationPopup open={confirmation} setOpen={setConfirmation} message="Two factor authentification is now activated."/>
 
     </>
   )
