@@ -5,7 +5,7 @@ import ValidationPopup from "components/utils/ValidationPopup";
 import React from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { UserDto } from "../../../api/dto/user.dto";
-import { SetUserContext, UserContext } from "../../../App";
+import { SetUserContext } from "../../../App";
 
 interface FriendButtonProps {
     friend: FriendDto
@@ -15,7 +15,6 @@ interface FriendButtonProps {
 export const FriendButton = ({friend, children}: FriendButtonProps) => {
 
     const setUser: Function = React.useContext(SetUserContext);
-    const user: UserDto | null = React.useContext(UserContext);
     const navigate: NavigateFunction = useNavigate();
 
 
