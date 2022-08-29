@@ -12,6 +12,7 @@ export interface UserDto {
     name: string;
     status: UserStatus;
     friends?: FriendDto[];
+    blocked?: FriendDto[];
     currentAvatar?: AvatarDto;
     avatars?: AvatarDto[];
     twoFactAuth: boolean;

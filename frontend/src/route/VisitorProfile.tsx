@@ -6,6 +6,7 @@ import { UserAPI } from "../api/user.api";
 import { Item } from "./Profile";
 import { AddFriendButton } from "../components/profile/profileFriends/AddFriendButton";
 import ProfileImage from "components/profile/ProfileImage/ProfileImage";
+import { BlockButton } from "components/profile/profileFriends/BlockButton";
 
 export const VisitorProfile = () => {
 
@@ -55,6 +56,12 @@ export const VisitorProfile = () => {
                 <Grid item >
                     <Item>
                         <AddFriendButton visited={visited}/>
+                    </Item>
+                </Grid>
+
+                <Grid item >
+                    <Item>
+                        <BlockButton visited={visited}/>
                     </Item>
                 </Grid>
 

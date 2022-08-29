@@ -141,4 +141,26 @@ export class UserAPI {
 
     return (resp.ok? resp.json() : null);
   }
+
+  public static async addBlock(blockedId: number): Promise<UserDto | null> {
+    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/blocked`, {
+      credentials: "include",
+      method: "POST",
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ id: blockedId})
+    });
+
+    return (resp.ok? resp.json() : null);
+  }
+
+  public static async removeBlock(blockedId: number): Promise<UserDto | null> {
+    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/blocked`, {
+      credentials: "include",
+      method: "DELETE",
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ id: blockedId})
+    });
+
+    return (resp.ok? resp.json() : null);
+  }
 }

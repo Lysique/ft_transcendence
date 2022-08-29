@@ -8,6 +8,7 @@ export class UserDto {
     name: string;
     status: UserStatus;
     friends: FriendDto[];
+    blocked: FriendDto[];
     avatars: AvatarDto[];
     currentAvatar?: AvatarDto;
     twoFactAuth: boolean;

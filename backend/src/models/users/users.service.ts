@@ -19,7 +19,7 @@ export class UsersService {
     @InjectRepository(User) private userRepository: Repository<User>,
     ) {}
 
-  private entityToFriendDto(user: User) {
+  private entityToRelationDto(user: User) {
     const friendDto = new FriendDto();
 
     friendDto.id = user.id;
@@ -38,7 +38,8 @@ export class UsersService {
     userDto.name = user.name;
     userDto.status = user.status;
     userDto.avatars = user.avatars;
-    userDto.friends = user.friends? user.friends.map(x => this.entityToFriendDto(x)): [];
+    userDto.friends = user.friends? user.friends.map(x => this.entityToRelationDto(x)): [];
+    userDto.blocked = user.blocked? user.blocked.map(x => this.entityToRelationDto(x)): [];
     userDto.currentAvatar = user.currentAvatarId? {id: user.currentAvatarId, data:user.currentAvatarData} : null;
     userDto.twoFactAuth = user.twoFactAuth;
 
@@ -90,7 +91,10 @@ export class UsersService {
   
   //  Find one user by id.
   public async findOneById(id: number) {
-    const user: User = await this.userRepository.findOne({ where: {id: id}, relations:{friends: true}})
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: id},
+      relations:{blocked: true, friends: true}
+    })
     
     if (!user) {
       return null;
@@ -102,7 +106,10 @@ export class UsersService {
   }
 
   public async updateName(id: number, name: string) {
-    const user: User = await this.userRepository.findOne({ where: {id: id}, relations:{friends: true}})
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: id},
+      relations:{blocked: true, friends: true}
+    })
 
     user.name = name;
     try {
@@ -117,7 +124,10 @@ export class UsersService {
   }
 
   public async addBlocked(userId: number, blockedId: number) {
-    const user: User = await this.userRepository.findOne({ where: {id: userId}, relations:{blocked: true}})
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: userId}, 
+      relations:{blocked: true, friends: true}
+    })
     const blocked: User = await this.userRepository.findOneBy({ id: blockedId });
 
     if (userId !== blockedId) {
@@ -135,7 +145,10 @@ export class UsersService {
   }
 
   public async removeBlocked(userId: number, blockedId: number) {
-    const user: User = await this.userRepository.findOne({ where: {id: userId}, relations:{blocked: true}})
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: userId},
+      relations:{blocked: true, friends: true}
+    })
     const blocked: User = await this.userRepository.findOneBy({ id: blockedId });
 
     for (var i = user.blocked.length - 1; i >= 0; i-- ) { 
@@ -152,7 +165,10 @@ export class UsersService {
   }
 
   public async addFriend(userId: number, friendId: number) {
-    const user: User = await this.userRepository.findOne({ where: {id: userId}, relations:{friends: true}})
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: userId},
+      relations:{blocked: true, friends: true}
+    })
     const friend: User = await this.userRepository.findOneBy({ id: friendId });
 
     if (userId !== friendId) {
@@ -170,7 +186,10 @@ export class UsersService {
   }
 
   public async removeFriend(userId: number, friendId: number) {
-    const user: User = await this.userRepository.findOne({ where: {id: userId}, relations:{friends: true}})
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: userId},
+      relations:{blocked: true, friends: true}
+    })
     const friend: User = await this.userRepository.findOneBy({ id: friendId });
 
     for (var i = user.friends.length - 1; i >= 0; i-- ) { 
@@ -187,31 +206,46 @@ export class UsersService {
   }
 
   public async updateSecret(id: number, secret: string) {
-    const user: User = await this.userRepository.findOne({ where: {id: id}, relations:{friends: true}})
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: id},
+      relations:{blocked: true, friends: true}
+    })
     user.secret = secret;
     await this.userRepository.save(user); 
   }
 
   public async getSecret(id: number) {
-    const user: User = await this.userRepository.findOne({ where: {id: id}, relations:{friends: true}})
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: id},
+      relations:{blocked: true, friends: true}
+    })
     return user.secret;
   }
 
   public async turnOnTfa(id: number) {
-    const user: User = await this.userRepository.findOne({ where: {id: id}, relations:{friends: true}})
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: id},
+      relations:{blocked: true, friends: true}
+    })
     user.twoFactAuth = true;
     await this.userRepository.save(user);
   }
 
   public async turnOffTfa(id: number) {
-    const user: User = await this.userRepository.findOne({ where: {id: id}, relations:{friends: true}})
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: id},
+      relations:{blocked: true, friends: true}
+    })
     user.twoFactAuth = false;
     await this.userRepository.save(user);
   }
 
   public async addAvatar(userDto: UserDto, data: Buffer)
   {
-    const user: User = await this.userRepository.findOne({ where: {id: userDto.id}, relations:{friends: true}})
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: userDto.id},
+      relations:{blocked: true, friends: true}
+    })
     
     const avatarDto: AvatarDto = await this.avatarService.create({
       user: user,
@@ -226,7 +260,10 @@ export class UsersService {
   public async updateCurrentAvatar(userDto: UserDto, avatarId: number) {
     const avatarDto: AvatarDto = await this.avatarService.findOneById(avatarId);
 
-    const user: User = await this.userRepository.findOne({ where: {id: userDto.id}, relations:{friends: true}})
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: userDto.id},
+      relations:{blocked: true, friends: true}
+    })
     user.currentAvatarData = avatarDto.data;
     user.currentAvatarId = avatarDto.id;
     await this.userRepository.save(user);
@@ -235,7 +272,10 @@ export class UsersService {
   };
 
   public async getAllAvatars(userDto: UserDto) {
-    const user: User = await this.userRepository.findOne({ where: {id: userDto.id}, relations:{friends: true}})
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: userDto.id},
+      relations:{blocked: true, friends: true}
+    })
 
     if (user.avatars.length == 0) {
       return null;
@@ -249,7 +289,10 @@ export class UsersService {
   public async removeAvatar(avatarId: number, userId: number) {
     await this.avatarService.remove(avatarId);
 
-    const user: User = await this.userRepository.findOne({ where: {id: userId}, relations:{friends: true}})
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: userId},
+      relations:{blocked: true, friends: true}
+    })
 
     if (user.currentAvatarId == avatarId) {
       user.currentAvatarId = null;
@@ -257,5 +300,4 @@ export class UsersService {
       await this.userRepository.save(user);
     }
   }
-
 }
