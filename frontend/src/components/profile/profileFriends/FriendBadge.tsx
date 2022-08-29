@@ -1,5 +1,5 @@
 import { Avatar, Tooltip} from "@mui/material";
-import { FriendDto } from "api/dto/friend.dto";
+import { FriendDto, UserStatus } from "api/dto/friend.dto";
 import React from "react";
 import defaultAvatar from '../../../default_avatar/profile_image.jpeg';
 import { FriendButton } from "./FriendButton";
@@ -10,11 +10,11 @@ export const FriendBadge = ({friend}: {friend: FriendDto}) => {
 
     const statusStyle = (status: number) => {
         switch (status) {
-            case 0:
+            case UserStatus.Online:
             return "green";
-            case 1:
+            case UserStatus.InGame:
             return "blue";
-            case 2:
+            case UserStatus.Offline:
             return "red";
             default:
             return "white";
