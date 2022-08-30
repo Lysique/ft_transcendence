@@ -1,4 +1,4 @@
-import { Card, Grid, Typography } from "@mui/material";
+import { Card, CardContent, Grid, Typography } from "@mui/material";
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { UserDto } from "../api/dto/user.dto";
@@ -7,6 +7,7 @@ import { Item } from "./Profile";
 import { AddFriendButton } from "../components/profile/profileFriends/AddFriendButton";
 import ProfileImage from "components/profile/ProfileImage/ProfileImage";
 import { BlockButton } from "components/profile/profileFriends/BlockButton";
+import { UserStatus } from "api/dto/friend.dto";
 
 export const VisitorProfile = () => {
 
@@ -39,6 +40,12 @@ export const VisitorProfile = () => {
                         <ProfileImage
                             profileImage={visited?.currentAvatar}
                         />
+                        <CardContent>
+                            Status: 
+                        {visited?.status === UserStatus.Offline? ' Offline' 
+                        :visited?.status === UserStatus.Online? ' Online'
+                        : ' In game'}
+                        </CardContent>
                     </Card>
 
                 </Grid>
