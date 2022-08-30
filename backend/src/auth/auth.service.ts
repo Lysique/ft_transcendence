@@ -6,6 +6,10 @@ import { CreateUserDto } from 'src/models/users/dto/create-user.dto';
 import { authenticator } from 'otplib';
 import { toFileStream } from 'qrcode';
 import { Response } from 'express';
+import { Socket } from 'socket.io';
+import { parse } from "cookie";
+import { jwtConstants } from './constants/constants';
+import { User } from 'src/models/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -61,5 +65,26 @@ export class AuthService {
 
     async turnOnTfa(user: any) {
         await this.usersService.turnOnTfa(user.id);
+    }
+
+    public async getUserFromSocket(socket: Socket): Promise<UserDto | null> {
+        const cookies = socket.handshake.headers.cookie;
+
+        const token = parse(cookies)['jwt'];
+
+        try {
+            const sub = this.jwtService.verify(token);
+            if (!sub) {
+                return null;
+            }
+    
+            const userDto: UserDto | null = await this.usersService.findOneById(sub.sub);
+    
+            return userDto;
+        }
+        catch {
+            return null;
+        }
+
     }
 }

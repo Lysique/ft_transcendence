@@ -7,7 +7,7 @@ import { AvatarDto } from '../avatars/dto/avatar.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FriendDto } from './dto/friend.dto';
 import { UserDto } from './dto/user.dto';
-import { User } from './entities/user.entity';
+import { User, UserStatus } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -99,6 +99,23 @@ export class UsersService {
     if (!user) {
       return null;
     }
+
+    const userDto: UserDto = this.entityToDto(user);
+
+    return userDto;
+  }
+
+  public async setStatus(id: number, status: UserStatus) {
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: id},
+      relations:{blocked: true, friends: true}
+    })
+    
+    if (!user) {
+      return null;
+    }
+    user.status = status;
+    await this.userRepository.save(user);
 
     const userDto: UserDto = this.entityToDto(user);
 
@@ -300,4 +317,5 @@ export class UsersService {
       await this.userRepository.save(user);
     }
   }
+
 }

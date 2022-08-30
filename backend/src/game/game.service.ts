@@ -4,10 +4,20 @@ import { ConnectedSocket } from '@nestjs/websockets';
 import { Ball, CANVAS_HEIGHT, CANVAS_WIDTH, Game } from './classes/game.classes';
 import { WindowInfo } from './interfaces/game.interfaces';
 import { collision } from './utils/game.utils';
+import { AuthService } from 'src/auth/auth.service';
+import { UserDto } from 'src/models/users/dto/user.dto';
 
 @Injectable()
 export class GameService {
+
+  constructor(
+    private authService: AuthService,
+  ) {}
+
+
   setUpGame(@ConnectedSocket() client: Socket): Game {
+    // const user: UserDto | null = await this.authService.getUserFromSocket(client);
+    // Ta fonction doit etre async je crois
     const game = new Game();
     game.player1.socketID = client.id;
     return game;
