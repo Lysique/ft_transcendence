@@ -24,6 +24,7 @@ async function bootstrap() {
   await app.listen(port, () => {
     console.log('[WEB]', config.get<string>('BASE_URL'));
   });
+  //await app.listen(3000, () => console.log('Running on Port 3000'));
 
 }
 bootstrap();
