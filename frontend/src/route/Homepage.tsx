@@ -7,6 +7,7 @@ import Copyright from "../components/CopyRight";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import Canvas from "components/Canvas";
 
 export const Homepage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -21,7 +22,7 @@ export const Homepage = () => {
           </Typography>
         </Box>
         <Box textAlign="center" sx={{ my: 3, py: 3, px: 3 }}>
-          {/* <Canvas /> */}
+          <Canvas />
         </Box>
         <ProTip />
         <Copyright />

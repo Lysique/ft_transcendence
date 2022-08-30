@@ -19,11 +19,12 @@ import { JwtTwoFactAuthStrategy } from './strategies/jwt-2fa.strategy';
     })
   ],
   providers: [
-    AuthService, 
+    AuthService,
     FortyTwoStrategy, 
     JwtStrategy,
     JwtTwoFactAuthStrategy
   ],
   controllers: [AuthController],
+  exports: [AuthService]
 })
 export class AuthModule {}

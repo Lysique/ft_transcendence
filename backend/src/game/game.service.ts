@@ -4,9 +4,15 @@ import { ConnectedSocket } from '@nestjs/websockets';
 import { Ball, Game } from './classes/game.classes';
 import { WindowInfo } from './interfaces/game.interfaces';
 import { collision } from './utils/game.utils';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class GameService {
+
+  constructor(
+    private authService: AuthService,
+  ) {}
+
   setUpGame(@ConnectedSocket() client: Socket, window: WindowInfo): Game {
     const game = new Game(window);
     game.player1.socketID = client;

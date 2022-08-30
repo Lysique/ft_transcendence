@@ -317,4 +317,5 @@ export class UsersService {
       await this.userRepository.save(user);
     }
   }
+
 }

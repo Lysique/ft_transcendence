@@ -15,7 +15,8 @@ import { WindowInfo } from './interfaces/game.interfaces';
 
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:3000',
+    origin: true,
+    credentials: true,
   },
 })
 export class GameGateway
@@ -31,18 +32,18 @@ export class GameGateway
   /* Lifecycle hooks */
   afterInit(server: Server) {
     this.server.on('connection', (socket) => {
-      this.logger.log(`Initialized: ${socket.id}`);
+      this.logger.log(`Client init: ${socket.id}`);
     });
   }
 
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
   }
-
+  
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
   }
-
+  
   /* Subscribe to incoming messages */
   @SubscribeMessage('launchGame')
   launchGame(
@@ -50,10 +51,10 @@ export class GameGateway
     @MessageBody() window: WindowInfo,
   ) {
     const gameInfo = this.gameService.setUpGame(client, window);
-    client.emit('gameLaunched', gameInfo);
+    client.emit('gameLaunched', '');
     setInterval(() => {
       this.gameService.updateGame(gameInfo, window);
-      client.emit('gameUpdate', gameInfo);
+      client.emit('gameUpdate', '');
     }, 1000 / 60);
   }
 
