@@ -9,6 +9,8 @@ import { Profile } from "./route/Profile";
 import HomeProtect from "./components/auth/HomeProtect";
 import RouteProtect from "./components/auth/RouteProtect";
 import { VisitorProfile } from "./route/VisitorProfile";
+import { socket, WebsocketProvider } from './contexts/WebsocketContext';
+import { Websocket } from './components/chat/Websocket';
 
 export const UserContext = React.createContext<UserDto | null>(null);
 export const SetUserContext = React.createContext<any>(null);
@@ -90,6 +92,16 @@ function App() {
                 element={
                   <RouteProtect>
                     <VisitorProfile />
+                  </RouteProtect>
+                }
+              />
+              <Route
+                path="/chat"
+                element={
+                  <RouteProtect>
+                    <WebsocketProvider value={socket}>
+      <Websocket />
+    </WebsocketProvider>
                   </RouteProtect>
                 }
               />
