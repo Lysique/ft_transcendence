@@ -9,6 +9,7 @@ import { getEnvPath } from './common/helper/env.helper';
 import { TypeOrmConfigService } from './config/typeorm/typeorm.service';
 import { AuthModule } from './auth/auth.module';
 import { GameGateway } from './game/game.gateway';
+import { GatewayModule } from './chat/gateway.module';
 
 //  Get the environment file
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
@@ -18,6 +19,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
   imports: [
     ConfigModule.forRoot({ envFilePath, isGlobal: true }),
     TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
+    GatewayModule,
     UsersModule,
     AuthModule,
     AvatarsModule,

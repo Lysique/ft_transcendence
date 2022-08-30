@@ -13,7 +13,8 @@ import { Server } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:3000'],
+    origin: true,
+    credentials: true,
   },
 })
 export class MyGateway implements OnModuleInit {

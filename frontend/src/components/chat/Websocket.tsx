@@ -45,7 +45,8 @@ export const Websocket = () => {
             <div>
               {messages.map((msg) => (
                 <div>
-                  <p>{msg.socketid} : {msg.content}</p>
+                  <p>
+                    {msg.content[1]} : {msg.content[0]}</p>
                 </div>
               ))}
             </div>
