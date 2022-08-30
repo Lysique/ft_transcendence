@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { debounce } from "../utils/game.resize";
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from "../interfaces/gameInterfaces";
-import GameMenuScreen from "../components/GameMenuScreen";
 import GameScreen from "../components/GameScreen";
 import GameOverScreen from "../components/GameOverScreen";
 import GameWonScreen from "../components/GameWonScreen";
@@ -10,6 +9,7 @@ import Copyright from "../components/CopyRight";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import GameMenuScreen from "../components/GameMenuScreen";
 
 export const Homepage = () => {
   /* Check for window resizes every 300ms */

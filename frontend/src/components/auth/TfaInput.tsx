@@ -1,12 +1,12 @@
 import { FormControl, FormHelperText } from '@mui/material';
 import * as React from 'react';
-import AuthCode from 'react-auth-code-input';
+import AuthCode, { AuthCodeRef } from 'react-auth-code-input';
 import "./styles.css";
 
 interface TfaInputProps {
-    setResult: any
+    setResult: Function
     error: boolean
-    AuthInputRef: any
+    AuthInputRef: React.RefObject<AuthCodeRef>
   }
 
 export default function TfaInput({

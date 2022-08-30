@@ -5,6 +5,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Request } from 'express';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
 import { UserDto } from './dto/user.dto';
+import { isNumber } from 'class-validator';
 
 @Controller('users')
 export class UsersController {
@@ -16,10 +17,84 @@ export class UsersController {
   async profile(@Req() req: Request) {
     const user: any = req.user;
     const userDto: UserDto = await this.usersService.findOneById(user.id);
-    
-    const {secret, ...rest} = userDto;
 
-    return rest;
+    return userDto;
+  }
+
+  // Set the current user's avatar
+  @Get('/:id')
+  @UseGuards(JwtAuthGuard)
+  public async getOneById(
+    @Param('id') userId: string
+    ) {
+
+    if (!isNumber(+userId)) {
+      return {};
+    }
+
+    const userDto = await this.usersService.findOneById(+userId);
+
+    if (!userDto) {
+      return {};
+    }
+
+    return userDto;
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  public async getAll() {
+    const userDtos: UserDto[] = await this.usersService.findAll();
+
+    return userDtos;
+  }
+
+  @Post('/friend')
+  @UseGuards(JwtAuthGuard)
+  public async addFriend(
+    @Req() req: Request,
+    @Body() body: any
+    ) {
+      const user: any = req.user;
+      const userDto: UserDto = await this.usersService.addFriend(user.id, body.id);
+
+      return userDto;
+  }
+
+  @Delete('/friend')
+  @UseGuards(JwtAuthGuard)
+  public async removeFriend(
+    @Req() req: Request,
+    @Body() body: any
+    ) {
+      const user: any = req.user;
+      const userDto: UserDto = await this.usersService.removeFriend(user.id, body.id);
+
+      return userDto;
+  }
+
+  @Post('/blocked')
+  @UseGuards(JwtAuthGuard)
+  public async addBlocked(
+    @Req() req: Request,
+    @Body() body: any
+    ) {
+      const user: any = req.user;
+      const userDto: UserDto = await this.usersService.addBlocked(user.id, body.id);
+
+      return userDto;
+  }
+
+  @Delete('/blocked')
+  @UseGuards(JwtAuthGuard)
+  public async removeBlocked(
+    @Req() req: Request,
+    @Body() body: any
+    ) {
+      const user: any = req.user;
+      const userDto: UserDto = await this.usersService.removeBlocked(user.id, body.id);
+
+      return userDto;
   }
   
   // Update name
@@ -36,9 +111,7 @@ export class UsersController {
         throw new UnauthorizedException();
       }
 
-      const {secret, ...rest} = userDto;
-
-      return rest;
+      return userDto;
   }
 
   @Post('/turnOffTfa')
@@ -50,9 +123,8 @@ export class UsersController {
     await this.usersService.turnOffTfa(user.id);
 
     const userDto: UserDto = await this.usersService.findOneById(user.id);
-    const {secret, ...rest} = userDto;
 
-    return rest;
+    return userDto;
   }
 
   // Create a new avatar for the user
@@ -67,9 +139,7 @@ export class UsersController {
     const userDto: UserDto = await this.usersService.findOneById(user.id);
     await this.usersService.addAvatar(userDto, file.buffer);
 
-    const {secret, ...rest} = userDto;
-
-    return rest;
+    return userDto;
   }
 
   // Set the current user's avatar
@@ -84,9 +154,7 @@ export class UsersController {
     
     await this.usersService.updateCurrentAvatar(userDto, avatarId);
 
-    const {secret, ...rest} = userDto;
-
-    return rest;
+    return userDto;
   }
 
   // Get all user's avatars

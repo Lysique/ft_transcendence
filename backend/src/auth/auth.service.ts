@@ -55,7 +55,8 @@ export class AuthService {
 
     //  Verify qr code scan
     async verifyTwoFactAuth(code: string, user: any) {
-        return authenticator.verify({ token: code, secret: user.secret })
+        const secret = await this.usersService.getSecret(user.id);
+        return authenticator.verify({ token: code, secret: secret })
     }
 
     async turnOnTfa(user: any) {

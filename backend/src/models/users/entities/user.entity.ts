@@ -1,5 +1,5 @@
 import { Avatar } from "src/models/avatars/entities/avatar.entity";
-import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { Column, Entity,  JoinTable,  ManyToMany,  OneToMany, PrimaryColumn } from "typeorm";
 
 export enum UserStatus {
     Online = 0,
@@ -18,6 +18,14 @@ export class User {
 
     @Column({ default: UserStatus.Online })
     status: UserStatus;
+
+    @ManyToMany(() => User)
+    @JoinTable()
+    friends: User[];
+
+    @ManyToMany(() => User)
+    @JoinTable()
+    blocked: User[];
     
     @OneToMany(() => Avatar, (avatar) => avatar.user, { eager: true })
     avatars: Avatar[];
@@ -28,7 +36,7 @@ export class User {
     @Column({ nullable: true })
     currentAvatarId: number;
 
-    @Column()
+    @Column({ default: false })
     twoFactAuth: boolean;
 
     @Column({ nullable: true })

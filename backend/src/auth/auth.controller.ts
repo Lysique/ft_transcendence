@@ -8,19 +8,20 @@ import { JwtTwoFactAuthGuard } from './guards/jwt-2fa.guard';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+
+  constructor(private readonly authService: AuthService) {}
 
     // This function is used to login thanks to the guard.
     @UseGuards(FortyTwoAuthGuard)
     @Get('login')
-    async login(@Req() req: Request) {}
+    async login() {}
     
     // Function called by 42 strategy
     @UseGuards(FortyTwoAuthGuard)
     @Get('42/callback')
     async fortyTwoAuthCallback(
       @Req() req: Request,
-      @Res({passthrough: true}) res: Response
+      @Res({passthrough: true}) res: Response,
       ) {
       //  Find user or signup if does not exist
       let userDto: UserDto = await this.authService.fetchUser(req.user);
@@ -35,10 +36,11 @@ export class AuthController {
         sub: userDto.id, 
         IsTwoFactAuth: false
       });
-      res.cookie('jwt', accessToken, { httpOnly: true });
+
+      res.cookie('jwt', accessToken, { httpOnly: true, sameSite: 'strict' });
     
       //  Redirect to the frontend
-      res.status(302).redirect(`http://${process.env.REACT_HOST}:${process.env.REACT_PORT}`);
+      res.redirect(req.headers.referer);
     }
 
     @UseGuards(JwtTwoFactAuthGuard)
@@ -97,7 +99,7 @@ export class AuthController {
         isTwoFactAuth: true,
       });
       
-      res.cookie('jwt', accessToken, { httpOnly: true });
+      res.cookie('jwt', accessToken, { httpOnly: true, sameSite: 'strict' });
 
       return {valid: true};
     }

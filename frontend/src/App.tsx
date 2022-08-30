@@ -6,8 +6,9 @@ import ResponsiveAppBar from "./components/AppBar";
 import { Route, Routes } from "react-router-dom";
 import { Homepage } from "./route/Homepage";
 import { Profile } from "./route/Profile";
-import UsernameTaken from "./components/auth/UsernameTaken";
-import TwoFactAuth from "./components/auth/TwoFactAuth";
+import HomeProtect from "./components/auth/HomeProtect";
+import RouteProtect from "./components/auth/RouteProtect";
+import { VisitorProfile } from "./route/VisitorProfile";
 
 export const UserContext = React.createContext<UserDto | null>(null);
 export const SetUserContext = React.createContext<any>(null);
@@ -44,8 +45,8 @@ function App() {
 
   React.useEffect(() => {
     const fetchProfile = async () => {
-      const user = await UserAPI.getUserProfile();
-      setUser(user);
+      const resp = await UserAPI.getUserProfile();
+      setUser(resp);
     };
     fetchProfile();
   }, []);
@@ -65,18 +66,34 @@ function App() {
         <SetUserContext.Provider value={setUser}>
           <CssBaseline />
           <div className="App">
-            <ResponsiveAppBar handleToggle={handleToggle} />
+            <ResponsiveAppBar handleToggle={handleToggle} setLoggedIn={setLoggedIn} />
 
-            {user && !user.name ? (
-              <UsernameTaken />
-            ) : loggedIn && !user ? (
-              <TwoFactAuth setLoggedIn={setLoggedIn} />
-            ) : (
-              <Routes>
-                <Route path="/" element={<Homepage />} />
-                <Route path="/profile" element={<Profile />} />
-              </Routes>
-            )}
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <HomeProtect loggedIn={loggedIn} setLoggedIn={setLoggedIn}>
+                    <Homepage />
+                  </HomeProtect>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <RouteProtect>
+                    <Profile />
+                  </RouteProtect>
+                }
+              />
+              <Route
+                path="/profile/:id"
+                element={
+                  <RouteProtect>
+                    <VisitorProfile />
+                  </RouteProtect>
+                }
+              />
+            </Routes>
           </div>
         </SetUserContext.Provider>
       </UserContext.Provider>
