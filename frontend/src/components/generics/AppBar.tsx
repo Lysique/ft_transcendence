@@ -15,34 +15,25 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useTheme } from "@mui/material/styles";
 import { UserAPI } from "../../api/user.api";
-import defaultAvatar from '../../default_avatar/profile_image.jpeg';
+import defaultAvatar from "../../default_avatar/profile_image.jpeg";
 import { SetUserContext, UserContext } from "../../App";
 import { Link } from "react-router-dom";
 import SearchFriendInput from "../appbar/SearchFriendBar";
 import { UserDto } from "../../api/dto/user.dto";
 
 interface ResponsiveAppBarProps {
-  handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]
-  setLoggedIn: Function
+  handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+  setLoggedIn: Function;
 }
 
-const ResponsiveAppBar = ({
-  handleToggle,
-  setLoggedIn
-}: ResponsiveAppBarProps) => {
-
+const ResponsiveAppBar = ({ handleToggle, setLoggedIn }: ResponsiveAppBarProps) => {
   const user: UserDto | null = React.useContext(UserContext);
   const setUser: Function = React.useContext(SetUserContext);
 
   const theme = useTheme();
 
-
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-    null
-  );
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-    null
-  );
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -59,44 +50,32 @@ const ResponsiveAppBar = ({
     setAnchorElUser(null);
   };
 
-  // UserMenu
-
   const ProfileButton = () => {
     return (
-      <MenuItem 
-        key="Profile"
-        onClick={handleCloseUserMenu}
-        component={Link}
-        to="profile"
-      >
+      <MenuItem key="Profile" onClick={handleCloseUserMenu} component={Link} to="profile">
         <Typography textAlign="center">Profile</Typography>
       </MenuItem>
-   );
+    );
   };
 
   const HomepageButton = () => {
     return (
-      <MenuItem 
-        key="Homepage"
-        onClick={handleCloseUserMenu}
-        component={Link}
-        to=""
-      >
+      <MenuItem key="Homepage" onClick={handleCloseUserMenu} component={Link} to="">
         <Typography textAlign="center">Home</Typography>
       </MenuItem>
-   );
+    );
   };
 
   const LoginButton = () => {
     return (
-      <MenuItem 
+      <MenuItem
         key="Login"
         href={`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/auth/login`}
         component="a"
       >
         <Typography textAlign="center">Login</Typography>
       </MenuItem>
-   );
+    );
   };
 
   async function Logout() {
@@ -108,54 +87,49 @@ const ResponsiveAppBar = ({
 
   function LogoutButton() {
     return (
-      <MenuItem 
-        key="Logout" 
-        onClick={Logout}
-        component={Link}
-        to=""
-      >
+      <MenuItem key="Logout" onClick={Logout} component={Link} to="">
         <Typography textAlign="center">Logout</Typography>
       </MenuItem>
     );
   }
-  
-  function LoginControl(props: any) {
-    const settings = user != null? loggedInSettings: loggedOutSettings;
 
-    return (
-      <div>
-      {settings.map((setting) => (
-        setting.button
-      ))}
-      </div>
-    );
+  function LoginControl(props: any) {
+    const settings = user != null ? loggedInSettings : loggedOutSettings;
+
+    return <div>{settings.map((setting) => setting.button)}</div>;
   }
 
   const pages = ["Play now", "Chat with friends"];
-  const loggedInSettings = [{
-    name: "Logout",
-    button: LogoutButton()
-  }, {
-    name: "Profile",
-    button: ProfileButton()
-  }, {
-    name: "Homepage",
-    button: HomepageButton()
-  }];
+  const loggedInSettings = [
+    {
+      name: "Logout",
+      button: LogoutButton(),
+    },
+    {
+      name: "Profile",
+      button: ProfileButton(),
+    },
+    {
+      name: "Homepage",
+      button: HomepageButton(),
+    },
+  ];
 
-  const loggedOutSettings = [{
-    name: "Login",
-    button: LoginButton()
-  }, {
-    name: "Homepage",
-    button: HomepageButton()
-  }];
+  const loggedOutSettings = [
+    {
+      name: "Login",
+      button: LoginButton(),
+    },
+    {
+      name: "Homepage",
+      button: HomepageButton(),
+    },
+  ];
 
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
@@ -167,7 +141,7 @@ const ResponsiveAppBar = ({
             >
               <MenuIcon />
             </IconButton>
-            
+
             <Menu
               id="menu-appbar"
               anchorEl={anchorElNav}
@@ -187,7 +161,7 @@ const ResponsiveAppBar = ({
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                <MenuItem key={page} onClick={handleCloseNavMenu} component={Link} to="/">
                   <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
@@ -199,21 +173,19 @@ const ResponsiveAppBar = ({
                 key={page}
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: "white", display: "block" }}
+                component={Link}
+                to="/"
               >
                 {page}
               </Button>
             ))}
           </Box>
-          <Box >
-          <SearchFriendInput />
+          <Box>
+            <SearchFriendInput />
           </Box>
           <Box textAlign="center">
             <IconButton sx={{ mr: 3 }} onClick={handleToggle} color="inherit">
-              {theme.palette.mode === "dark" ? (
-                <Brightness7Icon />
-              ) : (
-                <Brightness4Icon />
-              )}
+              {theme.palette.mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
             </IconButton>
           </Box>
           <Box sx={{ flexGrow: 0 }}>
@@ -221,7 +193,11 @@ const ResponsiveAppBar = ({
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar
                   alt="Remy Sharp"
-                  src={user?.currentAvatar ? `data:image/jpeg;base64,${user.currentAvatar.data}` : defaultAvatar}
+                  src={
+                    user?.currentAvatar
+                      ? `data:image/jpeg;base64,${user.currentAvatar.data}`
+                      : defaultAvatar
+                  }
                 />
               </IconButton>
             </Tooltip>
@@ -241,7 +217,7 @@ const ResponsiveAppBar = ({
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-            <LoginControl />
+              <LoginControl />
             </Menu>
           </Box>
         </Toolbar>

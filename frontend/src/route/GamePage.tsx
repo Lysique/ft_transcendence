@@ -7,11 +7,10 @@ import GameWonScreen from "../components/game/GameWonScreen";
 import ProTip from "../components/generics/ProTip";
 import Copyright from "../components/generics/CopyRight";
 import Container from "@mui/material/Container";
-import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import GameMenuScreen from "../components/game/GameMenuScreen";
 
-export const Homepage = () => {
+export const GamePage = () => {
   /* Check for window resizes every 300ms */
   const [dimensions, setDimensions] = useState({
     height: window.innerHeight,
@@ -62,13 +61,8 @@ export const Homepage = () => {
   };
 
   return (
-    <div className="Homepage">
+    <div className="Gamepage">
       <Container maxWidth="lg">
-        <Box sx={{ my: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom align="center">
-            Get ready to play the mighty Pong game!
-          </Typography>
-        </Box>
         <Box textAlign="center" sx={{ my: 3, py: 3, px: 3 }}>
           {ToggleScreen()}
         </Box>
