@@ -8,15 +8,19 @@ import { toFileStream } from 'qrcode';
 import { Response } from 'express';
 import { Socket } from 'socket.io';
 import { parse } from "cookie";
-import { jwtConstants } from './constants/constants';
-import { User } from 'src/models/users/entities/user.entity';
+import { UserStatus } from 'src/models/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
+
+    private userSessions: Map<number, number[]>
+
     constructor(
         private usersService: UsersService,
         private jwtService: JwtService
-    ) {}
+        ) {
+        this.userSessions = new Map();  
+    }
 
     async fetchUser(user: any): Promise<UserDto> {
         const userDto: UserDto | null = await this.usersService.findOneById(user.id);
@@ -65,6 +69,45 @@ export class AuthService {
 
     async turnOnTfa(user: any) {
         await this.usersService.turnOnTfa(user.id);
+    }
+
+    async modifyUserState(userDto: UserDto, status: UserStatus) {
+        this.usersService.setStatus(userDto.id, status)
+    }
+
+    async addToConnection(client: Socket) {
+
+        const userDto: UserDto | null = await this.getUserFromSocket(client);
+
+        if (!userDto) {
+            return ;
+        }
+
+        if (!this.userSessions[userDto.id] || this.userSessions[userDto.id].length === 0) {
+            this.modifyUserState(userDto, UserStatus.Online);
+            this.userSessions[userDto.id] = [];
+        }
+        this.userSessions[userDto.id].push(client.id);
+    }
+
+    async removeFromConnection(client: Socket) {
+
+        const userDto: UserDto | null = await this.getUserFromSocket(client);
+
+        if (!userDto) {
+            return ;
+        }
+
+        const index = this.userSessions[userDto.id].indexOf(client.id);
+        this.userSessions[userDto.id].splice(index, 1);
+        if (this.userSessions[userDto.id].length === 0) {
+            this.modifyUserState(userDto, UserStatus.Offline);
+        }
+    }
+
+    async clearSession(userDto: UserDto) {
+        this.userSessions[userDto.id] = [];
+        this.modifyUserState(userDto, UserStatus.Offline);
     }
 
     public async getUserFromSocket(socket: Socket): Promise<UserDto | null> {
