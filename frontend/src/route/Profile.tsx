@@ -7,6 +7,8 @@ import { UserDto } from "../api/dto/user.dto";
 import { FriendBar } from "../components/profile/profileFriends/FriendBar";
 import UserProfileImageModificator from "../components/profile/ProfileImage/UserProfileImageModificator";
 import ProfileImage from "../components/profile/ProfileImage/ProfileImage";
+import { StatBar } from "components/profile/profileStats/StatBar";
+import { HistoryBar } from "components/profile/profileHistory/HistoryBar";
 
 export const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -57,6 +59,12 @@ export const Profile = () => {
         <Grid item xs={1}></Grid>
 
         <Grid item xs={7} container spacing={3} direction={"column"}>
+          <Grid item>
+            <StatBar />
+          </Grid>
+          <Grid item>
+            <HistoryBar />
+          </Grid>
           <Grid item>
             <FriendBar />
           </Grid>

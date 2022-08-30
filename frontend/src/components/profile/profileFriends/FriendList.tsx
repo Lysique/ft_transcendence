@@ -1,6 +1,5 @@
 import { Stack, Typography } from "@mui/material";
 import React from "react";
-import { FriendDto } from "../../../api/dto/friend.dto";
 import { UserDto } from "../../../api/dto/user.dto";
 import { UserContext } from "../../../App";
 import { FriendBadge } from "./FriendBadge";
@@ -11,7 +10,7 @@ export const FriendList = () => {
     
     return (
         <>
-            {user?.friends && user?.friends.length > 0 ? user?.friends.map((friend: FriendDto) => {
+            {user?.friends && user?.friends.length > 0 ? user?.friends.map((friend: UserDto) => {
             return (
                 <Stack key={friend.id}>
 

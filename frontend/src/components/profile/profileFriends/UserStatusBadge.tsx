@@ -1,4 +1,4 @@
-import { FriendDto, UserStatus } from "api/dto/friend.dto";
+import { UserStatus } from "api/dto/user.dto";
 import React from "react";
 import { StyledBadge } from "./StyledBadge";
 

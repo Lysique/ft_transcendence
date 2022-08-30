@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { FriendDto } from './dto/friend.dto';
 import { UserDto } from './dto/user.dto';
 import { User, UserStatus } from './entities/user.entity';
 
@@ -19,17 +18,6 @@ export class UsersService {
     @InjectRepository(User) private userRepository: Repository<User>,
     ) {}
 
-  private entityToRelationDto(user: User) {
-    const friendDto = new FriendDto();
-
-    friendDto.id = user.id;
-    friendDto.name = user.name;
-    friendDto.status = user.status;
-    friendDto.currentAvatar = user.currentAvatarId? {id: user.currentAvatarId, data:user.currentAvatarData} : null;
-
-    return friendDto;
-  }
-
   //  Utility method to get dto object from entity
   private entityToDto(user: User): UserDto {
     const userDto = new UserDto();
@@ -38,8 +26,8 @@ export class UsersService {
     userDto.name = user.name;
     userDto.status = user.status;
     userDto.avatars = user.avatars;
-    userDto.friends = user.friends? user.friends.map(x => this.entityToRelationDto(x)): [];
-    userDto.blocked = user.blocked? user.blocked.map(x => this.entityToRelationDto(x)): [];
+    userDto.friends = user.friends? user.friends.map(x => this.entityToDto(x)): [];
+    userDto.blocked = user.blocked? user.blocked.map(x => this.entityToDto(x)): [];
     userDto.currentAvatar = user.currentAvatarId? {id: user.currentAvatarId, data:user.currentAvatarData} : null;
     userDto.twoFactAuth = user.twoFactAuth;
 

@@ -49,18 +49,22 @@ function App() {
     const fetchProfile = async () => {
       const resp = await UserAPI.getUserProfile();
       setUser(resp);
-    };
-    fetchProfile();
-  }, []);
 
-  React.useEffect(() => {
-    const isLoggedIn = async () => {
       const logged = await UserAPI.isLoggedIn();
       setLoggedIn(logged.loggedIn);
     };
+    
+    fetchProfile();
+  }, []);
 
-    isLoggedIn();
-  }, [user]);
+  // React.useEffect(() => {
+  //   const isLoggedIn = async () => {
+  //     const logged = await UserAPI.isLoggedIn();
+  //     setLoggedIn(logged.loggedIn);
+  //   };
+
+  //   isLoggedIn();
+  // }, [user]);
 
   return (
     <ThemeProvider theme={theme}>

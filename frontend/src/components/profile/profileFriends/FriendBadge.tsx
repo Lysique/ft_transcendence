@@ -1,12 +1,12 @@
 import { Avatar, Tooltip} from "@mui/material";
-import { FriendDto } from "api/dto/friend.dto";
+import { UserDto } from "api/dto/user.dto";
 import React from "react";
 import defaultAvatar from '../../../default_avatar/profile_image.jpeg';
 import { FriendButton } from "./FriendButton";
 import { UserStatusBadge } from "./UserStatusBadge";
 
 
-export const FriendBadge = ({friend}: {friend: FriendDto}) => {
+export const FriendBadge = ({friend}: {friend: UserDto}) => {
 
     return (
         <FriendButton friend={friend}>
