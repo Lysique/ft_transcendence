@@ -14,86 +14,89 @@ export const UserContext = React.createContext<UserDto | null>(null);
 export const SetUserContext = React.createContext<any>(null);
 
 function App() {
-  
-  React.useState('Homepage');
-	
-	/* Dark/light mode */
+  React.useState("Homepage");
+
+  /* Dark/light mode */
 
   const [darkMode, setDarkMode] = useState(false);
-  
+
   const theme = createTheme({
     palette: {
       mode: darkMode ? "dark" : "light",
     },
   });
-  
+
   useEffect(() => {
     const themeType = localStorage.getItem("dark") || "dark";
     if (themeType === "dark") {
       setDarkMode(true);
     }
   }, []);
-  
+
   const handleToggle = () => {
     localStorage.setItem("dark", darkMode ? "light" : "dark");
     setDarkMode(!darkMode);
   };
-  
+
   // Check if user is logged and retrieve profile
   const [user, setUser] = React.useState<UserDto | null>(null);
 
   const [loggedIn, setLoggedIn] = React.useState(false);
-  
+
   React.useEffect(() => {
     const fetchProfile = async () => {
       const resp = await UserAPI.getUserProfile();
       setUser(resp);
-    }
+    };
     fetchProfile();
-  }, [])
+  }, []);
 
   React.useEffect(() => {
     const isLoggedIn = async () => {
       const logged = await UserAPI.isLoggedIn();
       setLoggedIn(logged.loggedIn);
-    }
+    };
 
     isLoggedIn();
-  }, [user])
+  }, [user]);
 
   return (
     <ThemeProvider theme={theme}>
-    <UserContext.Provider value={user}>
-    <SetUserContext.Provider value={setUser}>
-    <CssBaseline />
-    <div className="App">
+      <UserContext.Provider value={user}>
+        <SetUserContext.Provider value={setUser}>
+          <CssBaseline />
+          <div className="App">
+            <ResponsiveAppBar handleToggle={handleToggle} setLoggedIn={setLoggedIn} />
 
-      <ResponsiveAppBar
-        handleToggle={handleToggle}
-        setLoggedIn={setLoggedIn}
-      />
-
-      <Routes >
-        <Route path="/" element={
-        <HomeProtect loggedIn={loggedIn} setLoggedIn={setLoggedIn}>
-          <Homepage />
-        </HomeProtect>
-        } />
-        <Route path="/profile" element={
-          <RouteProtect >
-            <Profile />
-          </RouteProtect>
-        } />
-        <Route path="/profile/:id" element={
-          <RouteProtect >
-            <VisitorProfile />
-          </RouteProtect>
-        } />
-      </Routes>
-
-    </div>
-    </SetUserContext.Provider>
-    </UserContext.Provider>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <HomeProtect loggedIn={loggedIn} setLoggedIn={setLoggedIn}>
+                    <Homepage />
+                  </HomeProtect>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <RouteProtect>
+                    <Profile />
+                  </RouteProtect>
+                }
+              />
+              <Route
+                path="/profile/:id"
+                element={
+                  <RouteProtect>
+                    <VisitorProfile />
+                  </RouteProtect>
+                }
+              />
+            </Routes>
+          </div>
+        </SetUserContext.Provider>
+      </UserContext.Provider>
     </ThemeProvider>
   );
 }
