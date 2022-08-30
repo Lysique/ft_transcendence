@@ -14,12 +14,12 @@ import MenuItem from "@mui/material/MenuItem";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useTheme } from "@mui/material/styles";
-import { UserAPI } from "../api/user.api";
-import defaultAvatar from '../default_avatar/profile_image.jpeg';
-import { SetUserContext, UserContext } from "../App";
+import { UserAPI } from "../../api/user.api";
+import defaultAvatar from '../../default_avatar/profile_image.jpeg';
+import { SetUserContext, UserContext } from "../../App";
 import { Link } from "react-router-dom";
-import SearchFriendInput from "./appbar/SearchFriendBar";
-import { UserDto } from "../api/dto/user.dto";
+import SearchFriendInput from "../appbar/SearchFriendBar";
+import { UserDto } from "../../api/dto/user.dto";
 
 interface ResponsiveAppBarProps {
   handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"]

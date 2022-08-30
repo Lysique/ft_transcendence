@@ -1,6 +1,5 @@
-import { WindowInfo } from '../interfaces/game.interfaces';
-import { Socket } from 'socket.io';
-
+export const CANVAS_WIDTH = 500;
+export const CANVAS_HEIGHT = 500;
 export class Ball {
   x: number;
   y: number;
@@ -9,13 +8,13 @@ export class Ball {
   velocityX: number;
   velocityY: number;
 
-  constructor(window: WindowInfo) {
-    this.x = (window.width * 0.5) / 2;
-    this.y = (window.height * 0.5) / 2;
-    this.radius = 10;
-    this.speed = 500 / 200;
-    this.velocityX = 500 / 150;
-    this.velocityY = 500 / 150;
+  constructor() {
+    this.x = CANVAS_WIDTH / 2;
+    this.y = CANVAS_HEIGHT / 2;
+    this.radius = CANVAS_WIDTH / 50;
+    this.speed = CANVAS_WIDTH / 100;
+    this.velocityX = CANVAS_WIDTH / 150;
+    this.velocityY = CANVAS_WIDTH / 150;
   }
 }
 
@@ -24,13 +23,19 @@ export class Player1 {
   y: number;
   width: number;
   height: number;
-  socketID: Socket;
+  socketID: string;
+  arrowDown: boolean;
+  arrowUp: boolean;
+  score: number;
 
-  constructor(window: WindowInfo) {
+  constructor() {
     this.x = 0;
-    this.y = (window.height * 0.5 - window.height * 0.1) / 2;
-    this.width = 10;
-    this.height = window.height * 0.1;
+    this.y = (CANVAS_HEIGHT - CANVAS_HEIGHT / 5) / 2;
+    this.width = CANVAS_WIDTH / 50;
+    this.height = CANVAS_HEIGHT / 5;
+    this.arrowDown = false;
+    this.arrowUp = false;
+    this.score = 0;
   }
 }
 
@@ -39,13 +44,18 @@ export class Player2 {
   y: number;
   width: number;
   height: number;
-  socketID: Socket;
+  socketID: string;
+  arrowDown: boolean;
+  arrowUp: boolean;
+  score: number;
 
-  constructor(window: WindowInfo) {
-    this.x = window.width * 0.5 - 10;
-    this.y = (window.height * 0.5 - window.height * 0.1) / 2;
-    this.width = 10;
-    this.height = window.height * 0.1;
+  constructor() {
+    this.x = CANVAS_WIDTH - CANVAS_WIDTH / 50;
+    this.y = (CANVAS_HEIGHT - CANVAS_HEIGHT / 5) / 2;
+    this.width = CANVAS_WIDTH / 50;
+    this.height = CANVAS_HEIGHT / 5;
+    this.arrowDown = false;
+    this.arrowUp = false;
   }
 }
 
@@ -54,9 +64,9 @@ export class Game {
   player2: Player2;
   ball: Ball;
 
-  constructor(window: WindowInfo) {
-    this.player1 = new Player1(window);
-    this.player2 = new Player2(window);
-    this.ball = new Ball(window);
+  constructor() {
+    this.player1 = new Player1();
+    this.player2 = new Player2();
+    this.ball = new Ball();
   }
 }

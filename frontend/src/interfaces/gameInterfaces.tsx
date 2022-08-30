@@ -1,3 +1,16 @@
+export const CANVAS_WIDTH = 500;
+export const CANVAS_HEIGHT = 500;
+
+export interface Dimensions {
+  width: number;
+  height: number;
+}
+
+export interface Ratio {
+  x: number;
+  y: number;
+}
+
 export interface Ball {
   x: number;
   y: number;
