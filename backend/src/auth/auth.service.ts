@@ -84,8 +84,8 @@ export class AuthService {
         }
 
         if (!this.userSessions[userDto.id] || this.userSessions[userDto.id].length === 0) {
-            this.modifyUserState(userDto, UserStatus.Online);
             this.userSessions[userDto.id] = [];
+            this.modifyUserState(userDto, UserStatus.Online);
         }
         this.userSessions[userDto.id].push(client.id);
     }
@@ -113,7 +113,14 @@ export class AuthService {
     public async getUserFromSocket(socket: Socket): Promise<UserDto | null> {
         const cookies = socket.handshake.headers.cookie;
 
+        if (!cookies) {
+            return null;
+        }
+        
         const token = parse(cookies)['jwt'];
+        if (!token) {
+            return null;
+        }
 
         try {
             const sub = this.jwtService.verify(token);
