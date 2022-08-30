@@ -1,23 +1,16 @@
-import { List, Stack, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import React from "react";
 
 export const StatBar = () => {
     
     return (
         <>
-            <Typography variant="h6" display="flex" >
+            <Typography variant="h6" display="flex" sx={{ mb:3 }}>
                 Stats: 
             </Typography>
 
-            <List component={Stack} direction="row" spacing={2} sx={{ maxWidth:500, overflow: 'auto' }}>
-            <Typography variant="h6" display="flex" >
-                Wins: 5 
-            </Typography>
-            <Typography variant="h6" display="flex" >
-                Loses: 5 
-            </Typography>
-
-            </List>
+            Wins: 5 <br/> Loses: 5
+            <br/>
         </>
     );
 }

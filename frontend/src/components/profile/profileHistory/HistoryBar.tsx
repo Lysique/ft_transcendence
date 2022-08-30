@@ -14,18 +14,25 @@ export const HistoryBar = () => {
                     width: '100%',
                     maxWidth: 360,
                     bgcolor: 'background.paper',
-                    position: 'relative',
                     overflow: 'auto',
                     maxHeight: 300,
-                    '& ul': { padding: 0 },
+                    '& ul': { padding: 1 },
                     }}
             >
         {historyList.map((match) => (
         <li key={`section-${match}`}>
           <ul>
               <ListItem key={`item-${match}`}>
-                <ListItemText primary={`Match date:  ${match.date}`}/>
-                <ListItemText primary={` Score : ${match.score}`} secondary={`Winner: ${match.winner}, Loser: ${match.loser}`} />
+                <ListItemText primary={`${match.date}`}/>
+                <ListItemText 
+                primary={`Score : ${match.score}`} 
+                secondary={
+                <div>
+                    Winner: {match.winner}
+                    <br/>
+                    Loser: {match.loser}
+                </div>
+                } />
               </ListItem>           
           </ul>
         </li>
