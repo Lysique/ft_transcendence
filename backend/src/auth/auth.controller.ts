@@ -53,8 +53,13 @@ export class AuthController {
     @UseGuards(JwtTwoFactAuthGuard)
     @HttpCode(204)
     @Delete('logout')
-    async logout(@Res({passthrough: true}) response: Response) {
+    async logout(
+      @Res({passthrough: true}) response: Response,
+      @Req() req: Request,
+      ) {
       response.clearCookie('jwt');
+      const user: any = req.user;
+      this.authService.clearSession(user);
     }
     
     // Generate QrCode

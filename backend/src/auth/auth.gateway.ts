@@ -3,11 +3,13 @@ import {
     WebSocketServer,
     OnGatewayDisconnect,
     OnGatewayConnection,
-    OnGatewayInit,
     ConnectedSocket,
+    OnGatewayInit,
   } from '@nestjs/websockets';
-  import { Server, Socket } from 'socket.io';
-  import { Logger } from '@nestjs/common';
+import { Server, Socket } from 'socket.io';
+import { Logger } from '@nestjs/common';
+import { AuthService } from './auth.service';
+
 
 @WebSocketGateway({
     cors: {
@@ -18,27 +20,32 @@ import {
   export class AuthGateway
     implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
   {
-    private logger: Logger;
-    constructor() {
-        this.logger = new Logger('AuthGateway');
-    }
+
+  private logger: Logger;
+
+  constructor(private authService: AuthService) {
+    this.logger = new Logger('AuthGateway');
+  }
+
+  @WebSocketServer()
+  server: Server;
   
-    @WebSocketServer()
-    server: Server;
-  
-    /* Lifecycle hooks */
-    afterInit(server: Server) {
-      this.server.on('connection', (socket) => {
-        this.logger.log(`Client init: ${socket.id}`);
-      });
-    }
-  
-    handleConnection(@ConnectedSocket() client: Socket, ...args: any[]) {
-      this.logger.log(`Client connected: ${client.id}`);
-    }
-  
-    handleDisconnect(@ConnectedSocket() client: Socket) {
-  
-      this.logger.log(`Client disconnected: ${client.id}`);
-    }
+  afterInit(server: any) {
+    this.server.on('connection', (socket) => {
+      this.logger.log(`Client init: ${socket.id}`);
+    });
+  }
+
+  async handleConnection(@ConnectedSocket() client: Socket, ...args: any[]) {
+    this.logger.log(`Client connected: ${client.id}`);
+
+    this.authService.addToConnection(client);
+
+  }
+
+  async handleDisconnect(@ConnectedSocket() client: Socket) {
+    this.logger.log(`Client disconnected: ${client.id}`);
+
+    this.authService.removeFromConnection(client);
+  }
 }
