@@ -44,7 +44,7 @@ export const Homepage = () => {
   }, [dimensions]);
 
   /* Toggles between start screen, game screen and end-of-game screen */
-  const [currentScreen, setCurrentScreen] = useState("GameMenu");
+  const [currentScreen, setCurrentScreen] = useState("GameOn");
 
   const ToggleScreen = () => {
     switch (currentScreen) {
