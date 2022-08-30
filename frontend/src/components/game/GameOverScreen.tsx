@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useRef } from "react";
-import { Dimensions } from "../interfaces/gameInterfaces";
+import { Dimensions } from "../../interfaces/gameInterfaces";
 
 const GameOverScreen = (props: Dimensions) => {
   /* Initialize Canvas */

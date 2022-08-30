@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { debounce } from "../utils/game.resize";
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from "../interfaces/gameInterfaces";
-import GameScreen from "../components/GameScreen";
-import GameOverScreen from "../components/GameOverScreen";
-import GameWonScreen from "../components/GameWonScreen";
-import ProTip from "../components/ProTip";
-import Copyright from "../components/CopyRight";
+import GameScreen from "../components/game/GameScreen";
+import GameOverScreen from "../components/game/GameOverScreen";
+import GameWonScreen from "../components/game/GameWonScreen";
+import ProTip from "../components/generics/ProTip";
+import Copyright from "../components/generics/CopyRight";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import GameMenuScreen from "../components/GameMenuScreen";
+import GameMenuScreen from "../components/game/GameMenuScreen";
 
 export const Homepage = () => {
   /* Check for window resizes every 300ms */

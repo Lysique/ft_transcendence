@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect, useRef } from "react";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, Dimensions, Ratio } from "../interfaces/gameInterfaces";
-import { drawRect } from "../utils/game.draw";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, Dimensions, Ratio } from "../../interfaces/gameInterfaces";
+import { drawRect } from "../../utils/game.draw";
 
 const GameMenuScreen = (props: Dimensions & Ratio) => {
   /* Initialize Canvas */

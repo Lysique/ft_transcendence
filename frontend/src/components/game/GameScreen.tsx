@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useState, useEffect, useContext, useRef, useCallback } from "react";
-import { WebsocketContext } from "../contexts/WebsocketContext";
-import { Dimensions, Game, Ratio } from "../interfaces/gameInterfaces";
-import { render } from "../utils/game.draw";
+import { WebsocketContext } from "../../contexts/WebsocketContext";
+import { Dimensions, Game, Ratio } from "../../interfaces/gameInterfaces";
+import { render } from "../../utils/game.draw";
 
 const GameScreen = (props: Dimensions & Ratio) => {
   /* Initialize Canvas */
