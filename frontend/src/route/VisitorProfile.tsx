@@ -7,7 +7,9 @@ import { Item } from "./Profile";
 import { AddFriendButton } from "../components/profile/profileFriends/AddFriendButton";
 import ProfileImage from "components/profile/ProfileImage/ProfileImage";
 import { BlockButton } from "components/profile/profileFriends/BlockButton";
-import { UserStatus } from "api/dto/friend.dto";
+import { UserStatus } from "api/dto/user.dto";
+import { HistoryBar } from "components/profile/profileHistory/HistoryBar";
+import { StatBar } from "components/profile/profileStats/StatBar";
 
 export const VisitorProfile = () => {
 
@@ -34,7 +36,7 @@ export const VisitorProfile = () => {
 
             <Grid item xs={12} container spacing={3} alignItems={'center'}>
 
-                <Grid item xs={3} >
+                <Grid item xs={4} >
 
                     <Card >
                         <ProfileImage
@@ -50,7 +52,7 @@ export const VisitorProfile = () => {
 
                 </Grid>
 
-                <Grid item xs={9}>
+                <Grid item xs={8}>
                     <Typography variant="h2" display="flex" >
                         {visited?.name}'s profile
                     </Typography>
@@ -58,7 +60,7 @@ export const VisitorProfile = () => {
 
             </Grid>
 
-            <Grid item xs={3} container spacing={3} direction={'column'} sx={{ mt:5 }}>
+            <Grid item xs={4} container spacing={3} direction={'column'} sx={{ mt:5 }}>
 
                 <Grid item >
                     <Item>
@@ -74,7 +76,16 @@ export const VisitorProfile = () => {
 
             </Grid>
 
-            <Grid item xs={9} container spacing={3} direction={'column'}>
+            <Grid item xs={1}></Grid>
+
+            <Grid item xs={7} container spacing={3} direction={'column'}>
+
+            <Grid item>
+                <StatBar />
+            </Grid>
+            <Grid item>
+                <HistoryBar />
+            </Grid>
                 
             </Grid>
 
