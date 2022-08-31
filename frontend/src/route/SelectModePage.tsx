@@ -8,6 +8,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { styled, useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import Rules from "components/game/Rules";
+import Spectator from "components/game/Spectator";
 
 const images = [
   {
@@ -109,24 +110,15 @@ const SelectMode = () => {
     setRules(!rules);
   };
 
+  /* Spectator screen */
+  const [spectator, setSpectator] = useState(false);
+  const showActiveGames = () => {
+    setSpectator(!spectator);
+  };
+
   const theme = useTheme();
   return (
     <div className="Gamepage">
-      <div>{rules && <Rules status={true} showRules={showRules} />}</div>
-      <div>
-        {open && (
-          <Backdrop
-            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-            open={open}
-            //   onClick={handleClose}
-          >
-            <CircularProgress color="inherit" />
-            <Typography sx={{ m: 2 }}>
-              Matchmaking in progress, don't refresh the page...
-            </Typography>
-          </Backdrop>
-        )}
-      </div>
       <Container maxWidth="md">
         <Box sx={{ my: 4 }}>
           <Typography
@@ -164,7 +156,7 @@ const SelectMode = () => {
                 } else if (image.title === "TWO PLAYERS") {
                   matchMaking();
                 } else if (image.title === "SPECTATOR") {
-                  alert("SPECTATOR");
+                  showActiveGames();
                 } else if (image.title === "RULES") {
                   showRules();
                 }
@@ -195,6 +187,22 @@ const SelectMode = () => {
           ))}
         </Box>
       </Container>
+      <div>{rules && <Rules status={true} showRules={showRules} />}</div>
+      <div>{spectator && <Spectator status={true} showActiveGames={showActiveGames} />}</div>
+      <div>
+        {open && (
+          <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={open}
+            //   onClick={handleClose}
+          >
+            <CircularProgress color="inherit" />
+            <Typography sx={{ m: 2 }}>
+              Matchmaking in progress, don't refresh the page...
+            </Typography>
+          </Backdrop>
+        )}
+      </div>
     </div>
   );
 };

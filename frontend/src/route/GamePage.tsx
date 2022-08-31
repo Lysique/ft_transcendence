@@ -5,7 +5,6 @@ import GameScreen from "../components/game/GameScreen";
 import GameOverScreen from "../components/game/GameOverScreen";
 import GameWonScreen from "../components/game/GameWonScreen";
 import Container from "@mui/material/Container";
-import GameMenuScreen from "../components/game/GameMenuScreen";
 
 export const GamePage = () => {
   /* Check for window resizes every 300ms */
@@ -44,8 +43,6 @@ export const GamePage = () => {
 
   const ToggleScreen = () => {
     switch (currentScreen) {
-      case "GameMenu":
-        return <GameMenuScreen {...dimensions} {...ratio} />;
       case "GameOn":
         return <GameScreen {...dimensions} {...ratio} />;
       case "GameWon":
