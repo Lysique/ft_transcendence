@@ -1,10 +1,13 @@
-import Slider from "@mui/material/Slider";
 import * as React from "react";
 import { useState, useEffect, useContext, useRef, useCallback } from "react";
+import Box from "@mui/material/Box";
+import Fab from "@mui/material/Fab";
+import EditIcon from "@mui/icons-material/Edit";
 import { genHexString } from "utils/game.color";
 import { WebsocketContext } from "../../contexts/WebsocketContext";
 import { Dimensions, Game, Ratio } from "../../interfaces/gameInterfaces";
 import { render } from "../../utils/game.draw";
+import Button from "@mui/material/Button";
 
 const GameScreen = (props: Dimensions & Ratio) => {
   /* Initialize Canvas */
@@ -131,16 +134,13 @@ const GameScreen = (props: Dimensions & Ratio) => {
     <div>
       <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} />
       <div>
-        <Slider
-          aria-label="Default"
-          defaultValue={50}
-          valueLabelDisplay="auto"
-          color="primary"
-          sx={{ width: "100px" }}
-          onChange={updateColor}
-        />
+        <Box sx={{ "& > :not(style)": { m: 1 } }}>
+          <Fab size="small" color="primary" aria-label="edit" onClick={updateColor}>
+            <EditIcon />
+          </Fab>
+        </Box>
       </div>
-      <button onClick={launchGame}>Launch game</button>
+      <Button onClick={launchGame}>Launch game</Button>
     </div>
   );
 };

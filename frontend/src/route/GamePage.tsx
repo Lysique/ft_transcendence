@@ -4,8 +4,6 @@ import { CANVAS_HEIGHT, CANVAS_WIDTH } from "../interfaces/gameInterfaces";
 import GameScreen from "../components/game/GameScreen";
 import GameOverScreen from "../components/game/GameOverScreen";
 import GameWonScreen from "../components/game/GameWonScreen";
-import ProTip from "../components/generics/ProTip";
-import Copyright from "../components/generics/CopyRight";
 import Container from "@mui/material/Container";
 import GameMenuScreen from "../components/game/GameMenuScreen";
 
@@ -74,8 +72,6 @@ export const GamePage = () => {
         }}
       >
         {ToggleScreen()}
-        <ProTip />
-        <Copyright />
       </Container>
     </div>
   );

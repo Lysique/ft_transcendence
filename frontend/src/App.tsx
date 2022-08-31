@@ -10,6 +10,8 @@ import HomeProtect from "./components/auth/HomeProtect";
 import RouteProtect from "./components/auth/RouteProtect";
 import { VisitorProfile } from "./route/VisitorProfile";
 import SelectModeScreen from "route/SelectModePage";
+import ProTip from "components/generics/ProTip";
+import Copyright from "components/generics/CopyRight";
 
 export const UserContext = React.createContext<UserDto | null>(null);
 export const SetUserContext = React.createContext<any>(null);
@@ -103,6 +105,8 @@ function App() {
                 }
               />
             </Routes>
+            <ProTip />
+            <Copyright />
           </div>
         </SetUserContext.Provider>
       </UserContext.Provider>
