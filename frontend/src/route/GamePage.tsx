@@ -7,7 +7,6 @@ import GameWonScreen from "../components/game/GameWonScreen";
 import ProTip from "../components/generics/ProTip";
 import Copyright from "../components/generics/CopyRight";
 import Container from "@mui/material/Container";
-import Box from "@mui/material/Box";
 import GameMenuScreen from "../components/game/GameMenuScreen";
 
 export const GamePage = () => {
@@ -62,10 +61,19 @@ export const GamePage = () => {
 
   return (
     <div className="Gamepage">
-      <Container maxWidth="lg">
-        <Box textAlign="center" sx={{ my: 3, py: 3, px: 3 }}>
-          {ToggleScreen()}
-        </Box>
+      <Container
+        maxWidth="lg"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          textAlign: "center",
+          my: 3,
+          py: 3,
+          px: 3,
+        }}
+      >
+        {ToggleScreen()}
         <ProTip />
         <Copyright />
       </Container>

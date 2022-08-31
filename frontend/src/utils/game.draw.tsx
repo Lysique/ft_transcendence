@@ -62,6 +62,7 @@ export const render = (
   gameState: Game,
   ratioX: number,
   ratioY: number,
+  color: string,
 ) => {
   if (!gameOn) return;
   /* Clear the canvas */
@@ -69,7 +70,7 @@ export const render = (
   drawRect(context, 0, 0, CANVAS_WIDTH * ratioX, CANVAS_HEIGHT * ratioY, "aliceblue");
 
   /* Draw net */
-  drawNet(canvas, context, "black");
+  drawNet(canvas, context, color);
 
   /* Draw score */
   // drawText(context, user1.score, canvas.width / 4, canvas.height / 6, "black");
@@ -82,7 +83,7 @@ export const render = (
     gameState.player1.y * ratioY,
     gameState.player1.width * ratioX,
     gameState.player1.height * ratioY,
-    "black"
+    color
   );
 
   /* Draw paddle 2 */
@@ -92,15 +93,16 @@ export const render = (
     gameState.player2.y * ratioY,
     gameState.player2.width * ratioX,
     gameState.player2.height * ratioY,
-    "black"
+    color
   );
 
   /* Draw ball */
+  const ballRadius = (CANVAS_WIDTH * ratioX < CANVAS_HEIGHT * ratioY) ? gameState.ball.radius * ratioX : gameState.ball.radius * ratioY;
   drawCircle(
     context,
     gameState.ball.x * ratioX,
     gameState.ball.y * ratioY,
-    gameState.ball.radius * ratioX,
-    "black"
+    ballRadius,
+    color
   );
 };

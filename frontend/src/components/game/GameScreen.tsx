@@ -1,5 +1,7 @@
+import Slider from "@mui/material/Slider";
 import * as React from "react";
 import { useState, useEffect, useContext, useRef, useCallback } from "react";
+import { genHexString } from "utils/game.color";
 import { WebsocketContext } from "../../contexts/WebsocketContext";
 import { Dimensions, Game, Ratio } from "../../interfaces/gameInterfaces";
 import { render } from "../../utils/game.draw";
@@ -17,6 +19,13 @@ const GameScreen = (props: Dimensions & Ratio) => {
   };
 
   useEffect(getCanvasContext, []);
+
+  /* Update color of game elements */
+  const [color, setColor] = useState("#000");
+
+  const updateColor = () => {
+    setColor(genHexString(3));
+  };
 
   /* Listen to Websocket server */
   const socket = useContext(WebsocketContext);
@@ -98,7 +107,7 @@ const GameScreen = (props: Dimensions & Ratio) => {
   const renderFrame = () => {
     if (!canvasRef.current || !context.current) return;
     if (gameState) {
-      render(context.current, canvasRef.current, gameOn, gameState, props.x, props.y);
+      render(context.current, canvasRef.current, gameOn, gameState, props.x, props.y, color);
     }
   };
 
@@ -119,10 +128,20 @@ const GameScreen = (props: Dimensions & Ratio) => {
   });
 
   return (
-    <>
+    <div>
       <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} />
+      <div>
+        <Slider
+          aria-label="Default"
+          defaultValue={50}
+          valueLabelDisplay="auto"
+          color="primary"
+          sx={{ width: "100px" }}
+          onChange={updateColor}
+        />
+      </div>
       <button onClick={launchGame}>Launch game</button>
-    </>
+    </div>
   );
 };
 

@@ -2,6 +2,8 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import ButtonBase from "@mui/material/ButtonBase";
 import Container from "@mui/material/Container";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 import { styled, useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import ProTip from "components/generics/ProTip";
@@ -89,21 +91,29 @@ const ImageMarked = styled("span")(({ theme }) => ({
   transition: theme.transitions.create("opacity"),
 }));
 
-// const GradientText = styled('span')<{
-// 	color?: 'primary' | 'error' | 'success' | 'warning';
-//   }>(({ theme, color = 'primary' }) => ({
-// 	background:
-// 	  theme.palette.mode === 'dark'
-// 		? theme.palette.primary.main
-// 		: `linear-gradient(to right, ${theme.palette[color].main}, ${theme.palette[color][700]})`,
-// 	WebkitBackgroundClip: 'text',
-// 	WebkitTextFillColor: 'transparent',
-//   }));
-
 const SelectMode = () => {
+  /* Backdrop element (loading screen) */
+  const [open, setOpen] = React.useState(false);
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleToggle = () => {
+    setOpen(!open);
+  };
+
   const theme = useTheme();
   return (
     <div className="Gamepage">
+      <div>
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={open}
+          onClick={handleClose}
+        >
+          <CircularProgress color="inherit" />
+		  <Typography sx={{ m: 2}}>Matchmaking in progress ...</Typography>
+        </Backdrop>
+      </div>
       <Container maxWidth="md">
         <Box sx={{ my: 4 }}>
           <Typography
@@ -138,7 +148,7 @@ const SelectMode = () => {
               key={image.title}
               onClick={() => {
                 if (image.title === "ONE PLAYER") {
-                  alert("ONE PLAYER");
+                  handleToggle();
                 } else if (image.title === "TWO PLAYERS") {
                   alert("TWO PLAYERS");
                 } else if (image.title === "RULES") {
