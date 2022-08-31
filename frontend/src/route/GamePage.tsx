@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { debounce } from "../utils/game.resize";
+import { debounce } from "../components/game/utils/game.resize";
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from "../interfaces/gameInterfaces";
 import GameScreen from "../components/game/GameScreen";
-import GameOverScreen from "../components/game/GameOverScreen";
-import GameWonScreen from "../components/game/GameWonScreen";
 import Container from "@mui/material/Container";
 
 export const GamePage = () => {
@@ -38,22 +36,6 @@ export const GamePage = () => {
     });
   }, [dimensions]);
 
-  /* Toggles between start screen, game screen and end-of-game screen */
-  const [currentScreen, setCurrentScreen] = useState("GameOn");
-
-  const ToggleScreen = () => {
-    switch (currentScreen) {
-      case "GameOn":
-        return <GameScreen {...dimensions} {...ratio} />;
-      case "GameWon":
-        return <GameWonScreen {...dimensions} {...ratio} />;
-      case "GameOver":
-        return <GameOverScreen {...dimensions} {...ratio} />;
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="Gamepage">
       <Container
@@ -68,7 +50,7 @@ export const GamePage = () => {
           px: 3,
         }}
       >
-        {ToggleScreen()}
+        <GameScreen {...dimensions} {...ratio} />
       </Container>
     </div>
   );

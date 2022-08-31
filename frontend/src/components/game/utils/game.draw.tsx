@@ -1,4 +1,4 @@
-import { CANVAS_HEIGHT, CANVAS_WIDTH, Game } from "../interfaces/gameInterfaces";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, Game } from "../../../interfaces/gameInterfaces";
 
 /* Draw rectangle */
 export function drawRect(
