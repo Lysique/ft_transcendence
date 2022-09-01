@@ -74,6 +74,7 @@ const GameScreen = (props: GameStatus & Dimensions & Ratio) => {
     });
     return () => {
       socket.off("gameFinished");
+	  setGameOn(false);
     };
   });
 

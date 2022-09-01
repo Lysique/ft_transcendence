@@ -68,11 +68,11 @@ export const GamePage = () => {
           {...ratio}
         />
       );
-    } else if (gameStatus === "won") {
+    } else if (gameStatus === "over") {
       return (
         <div>
           <Typography
-            variant="h4"
+            variant="h1"
             component="h1"
             gutterBottom
             align="center"
@@ -86,30 +86,7 @@ export const GamePage = () => {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Congratulations, you beat your opponent and just won!
-          </Typography>
-          <Button href="/">Go to main menu</Button>
-        </div>
-      );
-    } else if (gameStatus === "lost") {
-      return (
-        <div>
-          <Typography
-            variant="h4"
-            component="h1"
-            gutterBottom
-            align="center"
-            sx={{
-              backgroundcolor: "primary",
-              backgroundImage: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              backgroundSize: "100%",
-              backgroundRepeat: "repeat",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Seems like you suck at this game, you just lost!
+            Game is over! Congrats to ADD_USER for winning!
           </Typography>
           <Button href="/">Go to main menu</Button>
         </div>

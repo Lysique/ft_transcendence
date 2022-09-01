@@ -73,8 +73,8 @@ export const render = (
   drawNet(canvas, context, color);
 
   /* Draw score */
-  // drawText(context, user1.score, canvas.width / 4, canvas.height / 6, "black");
-  // drawText(context, user2.score, (3 * canvas.width) / 4, canvas.height / 6, "black");
+  drawText(context, gameState.player1.score, CANVAS_WIDTH * ratioX / 4, CANVAS_HEIGHT * ratioY / 6, color);
+  drawText(context, gameState.player2.score, (3 * CANVAS_WIDTH * ratioX) / 4, CANVAS_HEIGHT * ratioY / 6, color);
 
   /* Draw paddle 1 */
   drawRect(
