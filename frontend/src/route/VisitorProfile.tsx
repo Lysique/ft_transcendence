@@ -52,11 +52,17 @@ export const VisitorProfile = () => {
 
                 </Grid>
 
-                <Grid item xs={8}>
-                    <Typography variant="h2" display="flex" >
-                        {visited?.name}'s profile
-                    </Typography>
+                <Grid item xs={1}></Grid>
+
+                <Grid item xs={6}>
+                    <Item>
+                        <Typography variant="h2" display="flex" >
+                            {visited?.name}'s profile
+                        </Typography>
+                    </Item>
                 </Grid>
+
+                <Grid item xs={1}></Grid>
 
             </Grid>
 
@@ -78,17 +84,20 @@ export const VisitorProfile = () => {
 
             <Grid item xs={1}></Grid>
 
-            <Grid item xs={7} container spacing={3} direction={'column'}>
+            <Grid item xs={6} container spacing={3} direction={"column"}>
+                <Grid item>
+                    <Item>
+                        <StatBar />
+                    </Item>
+                </Grid>
+                <Grid item >
+                    <Item >
+                        <HistoryBar />
+                    </Item>
+                </Grid>
 
-            <Grid item>
-                <StatBar />
             </Grid>
-            <Grid item>
-                <HistoryBar />
-            </Grid>
-                
-            </Grid>
-
+            <Grid item xs={1}></Grid>
         </Grid>
 
         </>

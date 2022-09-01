@@ -12,7 +12,6 @@ export const HistoryBar = () => {
             <List
                 sx={{
                     width: '100%',
-                    maxWidth: 360,
                     bgcolor: 'background.paper',
                     overflow: 'auto',
                     maxHeight: 300,
