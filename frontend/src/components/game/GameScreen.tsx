@@ -50,6 +50,7 @@ const GameScreen = (props: GameStatus & Dimensions & Ratio) => {
 
   useEffect(() => {
     socket.on("gameLaunched", (data: Game) => {
+      console.log("I GOT MSG: gameLaunched");
       setGameState(data);
       setGameOn(true);
       props.updateGameStatus("active");
@@ -61,6 +62,7 @@ const GameScreen = (props: GameStatus & Dimensions & Ratio) => {
 
   useEffect(() => {
     socket.on("gameUpdate", (data: Game) => {
+      console.log("I GOT MSG: gameUpdate");
       setGameState(data);
     });
     return () => {
@@ -74,7 +76,7 @@ const GameScreen = (props: GameStatus & Dimensions & Ratio) => {
     });
     return () => {
       socket.off("gameFinished");
-	  setGameOn(false);
+      setGameOn(false);
     };
   });
 

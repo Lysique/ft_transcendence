@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Socket } from 'socket.io';
-import { ConnectedSocket } from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
+import { WebSocketServer, ConnectedSocket } from '@nestjs/websockets';
 import {
   Ball,
   CANVAS_HEIGHT,
@@ -13,6 +13,7 @@ import { AuthService } from 'src/auth/auth.service';
 @Injectable()
 export class GameService {
   private gameSessions: Map<string, Game>;
+
   constructor(private authService: AuthService) {
     this.gameSessions = new Map();
   }
@@ -30,16 +31,25 @@ export class GameService {
     const gameInfo = new Game();
     gameInfo.player1.socketID = id1.id;
     gameInfo.player2.socketID = id2.id;
+    console.log(gameInfo.player1.socketID);
+    console.log(gameInfo.player2.socketID);
 
     /* set up room for game */
-	gameInfo.gameID = id1.id + id2.id;
+    gameInfo.gameID = id1.id + id2.id;
+    console.log(gameInfo.gameID);
     id1.join(gameInfo.gameID);
     id2.join(gameInfo.gameID);
 
     /* add that game info to the gameSessions */
     this.gameSessions[gameInfo.gameID] = gameInfo;
-    id1.to(gameInfo.gameID).emit('gameLaunched', gameInfo);
-    this.serverLoop(id1, id1.id + id2.id, this.gameSessions[gameInfo.gameID]);
+
+
+	// THIS DOESN'T WORK!!!!
+    // this.server.to(gameInfo.gameID).emit('gameLaunched', gameInfo);
+    
+	
+	
+	this.serverLoop(id1, gameInfo.gameID, this.gameSessions[gameInfo.gameID]);
   }
 
   async serverLoop(client: Socket, room: string, gameInfo: Game) {

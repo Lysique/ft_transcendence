@@ -45,7 +45,7 @@ export const GamePage = () => {
 
   /* Send info to Websocket server */
   const launchGame = () => {
-    socket.emit("launchGame");
+    socket.emit("joinQueue");
     setGameStatus("active");
   };
 
