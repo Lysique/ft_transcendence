@@ -9,13 +9,17 @@ import {
 } from './classes/game.classes';
 import { collision } from './utils/game.utils';
 import { AuthService } from 'src/auth/auth.service';
+import { GameGateway } from './game.gateway';
 
 @Injectable()
 export class GameService {
   private gameSessions: Map<string, Game>;
 
-  constructor(private authService: AuthService) {
-    this.gameSessions = new Map();
+  constructor(
+    private authService: AuthService,
+    private gameGateway: GameGateway,
+  ) {
+    this.gameSessions = new Map(); // should I instead use this.gameGateway.gameSessions?
   }
 
   monitorQueue(queue: Array<Socket>) {
@@ -43,13 +47,9 @@ export class GameService {
     /* add that game info to the gameSessions */
     this.gameSessions[gameInfo.gameID] = gameInfo;
 
-
-	// THIS DOESN'T WORK!!!!
-    // this.server.to(gameInfo.gameID).emit('gameLaunched', gameInfo);
-    
-	
-	
-	this.serverLoop(id1, gameInfo.gameID, this.gameSessions[gameInfo.gameID]);
+    /* Inform two players game is starting */
+    this.gameGateway.server.to(gameInfo.gameID).emit('gameLaunched', gameInfo);
+    this.serverLoop(id1, gameInfo.gameID, this.gameSessions[gameInfo.gameID]);
   }
 
   async serverLoop(client: Socket, room: string, gameInfo: Game) {
