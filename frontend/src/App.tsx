@@ -57,15 +57,6 @@ function App() {
     fetchProfile();
   }, []);
 
-  // React.useEffect(() => {
-  //   const isLoggedIn = async () => {
-  //     const logged = await UserAPI.isLoggedIn();
-  //     setLoggedIn(logged.loggedIn);
-  //   };
-
-  //   isLoggedIn();
-  // }, [user]);
-
   return (
     <ThemeProvider theme={theme}>
       <UserContext.Provider value={user}>
@@ -104,8 +95,8 @@ function App() {
                 element={
                   <RouteProtect>
                     <WebsocketProvider value={socket}>
-      <Websocket />
-    </WebsocketProvider>
+                      <Websocket />
+                    </WebsocketProvider>
                   </RouteProtect>
                 }
               />

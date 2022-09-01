@@ -35,11 +35,14 @@ export const Profile = () => {
 
           <Grid item xs={1}></Grid>
 
-          <Grid item xs={7}>
-            <Typography variant="h2" display="flex">
-              {user?.name}'s profile
-            </Typography>
+          <Grid item xs={6}>
+            <Item >
+              <Typography variant="h2" display="flex">
+                {user?.name}'s profile
+              </Typography>
+            </Item>
           </Grid>
+          <Grid item xs={1}></Grid>
         </Grid>
 
         <Grid item xs={4} container spacing={3} direction={"column"}>
@@ -58,17 +61,24 @@ export const Profile = () => {
 
         <Grid item xs={1}></Grid>
 
-        <Grid item xs={7} container spacing={3} direction={"column"}>
+        <Grid item xs={6} container spacing={3} direction={"column"}>
           <Grid item>
-            <StatBar />
+            <Item>
+              <StatBar />
+            </Item>
           </Grid>
           <Grid item>
-            <HistoryBar />
+            <Item >
+              <HistoryBar />
+            </Item>
           </Grid>
           <Grid item>
-            <FriendBar />
+            <Item>
+              <FriendBar />
+            </Item>
           </Grid>
         </Grid>
+        <Grid item xs={1}></Grid>
       </Grid>
     </>
   );
