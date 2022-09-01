@@ -5,11 +5,10 @@ import Fab from "@mui/material/Fab";
 import EditIcon from "@mui/icons-material/Edit";
 import { genHexString } from "components/game/utils/game.color";
 import { WebsocketContext } from "../../contexts/WebsocketContext";
-import { Dimensions, Game, Ratio } from "../../interfaces/gameInterfaces";
+import { Dimensions, Game, GameStatus, Ratio } from "../../interfaces/gameInterfaces";
 import { render } from "./utils/game.draw";
-import Button from "@mui/material/Button";
 
-const GameScreen = (props: Dimensions & Ratio) => {
+const GameScreen = (props: GameStatus & Dimensions & Ratio) => {
   /* Initialize Canvas */
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const context = useRef<CanvasRenderingContext2D | null>();
@@ -34,7 +33,6 @@ const GameScreen = (props: Dimensions & Ratio) => {
   const socket = useContext(WebsocketContext);
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [gameOn, setGameOn] = useState(false);
-  const [gameStatus, setGameStatus] = useState(""); // (true = won, false = lost)
   const [gameState, setGameState] = useState<Game>();
 
   useEffect(() => {
@@ -54,15 +52,12 @@ const GameScreen = (props: Dimensions & Ratio) => {
     socket.on("gameLaunched", (data: Game) => {
       setGameState(data);
       setGameOn(true);
-      setGameStatus("active");
-      console.log(gameStatus);
+      props.updateGameStatus("lost");
     });
     return () => {
       socket.off("gameLaunched");
     };
   });
-
-  useEffect(() => console.log(gameStatus), [gameStatus]);
 
   useEffect(() => {
     socket.on("gameUpdate", (data: Game) => {
@@ -75,17 +70,12 @@ const GameScreen = (props: Dimensions & Ratio) => {
 
   useEffect(() => {
     socket.on("gameFinished", (status: string) => {
-      setGameStatus(status); // 'won' or 'lost'
+      props.updateGameStatus(status);
     });
     return () => {
       socket.off("gameFinished");
     };
   });
-
-  /* Send info to Websocket server */
-  const launchGame = () => {
-    socket.emit("launchGame");
-  };
 
   /* Capture user inputs */
   const keyDownHandler = useCallback(
@@ -147,27 +137,10 @@ const GameScreen = (props: Dimensions & Ratio) => {
     };
   });
 
-  /* ToggleScreen */
-  //   const ToggleScreen = (gameStat: string) => {
-  //     if (gameStat == "active") {
-  //     //   return <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} />;
-  //     } else if (gameStat == "won") {
-  //       return null;
-  //     } else if (gameStat == "lost") {
-  //       return null;
-  //     }
-  //   };
-  
- // SOLUTION HERE? https://stackoverflow.com/questions/53868054/accessing-conditionally-rendered-canvas-element-in-react-for-plotting
-
   return (
     <div>
       <div>
-        {gameStatus === "active" && (
-          <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} />
-        )}
-        {/* {ToggleScreen(gameStatus)} */}
-        {/* <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} /> */}
+        <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} />
       </div>
       <div>
         <Box sx={{ "& > :not(style)": { m: 1 } }}>
@@ -176,7 +149,6 @@ const GameScreen = (props: Dimensions & Ratio) => {
           </Fab>
         </Box>
       </div>
-      <Button onClick={launchGame}>Launch game</Button>
     </div>
   );
 };
