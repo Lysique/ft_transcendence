@@ -5,9 +5,8 @@ import { Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { FriendDto } from './dto/friend.dto';
 import { UserDto } from './dto/user.dto';
-import { User } from './entities/user.entity';
+import { User, UserStatus } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -19,17 +18,6 @@ export class UsersService {
     @InjectRepository(User) private userRepository: Repository<User>,
     ) {}
 
-  private entityToRelationDto(user: User) {
-    const friendDto = new FriendDto();
-
-    friendDto.id = user.id;
-    friendDto.name = user.name;
-    friendDto.status = user.status;
-    friendDto.currentAvatar = user.currentAvatarId? {id: user.currentAvatarId, data:user.currentAvatarData} : null;
-
-    return friendDto;
-  }
-
   //  Utility method to get dto object from entity
   private entityToDto(user: User): UserDto {
     const userDto = new UserDto();
@@ -38,8 +26,8 @@ export class UsersService {
     userDto.name = user.name;
     userDto.status = user.status;
     userDto.avatars = user.avatars;
-    userDto.friends = user.friends? user.friends.map(x => this.entityToRelationDto(x)): [];
-    userDto.blocked = user.blocked? user.blocked.map(x => this.entityToRelationDto(x)): [];
+    userDto.friends = user.friends? user.friends.map(x => this.entityToDto(x)): [];
+    userDto.blocked = user.blocked? user.blocked.map(x => this.entityToDto(x)): [];
     userDto.currentAvatar = user.currentAvatarId? {id: user.currentAvatarId, data:user.currentAvatarData} : null;
     userDto.twoFactAuth = user.twoFactAuth;
 
@@ -99,6 +87,23 @@ export class UsersService {
     if (!user) {
       return null;
     }
+
+    const userDto: UserDto = this.entityToDto(user);
+
+    return userDto;
+  }
+
+  public async setStatus(id: number, status: UserStatus) {
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: id},
+      relations:{blocked: true, friends: true}
+    })
+    
+    if (!user) {
+      return null;
+    }
+    user.status = status;
+    await this.userRepository.save(user);
 
     const userDto: UserDto = this.entityToDto(user);
 
@@ -300,4 +305,5 @@ export class UsersService {
       await this.userRepository.save(user);
     }
   }
+
 }

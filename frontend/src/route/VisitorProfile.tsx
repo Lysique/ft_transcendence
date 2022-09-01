@@ -1,4 +1,4 @@
-import { Card, Grid, Typography } from "@mui/material";
+import { Card, CardContent, Grid, Typography } from "@mui/material";
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { UserDto } from "../api/dto/user.dto";
@@ -7,6 +7,9 @@ import { Item } from "./Profile";
 import { AddFriendButton } from "../components/profile/profileFriends/AddFriendButton";
 import ProfileImage from "components/profile/ProfileImage/ProfileImage";
 import { BlockButton } from "components/profile/profileFriends/BlockButton";
+import { UserStatus } from "api/dto/user.dto";
+import { HistoryBar } from "components/profile/profileHistory/HistoryBar";
+import { StatBar } from "components/profile/profileStats/StatBar";
 
 export const VisitorProfile = () => {
 
@@ -33,25 +36,37 @@ export const VisitorProfile = () => {
 
             <Grid item xs={12} container spacing={3} alignItems={'center'}>
 
-                <Grid item xs={3} >
+                <Grid item xs={4} >
 
                     <Card >
                         <ProfileImage
                             profileImage={visited?.currentAvatar}
                         />
+                        <CardContent>
+                            Status: 
+                        {visited?.status === UserStatus.Offline? ' Offline' 
+                        :visited?.status === UserStatus.Online? ' Online'
+                        : ' In game'}
+                        </CardContent>
                     </Card>
 
                 </Grid>
 
-                <Grid item xs={9}>
-                    <Typography variant="h2" display="flex" >
-                        {visited?.name}'s profile
-                    </Typography>
+                <Grid item xs={1}></Grid>
+
+                <Grid item xs={6}>
+                    <Item>
+                        <Typography variant="h2" display="flex" >
+                            {visited?.name}'s profile
+                        </Typography>
+                    </Item>
                 </Grid>
+
+                <Grid item xs={1}></Grid>
 
             </Grid>
 
-            <Grid item xs={3} container spacing={3} direction={'column'} sx={{ mt:5 }}>
+            <Grid item xs={4} container spacing={3} direction={'column'} sx={{ mt:5 }}>
 
                 <Grid item >
                     <Item>
@@ -67,10 +82,22 @@ export const VisitorProfile = () => {
 
             </Grid>
 
-            <Grid item xs={9} container spacing={3} direction={'column'}>
-                
-            </Grid>
+            <Grid item xs={1}></Grid>
 
+            <Grid item xs={6} container spacing={3} direction={"column"}>
+                <Grid item>
+                    <Item>
+                        <StatBar />
+                    </Item>
+                </Grid>
+                <Grid item >
+                    <Item >
+                        <HistoryBar />
+                    </Item>
+                </Grid>
+
+            </Grid>
+            <Grid item xs={1}></Grid>
         </Grid>
 
         </>

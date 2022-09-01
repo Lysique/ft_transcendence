@@ -12,6 +12,8 @@ import { VisitorProfile } from "./route/VisitorProfile";
 import SelectModeScreen from "route/SelectModePage";
 import ProTip from "components/generics/ProTip";
 import Copyright from "components/generics/CopyRight";
+import { socket, WebsocketProvider } from './contexts/WebsocketContext';
+import { Websocket } from './components/chat/Websocket';
 
 export const UserContext = React.createContext<UserDto | null>(null);
 export const SetUserContext = React.createContext<any>(null);
@@ -50,18 +52,13 @@ function App() {
     const fetchProfile = async () => {
       const resp = await UserAPI.getUserProfile();
       setUser(resp);
-    };
-    fetchProfile();
-  }, []);
 
-  React.useEffect(() => {
-    const isLoggedIn = async () => {
       const logged = await UserAPI.isLoggedIn();
       setLoggedIn(logged.loggedIn);
     };
-
-    isLoggedIn();
-  }, [user]);
+    
+    fetchProfile();
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -101,6 +98,16 @@ function App() {
                 element={
                   <RouteProtect>
                     <VisitorProfile />
+                  </RouteProtect>
+                }
+              />
+              <Route
+                path="/chat"
+                element={
+                  <RouteProtect>
+                    <WebsocketProvider value={socket}>
+                      <Websocket />
+                    </WebsocketProvider>
                   </RouteProtect>
                 }
               />

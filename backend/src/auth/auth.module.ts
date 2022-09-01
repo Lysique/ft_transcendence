@@ -8,6 +8,7 @@ import { jwtConstants } from './constants/constants';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthController } from './auth.controller';
 import { JwtTwoFactAuthStrategy } from './strategies/jwt-2fa.strategy';
+import { AuthGateway } from './auth.gateway';
 
 @Module({
   imports: [
@@ -19,11 +20,13 @@ import { JwtTwoFactAuthStrategy } from './strategies/jwt-2fa.strategy';
     })
   ],
   providers: [
-    AuthService, 
+    AuthService,
     FortyTwoStrategy, 
     JwtStrategy,
-    JwtTwoFactAuthStrategy
+    JwtTwoFactAuthStrategy,
+    AuthGateway
   ],
   controllers: [AuthController],
+  exports: [AuthService]
 })
 export class AuthModule {}

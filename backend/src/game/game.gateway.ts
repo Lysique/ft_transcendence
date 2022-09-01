@@ -3,9 +3,6 @@ import {
   SubscribeMessage,
   MessageBody,
   WebSocketServer,
-  OnGatewayDisconnect,
-  OnGatewayConnection,
-  OnGatewayInit,
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -15,12 +12,11 @@ import { Game } from './classes/game.classes';
 
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:3000',
+    origin: true,
+    credentials: true,
   },
 })
-export class GameGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class GameGateway {
   private gameSessions: Map<string, Game>;
   private logger: Logger;
 
@@ -31,22 +27,7 @@ export class GameGateway
 
   @WebSocketServer()
   server: Server;
-
-  /* Lifecycle hooks */
-  afterInit(server: Server) {
-    this.server.on('connection', (socket) => {
-      this.logger.log(`Initialized: ${socket.id}`);
-    });
-  }
-
-  handleConnection(@ConnectedSocket() client: Socket, ...args: any[]) {
-    this.logger.log(`Client connected: ${client.id}`);
-  }
-
-  handleDisconnect(@ConnectedSocket() client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
-  }
-
+  
   /* Subscribe to incoming messages */
   /* TODO: Add decorator @guard */
   @SubscribeMessage('launchGame')

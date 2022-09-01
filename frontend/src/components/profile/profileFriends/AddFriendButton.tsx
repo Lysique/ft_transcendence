@@ -24,7 +24,7 @@ export const AddFriendButton = ({visited}: AddFriendButtonProps) => {
         setOpenValidation(true);
         if (visited?.id === user?.id) {
             setMessage({
-                title: `You want to add yourself to your playlist ?`,
+                title: `You want to add yourself to your friendlist ?`,
                 message: 'You cannot do that, look for other friends.'
             })
         }

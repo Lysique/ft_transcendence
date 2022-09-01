@@ -16,7 +16,7 @@ export class User {
     @Column({ unique: true, nullable: true })
     name: string;
 
-    @Column({ default: UserStatus.Online })
+    @Column({ default: UserStatus.Offline })
     status: UserStatus;
 
     @ManyToMany(() => User)

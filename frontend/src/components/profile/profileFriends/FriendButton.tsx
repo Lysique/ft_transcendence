@@ -1,5 +1,4 @@
 import { Button, Menu, MenuItem } from "@mui/material";
-import { FriendDto } from "api/dto/friend.dto";
 import { UserAPI } from "api/user.api";
 import ValidationPopup from "components/utils/ValidationPopup";
 import React from "react";
@@ -8,7 +7,7 @@ import { UserDto } from "../../../api/dto/user.dto";
 import { SetUserContext } from "../../../App";
 
 interface FriendButtonProps {
-    friend: FriendDto
+    friend: UserDto
     children: any
 }
 

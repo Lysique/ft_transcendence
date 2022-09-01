@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Param, Delete, HttpCode, UseInterceptors, UploadedFile, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Request } from 'express';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
 import { UserDto } from './dto/user.dto';
 import { isNumber } from 'class-validator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
