@@ -6,8 +6,7 @@ import GameScreen from "../components/game/GameScreen";
 import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { styled, useTheme } from "@mui/material/styles";
-import { Link } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 export const GamePage = () => {
   /* Check for window resizes every 300ms */

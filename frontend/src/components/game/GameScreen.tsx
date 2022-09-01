@@ -52,7 +52,7 @@ const GameScreen = (props: GameStatus & Dimensions & Ratio) => {
     socket.on("gameLaunched", (data: Game) => {
       setGameState(data);
       setGameOn(true);
-      props.updateGameStatus("lost");
+      props.updateGameStatus("active");
     });
     return () => {
       socket.off("gameLaunched");
