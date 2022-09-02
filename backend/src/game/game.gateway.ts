@@ -7,6 +7,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Inject, Logger } from '@nestjs/common';
 import { GameService } from './game.service';
+import { Game } from './classes/game.classes';
 
 @WebSocketGateway({
   cors: {
@@ -15,22 +16,21 @@ import { GameService } from './game.service';
   },
 })
 export class GameGateway {
-  private queue: Array<Socket>;
-  private logger: Logger;
+  @WebSocketServer() server: Server;
 
-  constructor(@Inject(GameService) private gameService: GameService) {
-    this.queue = new Array();
-    this.logger = new Logger('GameGateway');
-  }
-
-  @WebSocketServer()
-  server: Server;
+  constructor(@Inject(GameService) private gameService: GameService) {}
 
   /* Subscribe to incoming messages */
   @SubscribeMessage('joinQueue')
   joinQueue(@ConnectedSocket() client: Socket) {
-    this.queue.push(client);
-    this.gameService.monitorQueue(this.queue);
+    this.gameService.pushtoQueue(client);
+    let gameID: string = this.gameService.monitorQueue();
+    if (typeof gameID != 'undefined') {
+      this.server
+        .to(gameID)
+        .emit('gameLaunched', this.gameService.gameSessions[gameID]);
+      this.gameService.serverLoop(this.server, gameID);
+    }
   }
 
   //   @SubscribeMessage('paddleDown')

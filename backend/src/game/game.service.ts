@@ -9,57 +9,61 @@ import {
 } from './classes/game.classes';
 import { collision } from './utils/game.utils';
 import { AuthService } from 'src/auth/auth.service';
-import { GameGateway } from './game.gateway';
 
 @Injectable()
 export class GameService {
-  private gameSessions: Map<string, Game>;
+  public queue: Array<Socket>;
+  public gameSessions: Map<string, Game>;
 
-  constructor(
-    private authService: AuthService,
-    private gameGateway: GameGateway,
-  ) {
-    this.gameSessions = new Map(); // should I instead use this.gameGateway.gameSessions?
+  constructor(private authService: AuthService) {
+    this.queue = new Array();
+    this.gameSessions = new Map();
   }
 
-  monitorQueue(queue: Array<Socket>) {
-    if (queue.length >= 2) {
-      this.setUpGame(queue[0], queue[1]);
-      queue.splice(0, 2);
+  pushtoQueue(client: Socket) {
+    this.queue.push(client);
+  }
+
+  monitorQueue(): string {
+    let gameID: string;
+    if (this.queue.length >= 2) {
+      gameID = this.queue[0].id + this.queue[1].id;
+      this.setUpGame(this.queue[0], this.queue[1]);
+      this.queue.splice(0, 2);
     }
+    return gameID;
   }
 
+  // should setUpGame be async?
   setUpGame(@ConnectedSocket() id1: Socket, @ConnectedSocket() id2: Socket) {
     // const user: UserDto | null = await this.authService.getUserFromSocket(client);
 
     const gameInfo = new Game();
     gameInfo.player1.socketID = id1.id;
     gameInfo.player2.socketID = id2.id;
-    console.log(gameInfo.player1.socketID);
-    console.log(gameInfo.player2.socketID);
 
     /* set up room for game */
     gameInfo.gameID = id1.id + id2.id;
-    console.log(gameInfo.gameID);
     id1.join(gameInfo.gameID);
     id2.join(gameInfo.gameID);
 
     /* add that game info to the gameSessions */
     this.gameSessions[gameInfo.gameID] = gameInfo;
 
-    /* Inform two players game is starting */
-    this.gameGateway.server.to(gameInfo.gameID).emit('gameLaunched', gameInfo);
-    this.serverLoop(id1, gameInfo.gameID, this.gameSessions[gameInfo.gameID]);
+    return this.gameSessions[gameInfo.gameID];
   }
 
-  async serverLoop(client: Socket, room: string, gameInfo: Game) {
+  async serverLoop(server: Server, gameID: string) {
     const myInterval = setInterval(() => {
-      this.updateGame(gameInfo);
-      if (gameInfo.player1.score >= 5 || gameInfo.player2.score >= 5) {
+      this.updateGame(this.gameSessions[gameID]);
+      if (
+        this.gameSessions[gameID].player1.score >= 5 ||
+        this.gameSessions[gameID].player2.score >= 5
+      ) {
         clearInterval(myInterval);
-        client.to(room).emit('gameFinished', 'over');
+        server.to(gameID).emit('gameFinished', 'over');
       } else {
-        client.to(room).emit('gameUpdate', gameInfo);
+        server.to(gameID).emit('gameUpdate', this.gameSessions[gameID]);
       }
     }, 1000 / 60);
   }
