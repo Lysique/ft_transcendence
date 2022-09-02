@@ -12,24 +12,36 @@ import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class GameService {
-  public queue: Array<Socket>;
+  //   public queue: Array<Socket>;
+  public queue: Map<string, Socket>;
   public gameSessions: Map<string, Game>;
 
   constructor(private authService: AuthService) {
-    this.queue = new Array();
+    // this.queue = new Array();
+    this.queue = new Map();
     this.gameSessions = new Map();
   }
 
   pushtoQueue(client: Socket) {
-    this.queue.push(client);
+    // this.queue.push(client);
+
+    //TODO: check if client socket is already in the queue. If it's the case, don't add it again!!!
+    // this.queue[client.id] = client;
+    this.queue.set(client.id, client);
   }
 
   monitorQueue(): string {
     let gameID: string;
-    if (this.queue.length >= 2) {
-      gameID = this.queue[0].id + this.queue[1].id;
-      this.setUpGame(this.queue[0], this.queue[1]);
-      this.queue.splice(0, 2);
+    if (this.queue.size === 2) {
+      gameID =
+        this.queue.get(Array.from(this.queue.keys())[0]).id +
+        this.queue.get(Array.from(this.queue.keys())[1]).id;
+
+      this.setUpGame(
+        this.queue.get(Array.from(this.queue.keys())[0]),
+        this.queue.get(Array.from(this.queue.keys())[1]),
+      );
+      this.queue.clear();
     }
     return gameID;
   }
@@ -48,22 +60,20 @@ export class GameService {
     id2.join(gameInfo.gameID);
 
     /* add that game info to the gameSessions */
-    this.gameSessions[gameInfo.gameID] = gameInfo;
-
-    return this.gameSessions[gameInfo.gameID];
+    this.gameSessions.set(gameInfo.gameID, gameInfo);
   }
 
   async serverLoop(server: Server, gameID: string) {
     const myInterval = setInterval(() => {
-      this.updateGame(this.gameSessions[gameID]);
+      this.updateGame(this.gameSessions.get(gameID));
       if (
-        this.gameSessions[gameID].player1.score >= 5 ||
-        this.gameSessions[gameID].player2.score >= 5
+        this.gameSessions.get(gameID).player1.score >= 5 ||
+        this.gameSessions.get(gameID).player2.score >= 5
       ) {
         clearInterval(myInterval);
         server.to(gameID).emit('gameFinished', 'over');
       } else {
-        server.to(gameID).emit('gameUpdate', this.gameSessions[gameID]);
+        server.to(gameID).emit('gameUpdate', this.gameSessions.get(gameID));
       }
     }, 1000 / 60);
   }
@@ -77,21 +87,21 @@ export class GameService {
 
   updatePaddle(
     clientID: string,
-    game: Game,
+    gameID: string,
     upOrDown: string,
     keyPress: boolean,
   ) {
-    if (clientID == game.player1.socketID) {
+    if (clientID == this.gameSessions.get(gameID).player1.socketID) {
       if (upOrDown == 'down') {
-        game.player1.arrowDown = keyPress;
+        this.gameSessions.get(gameID).player1.arrowDown = keyPress;
       } else if (upOrDown == 'up') {
-        game.player1.arrowUp = keyPress;
+        this.gameSessions.get(gameID).player1.arrowUp = keyPress;
       }
-    } else if (clientID == game.player2.socketID) {
+    } else if (clientID == this.gameSessions.get(gameID).player2.socketID) {
       if (upOrDown == 'down') {
-        game.player2.arrowDown = keyPress;
+        this.gameSessions.get(gameID).player2.arrowDown = keyPress;
       } else if (upOrDown == 'up') {
-        game.player2.arrowUp = keyPress;
+        this.gameSessions.get(gameID).player2.arrowUp = keyPress;
       }
     }
   }
@@ -131,10 +141,10 @@ export class GameService {
     }
 
     /* Update Computer paddle's position */
-    let computerLevel: number = 0.1;
-    game.player2.y +=
-      (game.ball.y - (game.player2.y + game.player2.height / 2)) *
-      computerLevel;
+    // let computerLevel: number = 0.1;
+    // game.player2.y +=
+    //   (game.ball.y - (game.player2.y + game.player2.height / 2)) *
+    //   computerLevel;
 
     /* Update ball's position */
     game.ball.x += game.ball.velocityX;
