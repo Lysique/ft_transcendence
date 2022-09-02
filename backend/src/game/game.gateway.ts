@@ -62,10 +62,12 @@ export class GameGateway {
   /* Allow spectator */
   //   @SubscribeMessage('spectator')
   //   joinSpectators(@ConnectedSocket() client: Socket) {}
+
+  /* Deal with player leaving game early */
+  //   @SubscribeMessage('playerLeft')
+  //   interruptGame(
+  //     @ConnectedSocket() client: Socket,
+  //     @MessageBody() keyPress: boolean,
+  //   ) {
+  // }
 }
-/* Deal with player leaving game early */
-//   @SubscribeMessage('playerLeft')
-//   interruptGame(
-//     @ConnectedSocket() client: Socket,
-//     @MessageBody() keyPress: boolean,
-//   ) {

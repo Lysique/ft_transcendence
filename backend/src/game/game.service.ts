@@ -12,21 +12,15 @@ import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class GameService {
-  //   public queue: Array<Socket>;
   public queue: Map<string, Socket>;
   public gameSessions: Map<string, Game>;
 
   constructor(private authService: AuthService) {
-    // this.queue = new Array();
     this.queue = new Map();
     this.gameSessions = new Map();
   }
 
   pushtoQueue(client: Socket) {
-    // this.queue.push(client);
-
-    //TODO: check if client socket is already in the queue. If it's the case, don't add it again!!!
-    // this.queue[client.id] = client;
     this.queue.set(client.id, client);
   }
 
@@ -139,12 +133,6 @@ export class GameService {
     if (game.player2.y < 0) {
       game.player2.y = 0;
     }
-
-    /* Update Computer paddle's position */
-    // let computerLevel: number = 0.1;
-    // game.player2.y +=
-    //   (game.ball.y - (game.player2.y + game.player2.height / 2)) *
-    //   computerLevel;
 
     /* Update ball's position */
     game.ball.x += game.ball.velocityX;
