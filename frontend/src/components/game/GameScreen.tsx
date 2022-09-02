@@ -5,10 +5,13 @@ import Fab from "@mui/material/Fab";
 import EditIcon from "@mui/icons-material/Edit";
 import { genHexString } from "components/game/utils/game.color";
 import { WebsocketContext } from "../../contexts/WebsocketContext";
-import { Dimensions, Game, GameStatus, Ratio } from "../../interfaces/gameInterfaces";
+import { Dimensions, Game, Ratio } from "../../interfaces/gameInterfaces";
 import { render } from "./utils/game.draw";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import { useTheme } from "@mui/material/styles";
 
-const GameScreen = (props: GameStatus & Dimensions & Ratio) => {
+const GameScreen = (props: Dimensions & Ratio) => {
   /* Initialize Canvas */
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const context = useRef<CanvasRenderingContext2D | null>();
@@ -32,7 +35,7 @@ const GameScreen = (props: GameStatus & Dimensions & Ratio) => {
   /* Listen to Websocket server */
   const socket = useContext(WebsocketContext);
   const [isConnected, setIsConnected] = useState(socket.connected);
-  const [gameOn, setGameOn] = useState(false);
+  const [gameOn, setGameOn] = useState<string>("");
   const [gameState, setGameState] = useState<Game>();
 
   useEffect(() => {
@@ -50,10 +53,8 @@ const GameScreen = (props: GameStatus & Dimensions & Ratio) => {
 
   useEffect(() => {
     socket.on("gameLaunched", (data: Game) => {
-      console.log("I GOT MSG: gameLaunched");
+      setGameOn("gameOn");
       setGameState(data);
-      setGameOn(true);
-      props.updateGameStatus("active");
     });
     return () => {
       socket.off("gameLaunched");
@@ -62,7 +63,6 @@ const GameScreen = (props: GameStatus & Dimensions & Ratio) => {
 
   useEffect(() => {
     socket.on("gameUpdate", (data: Game) => {
-      console.log("I GOT MSG: gameUpdate");
       setGameState(data);
     });
     return () => {
@@ -72,34 +72,37 @@ const GameScreen = (props: GameStatus & Dimensions & Ratio) => {
 
   useEffect(() => {
     socket.on("gameFinished", (status: string) => {
-      props.updateGameStatus(status);
+      setGameOn("gameOver");
     });
     return () => {
       socket.off("gameFinished");
-      setGameOn(false);
     };
   });
 
   /* Capture user inputs */
   const keyDownHandler = useCallback(
     (e: KeyboardEvent) => {
-      if ((e.key === "Down" || e.key === "ArrowDown") && gameOn === true) {
-        socket.emit("paddleDown", true);
-      } else if ((e.key === "Up" || e.key === "ArrowUp") && gameOn === true) {
-        socket.emit("paddleUp", true);
+      if (typeof gameState != "undefined" && gameOn === "gameOn") {
+        if (e.key === "Down" || e.key === "ArrowDown") {
+          socket.emit("paddleDown", true, gameState.gameID);
+        } else if (e.key === "Up" || e.key === "ArrowUp") {
+          socket.emit("paddleUp", true, gameState.gameID);
+        }
       }
     },
-    [socket, gameOn]
+    [socket, gameOn, gameState]
   );
   const keyUpHandler = useCallback(
     (e: KeyboardEvent) => {
-      if ((e.key === "Down" || e.key === "ArrowDown") && gameOn === true) {
-        socket.emit("paddleDown", false);
-      } else if ((e.key === "Up" || e.key === "ArrowUp") && gameOn === true) {
-        socket.emit("paddleUp", false);
+      if (typeof gameState != "undefined" && gameOn === "gameOn") {
+        if (e.key === "Down" || e.key === "ArrowDown") {
+          socket.emit("paddleDown", false, gameState.gameID);
+        } else if (e.key === "Up" || e.key === "ArrowUp") {
+          socket.emit("paddleUp", false, gameState.gameID);
+        }
       }
     },
-    [socket, gameOn]
+    [socket, gameOn, gameState]
   );
 
   useEffect(() => {
@@ -120,7 +123,7 @@ const GameScreen = (props: GameStatus & Dimensions & Ratio) => {
   const renderFrame = () => {
     if (!canvasRef.current || !context.current) return;
     if (gameState) {
-      render(context.current, canvasRef.current, gameOn, gameState, props.x, props.y, color);
+      render(context.current, canvasRef.current, gameState, props.x, props.y, color);
     }
   };
 
@@ -140,8 +143,33 @@ const GameScreen = (props: GameStatus & Dimensions & Ratio) => {
     };
   });
 
+  const theme = useTheme();
+
   return (
     <div>
+      {gameOn === "gameOver" && (
+        <div>
+          <Typography
+            variant="h2"
+            component="h2"
+            gutterBottom
+            align="center"
+            sx={{
+              backgroundcolor: "primary",
+              backgroundImage: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              backgroundSize: "100%",
+              backgroundRepeat: "repeat",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            Game is over! Congrats to ADD_USER for winning!
+          </Typography>
+          <Button href="/">Go to main menu</Button>
+        </div>
+      )}
+      {/* >} */}
       <div>
         <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} />
       </div>

@@ -1,9 +1,6 @@
 export const CANVAS_WIDTH = 500;
 export const CANVAS_HEIGHT = 500;
 
-export interface GameStatus {
-  updateGameStatus: any;
-}
 export interface Dimensions {
   width: number;
   height: number;
@@ -35,4 +32,5 @@ export interface Game {
   ball: Ball;
   player1: Player;
   player2: Player;
+  gameID: string;
 }

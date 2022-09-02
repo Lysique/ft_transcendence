@@ -46,53 +46,52 @@ export const GamePage = () => {
   /* Send info to Websocket server */
   const launchGame = () => {
     socket.emit("joinQueue");
-    setGameStatus("active");
   };
 
-  /* Check for game status */
-  const [gameStatus, setGameStatus] = useState("");
+  //   /* Check for game status */
+  //   const [gameStatus, setGameStatus] = useState("");
 
-  const updateGameStatus = (status: string) => {
-    setGameStatus(status);
-  };
+  //   const updateGameStatus = (status: string) => {
+  //     setGameStatus(status);
+  //   };
 
   /* ToggleScreen */
-  const theme = useTheme();
-  const ToggleScreen = () => {
-    if (gameStatus === "active") {
-      return (
-        <GameScreen
-          updateGameStatus={updateGameStatus} // Can use setGameStatus directly if needed?
-          {...updateGameStatus}
-          {...dimensions}
-          {...ratio}
-        />
-      );
-    } else if (gameStatus === "over") {
-      return (
-        <div>
-          <Typography
-            variant="h1"
-            component="h1"
-            gutterBottom
-            align="center"
-            sx={{
-              backgroundcolor: "primary",
-              backgroundImage: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              backgroundSize: "100%",
-              backgroundRepeat: "repeat",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Game is over! Congrats to ADD_USER for winning!
-          </Typography>
-          <Button href="/">Go to main menu</Button>
-        </div>
-      );
-    }
-  };
+//   const theme = useTheme();
+  //   const ToggleScreen = () => {
+  //     if (gameStatus === "active") {
+  //       return (
+  //         <GameScreen
+  //           updateGameStatus={updateGameStatus} // Can use setGameStatus directly if needed?
+  //           {...updateGameStatus}
+  //           {...dimensions}
+  //           {...ratio}
+  //         />
+  //       );
+  //     } else if (gameStatus === "over") {
+  //       return (
+  //         <div>
+  //           <Typography
+  //             variant="h1"
+  //             component="h1"
+  //             gutterBottom
+  //             align="center"
+  //             sx={{
+  //               backgroundcolor: "primary",
+  //               backgroundImage: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+  //               backgroundSize: "100%",
+  //               backgroundRepeat: "repeat",
+  //               backgroundClip: "text",
+  //               WebkitBackgroundClip: "text",
+  //               WebkitTextFillColor: "transparent",
+  //             }}
+  //           >
+  //             Game is over! Congrats to ADD_USER for winning!
+  //           </Typography>
+  //           <Button href="/">Go to main menu</Button>
+  //         </div>
+  //       );
+  //     }
+  //   };
 
   return (
     <div className="Gamepage">
@@ -108,8 +107,10 @@ export const GamePage = () => {
           px: 3,
         }}
       >
-        {ToggleScreen()}
-        {gameStatus !== "active" && <Button onClick={launchGame}>Launch game</Button>}
+        <GameScreen {...dimensions} {...ratio} />
+        {/* {ToggleScreen()} */}
+        {/* {gameStatus !== "active" && <Button onClick={launchGame}>Launch game</Button>} */}
+        <Button onClick={launchGame}>Launch game</Button>
       </Container>
     </div>
   );

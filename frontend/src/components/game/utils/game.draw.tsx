@@ -48,7 +48,11 @@ export function drawText(
 }
 
 /* Draw net */
-export function drawNet(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, color: string) {
+export function drawNet(
+  canvas: HTMLCanvasElement,
+  context: CanvasRenderingContext2D,
+  color: string
+) {
   for (let i = 0; i <= canvas.height; i += 15) {
     drawRect(context, (canvas.width - 2) / 2, i, 2, 10, color);
   }
@@ -58,13 +62,11 @@ export function drawNet(canvas: HTMLCanvasElement, context: CanvasRenderingConte
 export const render = (
   context: CanvasRenderingContext2D,
   canvas: HTMLCanvasElement,
-  gameOn: boolean,
   gameState: Game,
   ratioX: number,
   ratioY: number,
-  color: string,
+  color: string
 ) => {
-  if (!gameOn) return;
   /* Clear the canvas */
   context.clearRect(0, 0, CANVAS_WIDTH * ratioX, CANVAS_HEIGHT * ratioY);
   drawRect(context, 0, 0, CANVAS_WIDTH * ratioX, CANVAS_HEIGHT * ratioY, "aliceblue");
@@ -73,8 +75,20 @@ export const render = (
   drawNet(canvas, context, color);
 
   /* Draw score */
-  drawText(context, gameState.player1.score, CANVAS_WIDTH * ratioX / 4, CANVAS_HEIGHT * ratioY / 6, color);
-  drawText(context, gameState.player2.score, (3 * CANVAS_WIDTH * ratioX) / 4, CANVAS_HEIGHT * ratioY / 6, color);
+  drawText(
+    context,
+    gameState.player1.score,
+    (CANVAS_WIDTH * ratioX) / 4,
+    (CANVAS_HEIGHT * ratioY) / 6,
+    color
+  );
+  drawText(
+    context,
+    gameState.player2.score,
+    (3 * CANVAS_WIDTH * ratioX) / 4,
+    (CANVAS_HEIGHT * ratioY) / 6,
+    color
+  );
 
   /* Draw paddle 1 */
   drawRect(
@@ -97,12 +111,9 @@ export const render = (
   );
 
   /* Draw ball */
-  const ballRadius = (CANVAS_WIDTH * ratioX < CANVAS_HEIGHT * ratioY) ? gameState.ball.radius * ratioX : gameState.ball.radius * ratioY;
-  drawCircle(
-    context,
-    gameState.ball.x * ratioX,
-    gameState.ball.y * ratioY,
-    ballRadius,
-    color
-  );
+  const ballRadius =
+    CANVAS_WIDTH * ratioX < CANVAS_HEIGHT * ratioY
+      ? gameState.ball.radius * ratioX
+      : gameState.ball.radius * ratioY;
+  drawCircle(context, gameState.ball.x * ratioX, gameState.ball.y * ratioY, ballRadius, color);
 };
