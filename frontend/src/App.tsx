@@ -4,11 +4,14 @@ import { UserDto } from "./api/dto/user.dto";
 import { UserAPI } from "./api/user.api";
 import ResponsiveAppBar from "./components/generics/AppBar";
 import { Route, Routes } from "react-router-dom";
-import { Homepage } from "./route/GamePage";
+import { GamePage } from "./route/GamePage";
 import { Profile } from "./route/Profile";
 import HomeProtect from "./components/auth/HomeProtect";
 import RouteProtect from "./components/auth/RouteProtect";
 import { VisitorProfile } from "./route/VisitorProfile";
+import SelectModeScreen from "route/SelectModePage";
+import ProTip from "components/generics/ProTip";
+import Copyright from "components/generics/CopyRight";
 import { socket, WebsocketProvider } from './contexts/WebsocketContext';
 import { Websocket } from './components/chat/Websocket';
 
@@ -16,7 +19,7 @@ export const UserContext = React.createContext<UserDto | null>(null);
 export const SetUserContext = React.createContext<any>(null);
 
 function App() {
-  React.useState("Homepage");
+  React.useState("GamePage");
 
   /* Dark/light mode */
 
@@ -70,7 +73,15 @@ function App() {
                 path="/"
                 element={
                   <HomeProtect loggedIn={loggedIn} setLoggedIn={setLoggedIn}>
-                    <Homepage />
+                    <SelectModeScreen />
+                  </HomeProtect>
+                }
+              />
+              <Route
+                path="/game"
+                element={
+                  <HomeProtect loggedIn={loggedIn} setLoggedIn={setLoggedIn}>
+                    <GamePage />
                   </HomeProtect>
                 }
               />
@@ -101,6 +112,8 @@ function App() {
                 }
               />
             </Routes>
+            <ProTip />
+            <Copyright />
           </div>
         </SetUserContext.Provider>
       </UserContext.Provider>

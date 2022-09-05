@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { debounce } from "../utils/game.resize";
+import React, { useContext, useEffect, useState } from "react";
+import { debounce } from "../components/game/utils/game.resize";
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from "../interfaces/gameInterfaces";
+import { WebsocketContext } from "contexts/WebsocketContext";
 import GameScreen from "../components/game/GameScreen";
-import GameOverScreen from "../components/game/GameOverScreen";
-import GameWonScreen from "../components/game/GameWonScreen";
-import ProTip from "../components/generics/ProTip";
-import Copyright from "../components/generics/CopyRight";
 import Container from "@mui/material/Container";
+import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import GameMenuScreen from "../components/game/GameMenuScreen";
+import { useTheme } from "@mui/material/styles";
 
-export const Homepage = () => {
+export const GamePage = () => {
   /* Check for window resizes every 300ms */
   const [dimensions, setDimensions] = useState({
     height: window.innerHeight,
@@ -43,37 +40,77 @@ export const Homepage = () => {
     });
   }, [dimensions]);
 
-  /* Toggles between start screen, game screen and end-of-game screen */
-  const [currentScreen, setCurrentScreen] = useState("GameOn");
+  /* Listen to Websocket server */
+  const socket = useContext(WebsocketContext);
 
-  const ToggleScreen = () => {
-    switch (currentScreen) {
-      case "GameMenu":
-        return <GameMenuScreen {...dimensions} {...ratio} />;
-      case "GameOn":
-        return <GameScreen {...dimensions} {...ratio} />;
-      case "GameWon":
-        return <GameWonScreen {...dimensions} {...ratio} />;
-      case "GameOver":
-        return <GameOverScreen {...dimensions} {...ratio} />;
-      default:
-        return null;
-    }
+  /* Send info to Websocket server */
+  const launchGame = () => {
+    socket.emit("joinQueue");
   };
 
+  //   /* Check for game status */
+  //   const [gameStatus, setGameStatus] = useState("");
+
+  //   const updateGameStatus = (status: string) => {
+  //     setGameStatus(status);
+  //   };
+
+  /* ToggleScreen */
+//   const theme = useTheme();
+  //   const ToggleScreen = () => {
+  //     if (gameStatus === "active") {
+  //       return (
+  //         <GameScreen
+  //           updateGameStatus={updateGameStatus} // Can use setGameStatus directly if needed?
+  //           {...updateGameStatus}
+  //           {...dimensions}
+  //           {...ratio}
+  //         />
+  //       );
+  //     } else if (gameStatus === "over") {
+  //       return (
+  //         <div>
+  //           <Typography
+  //             variant="h1"
+  //             component="h1"
+  //             gutterBottom
+  //             align="center"
+  //             sx={{
+  //               backgroundcolor: "primary",
+  //               backgroundImage: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+  //               backgroundSize: "100%",
+  //               backgroundRepeat: "repeat",
+  //               backgroundClip: "text",
+  //               WebkitBackgroundClip: "text",
+  //               WebkitTextFillColor: "transparent",
+  //             }}
+  //           >
+  //             Game is over! Congrats to ADD_USER for winning!
+  //           </Typography>
+  //           <Button href="/">Go to main menu</Button>
+  //         </div>
+  //       );
+  //     }
+  //   };
+
   return (
-    <div className="Homepage">
-      <Container maxWidth="lg">
-        <Box sx={{ my: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom align="center">
-            Get ready to play the mighty Pong game!
-          </Typography>
-        </Box>
-        <Box textAlign="center" sx={{ my: 3, py: 3, px: 3 }}>
-          {ToggleScreen()}
-        </Box>
-        <ProTip />
-        <Copyright />
+    <div className="Gamepage">
+      <Container
+        maxWidth="lg"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          textAlign: "center",
+          my: 3,
+          py: 3,
+          px: 3,
+        }}
+      >
+        <GameScreen {...dimensions} {...ratio} />
+        {/* {ToggleScreen()} */}
+        {/* {gameStatus !== "active" && <Button onClick={launchGame}>Launch game</Button>} */}
+        <Button onClick={launchGame}>Launch game</Button>
       </Container>
     </div>
   );

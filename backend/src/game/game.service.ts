@@ -1,112 +1,117 @@
 import { Injectable } from '@nestjs/common';
-import { Socket } from 'socket.io';
-import { ConnectedSocket } from '@nestjs/websockets';
-import { Ball, CANVAS_HEIGHT, CANVAS_WIDTH, Game } from './classes/game.classes';
-import { WindowInfo } from './interfaces/game.interfaces';
+import { Server, Socket } from 'socket.io';
+import { WebSocketServer, ConnectedSocket } from '@nestjs/websockets';
+import {
+  Ball,
+  CANVAS_HEIGHT,
+  CANVAS_WIDTH,
+  Game,
+} from './classes/game.classes';
 import { collision } from './utils/game.utils';
 import { AuthService } from 'src/auth/auth.service';
-import { UserDto } from 'src/models/users/dto/user.dto';
 
 @Injectable()
 export class GameService {
+  public queue: Map<string, Socket>;
+  public gameSessions: Map<string, Game>;
 
-  constructor(
-    private authService: AuthService,
-  ) {}
+  constructor(private authService: AuthService) {
+    this.queue = new Map();
+    this.gameSessions = new Map();
+  }
 
+  pushtoQueue(client: Socket) {
+    this.queue.set(client.id, client);
+  }
 
-  setUpGame(@ConnectedSocket() client: Socket): Game {
+  monitorQueue(): string {
+    let gameID: string;
+    if (this.queue.size === 2) {
+      gameID =
+        this.queue.get(Array.from(this.queue.keys())[0]).id +
+        this.queue.get(Array.from(this.queue.keys())[1]).id;
+
+      this.setUpGame(
+        this.queue.get(Array.from(this.queue.keys())[0]),
+        this.queue.get(Array.from(this.queue.keys())[1]),
+      );
+      this.queue.clear();
+    }
+    return gameID;
+  }
+
+  // should setUpGame be async?
+  setUpGame(@ConnectedSocket() id1: Socket, @ConnectedSocket() id2: Socket) {
     // const user: UserDto | null = await this.authService.getUserFromSocket(client);
-    // Ta fonction doit etre async je crois
-    const game = new Game();
-    game.player1.socketID = client.id;
-    return game;
+
+    const gameInfo = new Game();
+    gameInfo.player1.socketID = id1.id;
+    gameInfo.player2.socketID = id2.id;
+
+    /* set up room for game */
+    gameInfo.gameID = id1.id + id2.id;
+    id1.join(gameInfo.gameID);
+    id2.join(gameInfo.gameID);
+
+    /* add that game info to the gameSessions */
+    this.gameSessions.set(gameInfo.gameID, gameInfo);
+  }
+
+  async serverLoop(server: Server, gameID: string) {
+    const myInterval = setInterval(() => {
+      this.updateGame(this.gameSessions.get(gameID));
+      if (
+        this.gameSessions.get(gameID).player1.score >= 5 ||
+        this.gameSessions.get(gameID).player2.score >= 5
+      ) {
+        clearInterval(myInterval);
+        server.to(gameID).emit('gameFinished', 'over');
+      } else {
+        server.to(gameID).emit('gameUpdate', this.gameSessions.get(gameID));
+      }
+    }, 1000 / 60);
   }
 
   resetBall(ball: Ball) {
     ball.x = CANVAS_WIDTH / 2;
     ball.y = CANVAS_HEIGHT / 2;
     ball.velocityX = -ball.velocityX;
-    ball.speed = CANVAS_WIDTH / 200;
+    ball.speed = CANVAS_WIDTH / 100;
   }
 
   updatePaddle(
     clientID: string,
-    game: Game,
+    gameID: string,
     upOrDown: string,
     keyPress: boolean,
   ) {
-    if (clientID == game.player1.socketID) {
+    if (clientID == this.gameSessions.get(gameID).player1.socketID) {
       if (upOrDown == 'down') {
-        game.player1.arrowDown = keyPress;
+        this.gameSessions.get(gameID).player1.arrowDown = keyPress;
       } else if (upOrDown == 'up') {
-        game.player1.arrowUp = keyPress;
+        this.gameSessions.get(gameID).player1.arrowUp = keyPress;
       }
-    } else if (clientID == game.player2.socketID) {
+    } else if (clientID == this.gameSessions.get(gameID).player2.socketID) {
       if (upOrDown == 'down') {
-        game.player2.arrowDown = keyPress;
+        this.gameSessions.get(gameID).player2.arrowDown = keyPress;
       } else if (upOrDown == 'up') {
-        game.player2.arrowUp = keyPress;
+        this.gameSessions.get(gameID).player2.arrowUp = keyPress;
       }
     }
-  }
-
-  /* Update game state */
-  //   const update = (width: number, height: number) => {
-  //     /* Check if game is over */
-  //     if (user2.score === 2) {
-  //       alert("GAME OVER");
-  //       document.location.reload();
-  //     } else if (user1.score === 1) {
-  //       alert("YOU WON");
-  //       document.location.reload();
-  //     }
-
-  //     /* Update score */
-  //     if (ball.x - ball.radius < 0) {
-  //       user2.score++;
-  //       resetBall(ball);
-  //     } else if (ball.x + ball.radius > width) {
-  //       user1.score++;
-  //       resetBall(ball);
-  //     }
-
-  //     /* Update ball's position */
-  //     ball.x += ball.velocityX; // * ratioX
-  //     ball.y += ball.velocityY; // * ratioY
-  //     if (ball.y + ball.radius > height || ball.y - ball.radius < 0) {
-  //       ball.velocityY = -ball.velocityY;
-  //     }
-
-  //     /* Update user1 paddle position */
-  //     if (downPressed.current) {
-  //       user1.y += 7;
-  //       if (user1.y + user1.height > height) {
-  //         user1.y = height - user1.height;
-  //       }
-  //     } else if (upPressed.current) {
-  //       user1.y -= 7;
-  //       if (user1.y < 0) {
-  //         user1.y = 0;
-  //       }
-  //     }
-
-  async serverLoop(client: Socket, gameInfo: Game) {
-    // TODO: Decide where to call setInterval()
-    const myInterval = setInterval(() => {
-      this.updateGame(gameInfo);
-      client.emit('gameUpdate', gameInfo);
-    }, 1000 / 60);
   }
 
   updateGame(game: Game): Game {
     /* Update score */
     if (game.ball.x - game.ball.radius < 0) {
       game.player2.score++;
-      this.resetBall(game.ball);
+      if (game.player2.score < 5) {
+        this.resetBall(game.ball);
+      }
     } else if (game.ball.x + game.ball.radius > CANVAS_WIDTH) {
       game.player1.score++;
-      this.resetBall(game.ball);
+      if (game.player1.score < 5) {
+        this.resetBall(game.ball);
+      }
     }
 
     /* Update paddle1 position */
@@ -139,12 +144,6 @@ export class GameService {
       game.ball.velocityY = -game.ball.velocityY;
     }
 
-    /* Update Computer paddle's position */
-    let computerLevel: number = 0.1;
-    game.player2.y +=
-      (game.ball.y - (game.player2.y + game.player2.height / 2)) *
-      computerLevel;
-
     /* Check for collision between ball and paddle */
     let player =
       game.ball.x + game.ball.radius < CANVAS_WIDTH / 2
@@ -154,18 +153,11 @@ export class GameService {
     if (collision(game.ball, player) === true) {
       let collidePoint = game.ball.y - (player.y + player.height / 2);
       collidePoint = collidePoint / (player.height / 2);
-
-      /* Calculate angle in Radian */
       let angleRad = (collidePoint * Math.PI) / 4;
-
-      /* X direction  of ball when hit */
       let direction =
-        game.ball.x + game.ball.radius < (CANVAS_WIDTH / 2) ? 1 : -1;
-
-      /* Change velocity */
+        game.ball.x + game.ball.radius < CANVAS_WIDTH / 2 ? 1 : -1;
       game.ball.velocityX = direction * game.ball.speed * Math.cos(angleRad);
       game.ball.velocityY = game.ball.speed * Math.sin(angleRad);
-
       game.ball.speed += 0.1;
     }
     return game;

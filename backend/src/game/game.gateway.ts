@@ -1,14 +1,14 @@
 import {
   WebSocketGateway,
   SubscribeMessage,
-  MessageBody,
   WebSocketServer,
   ConnectedSocket,
+  MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Inject, Logger } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { GameService } from './game.service';
-import { Game } from './classes/game.classes';
+import { PaddleInfo } from './interfaces/game.interfaces';
 
 @WebSocketGateway({
   cors: {
@@ -17,70 +17,57 @@ import { Game } from './classes/game.classes';
   },
 })
 export class GameGateway {
-  private gameSessions: Map<string, Game>;
-  private logger: Logger;
+  @WebSocketServer() server: Server;
 
-  constructor(@Inject(GameService) private gameService: GameService) {
-    this.gameSessions = new Map();
-    this.logger = new Logger('GameGateway');
-  }
+  constructor(@Inject(GameService) private gameService: GameService) {}
 
-  @WebSocketServer()
-  server: Server;
-  
-  /* Subscribe to incoming messages */
-  /* TODO: Add decorator @guard */
-  @SubscribeMessage('launchGame')
-  launchGame(@ConnectedSocket() client: Socket) {
-    // TODO: Only call setUpGame if two players ready to play
-    const gameInfo = this.gameService.setUpGame(client);
-    this.gameSessions[client.id] = gameInfo;
-    client.emit('gameLaunched', gameInfo);
-    this.gameService.serverLoop(client, this.gameSessions[client.id]);
+  @SubscribeMessage('joinQueue')
+  joinQueue(@ConnectedSocket() client: Socket) {
+    this.gameService.pushtoQueue(client);
+    let gameID: string = this.gameService.monitorQueue();
+    if (typeof gameID !== 'undefined') {
+      this.server
+        .to(gameID)
+        .emit('gameLaunched', this.gameService.gameSessions.get(gameID));
+      this.gameService.serverLoop(this.server, gameID);
+    }
   }
 
   @SubscribeMessage('paddleDown')
   paddleDown(
     @ConnectedSocket() client: Socket,
-    @MessageBody() keyPress: boolean,
+    @MessageBody() paddleInfo: PaddleInfo,
   ) {
-    if (this.gameSessions[client.id]) {
-      this.gameService.updatePaddle(
-        client.id,
-        this.gameSessions[client.id],
-        'down',
-        keyPress,
-      );
-    }
+    this.gameService.updatePaddle(
+      client.id,
+      paddleInfo[1],
+      'down',
+      paddleInfo[0],
+    );
   }
 
   @SubscribeMessage('paddleUp')
   paddleUp(
     @ConnectedSocket() client: Socket,
-    @MessageBody() keyPress: boolean,
+    @MessageBody() paddleInfo: PaddleInfo,
   ) {
     this.gameService.updatePaddle(
       client.id,
-      this.gameSessions[client.id],
+      paddleInfo[1],
       'up',
-      keyPress,
+      paddleInfo[0],
     );
   }
 
-  //   @SubscribeMessage('stopGame')
-  //   stopGame(@ConnectedSocket() client: Socket) {
-  //     clearInterval(myInterval);
-  //   }
+  /* Allow spectator */
+  //   @SubscribeMessage('spectator')
+  //   joinSpectators(@ConnectedSocket() client: Socket) {}
+
+  /* Deal with player leaving game early */
+  //   @SubscribeMessage('playerLeft')
+  //   interruptGame(
+  //     @ConnectedSocket() client: Socket,
+  //     @MessageBody() keyPress: boolean,
+  //   ) {
+  // }
 }
-
-//     /* Send response to client only */
-//     client.emit('onMessage', {
-//       msg: 'Test Message only you can see',
-//       content: data,
-//     });
-
-//     /* Send response to everyone */
-//     this.server.emit('onMessage', {
-//       msg: 'New Message everyone can see',
-//       content: data,
-//     });

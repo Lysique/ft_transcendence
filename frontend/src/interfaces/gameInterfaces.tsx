@@ -25,10 +25,12 @@ export interface Player {
   y: number;
   width: number;
   height: number;
+  score: number;
 }
 
 export interface Game {
   ball: Ball;
   player1: Player;
   player2: Player;
+  gameID: string;
 }

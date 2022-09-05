@@ -56,6 +56,7 @@ export class Player2 {
     this.height = CANVAS_HEIGHT / 5;
     this.arrowDown = false;
     this.arrowUp = false;
+	this.score = 0;
   }
 }
 
@@ -63,6 +64,7 @@ export class Game {
   player1: Player1;
   player2: Player2;
   ball: Ball;
+  gameID: string;
 
   constructor() {
     this.player1 = new Player1();

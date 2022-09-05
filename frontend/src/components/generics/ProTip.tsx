@@ -13,7 +13,7 @@ function ProTip() {
   return (
     <Typography sx={{ mt: 3, mb: 3 }} color="text.secondary" align="center">
       <LightBulbIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-      Pro tip: Press the spacebar to start playing.
+      Pro tip: You need to be logged in before you can chat & game.
     </Typography>
   );
 };

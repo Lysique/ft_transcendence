@@ -1,8 +1,15 @@
 import * as React from "react";
 import { useState, useEffect, useContext, useRef, useCallback } from "react";
+import Box from "@mui/material/Box";
+import Fab from "@mui/material/Fab";
+import EditIcon from "@mui/icons-material/Edit";
+import { genHexString } from "components/game/utils/game.color";
 import { WebsocketContext } from "../../contexts/WebsocketContext";
 import { Dimensions, Game, Ratio } from "../../interfaces/gameInterfaces";
-import { render } from "../../utils/game.draw";
+import { render } from "./utils/game.draw";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import { useTheme } from "@mui/material/styles";
 
 const GameScreen = (props: Dimensions & Ratio) => {
   /* Initialize Canvas */
@@ -18,31 +25,41 @@ const GameScreen = (props: Dimensions & Ratio) => {
 
   useEffect(getCanvasContext, []);
 
+  /* Update color of game elements */
+  const [color, setColor] = useState("#000");
+
+  const updateColor = () => {
+    setColor(genHexString(3));
+  };
+
   /* Listen to Websocket server */
   const socket = useContext(WebsocketContext);
   const [isConnected, setIsConnected] = useState(socket.connected);
-  const [gameOn, setGameOn] = useState(false);
+  const [gameOn, setGameOn] = useState<string>("");
   const [gameState, setGameState] = useState<Game>();
 
   useEffect(() => {
     socket.on("connect", () => {
       setIsConnected(true);
     });
-
     socket.on("disconnect", () => {
       setIsConnected(false);
-    });
-
-    socket.on("gameLaunched", (data: Game) => {
-      setGameState(data);
-      setGameOn(true);
     });
     return () => {
       socket.off("connect");
       socket.off("disconnect");
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    socket.on("gameLaunched", (data: Game) => {
+      setGameOn("gameOn");
+      setGameState(data);
+    });
+    return () => {
       socket.off("gameLaunched");
     };
-  }, [socket, gameOn]);
+  });
 
   useEffect(() => {
     socket.on("gameUpdate", (data: Game) => {
@@ -53,31 +70,39 @@ const GameScreen = (props: Dimensions & Ratio) => {
     };
   });
 
-  /* Send info to Websocket server */
-  const launchGame = () => {
-    socket.emit("launchGame");
-  };
+  useEffect(() => {
+    socket.on("gameFinished", (status: string) => {
+      setGameOn("gameOver");
+    });
+    return () => {
+      socket.off("gameFinished");
+    };
+  });
 
   /* Capture user inputs */
   const keyDownHandler = useCallback(
     (e: KeyboardEvent) => {
-      if ((e.key === "Down" || e.key === "ArrowDown") && gameOn === true) {
-        socket.emit("paddleDown", true);
-      } else if ((e.key === "Up" || e.key === "ArrowUp") && gameOn === true) {
-        socket.emit("paddleUp", true);
+      if (typeof gameState != "undefined" && gameOn === "gameOn") {
+        if (e.key === "Down" || e.key === "ArrowDown") {
+          socket.emit("paddleDown", true, gameState.gameID);
+        } else if (e.key === "Up" || e.key === "ArrowUp") {
+          socket.emit("paddleUp", true, gameState.gameID);
+        }
       }
     },
-    [socket, gameOn]
+    [socket, gameOn, gameState]
   );
   const keyUpHandler = useCallback(
     (e: KeyboardEvent) => {
-      if ((e.key === "Down" || e.key === "ArrowDown") && gameOn === true) {
-        socket.emit("paddleDown", false);
-      } else if ((e.key === "Up" || e.key === "ArrowUp") && gameOn === true) {
-        socket.emit("paddleUp", false);
+      if (typeof gameState != "undefined" && gameOn === "gameOn") {
+        if (e.key === "Down" || e.key === "ArrowDown") {
+          socket.emit("paddleDown", false, gameState.gameID);
+        } else if (e.key === "Up" || e.key === "ArrowUp") {
+          socket.emit("paddleUp", false, gameState.gameID);
+        }
       }
     },
-    [socket, gameOn]
+    [socket, gameOn, gameState]
   );
 
   useEffect(() => {
@@ -98,7 +123,7 @@ const GameScreen = (props: Dimensions & Ratio) => {
   const renderFrame = () => {
     if (!canvasRef.current || !context.current) return;
     if (gameState) {
-      render(context.current, canvasRef.current, gameOn, gameState, props.x, props.y);
+      render(context.current, canvasRef.current, gameState, props.x, props.y, color);
     }
   };
 
@@ -118,11 +143,44 @@ const GameScreen = (props: Dimensions & Ratio) => {
     };
   });
 
+  const theme = useTheme();
+
   return (
-    <>
-      <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} />
-      <button onClick={launchGame}>Launch game</button>
-    </>
+    <div>
+      {gameOn === "gameOver" && (
+        <div>
+          <Typography
+            variant="h2"
+            component="h2"
+            gutterBottom
+            align="center"
+            sx={{
+              backgroundcolor: "primary",
+              backgroundImage: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              backgroundSize: "100%",
+              backgroundRepeat: "repeat",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            Game is over! Congrats to ADD_USER for winning!
+          </Typography>
+          <Button href="/">Go to main menu</Button>
+        </div>
+      )}
+      {/* >} */}
+      <div>
+        <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} />
+      </div>
+      <div>
+        <Box sx={{ "& > :not(style)": { m: 1 } }}>
+          <Fab size="small" color="primary" aria-label="edit" onClick={updateColor}>
+            <EditIcon />
+          </Fab>
+        </Box>
+      </div>
+    </div>
   );
 };
 
