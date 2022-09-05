@@ -1,4 +1,4 @@
-import { List, ListItem, ListItemText, Typography } from "@mui/material";
+import { Divider, List, ListItem, ListItemText, Typography } from "@mui/material";
 import React from "react";
 
 export const HistoryBar = () => {
@@ -32,7 +32,8 @@ export const HistoryBar = () => {
                     Loser: {match.loser}
                 </>
                 } />
-              </ListItem>           
+              </ListItem>
+              <Divider component="li" />
           </ul>
         </li>
       ))}

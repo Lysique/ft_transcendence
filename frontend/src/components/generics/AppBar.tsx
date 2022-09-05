@@ -18,7 +18,7 @@ import { UserAPI } from "../../api/user.api";
 import defaultAvatar from "../../default_avatar/profile_image.jpeg";
 import { SetUserContext, UserContext } from "../../App";
 import { Link } from "react-router-dom";
-import SearchFriendInput from "./SearchFriendBar";
+import SearchFriendBar from "./SearchFriendBar";
 import { UserDto } from "../../api/dto/user.dto";
 
 interface ResponsiveAppBarProps {
@@ -180,9 +180,12 @@ const ResponsiveAppBar = ({ handleToggle, setLoggedIn }: ResponsiveAppBarProps) 
               </Button>
             ))}
           </Box>
+          { user?
           <Box>
-            <SearchFriendInput />
+            <SearchFriendBar />
           </Box>
+          : ''
+          }
           <Box textAlign="center">
             <IconButton sx={{ mr: 3 }} onClick={handleToggle} color="inherit">
               {theme.palette.mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
