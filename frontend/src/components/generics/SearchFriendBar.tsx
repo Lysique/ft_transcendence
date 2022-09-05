@@ -3,10 +3,9 @@ import React from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { UserDto } from "../../api/dto/user.dto";
 import { UserAPI } from "../../api/user.api";
-import RouteProtect from "../auth/RouteProtect";
 import { WhiteBorderTextField } from "../utils/WhiteBorderTextField";
 
-const SearchFriendInput = () => {
+const SearchFriendBar = () => {
 
     const navigate: NavigateFunction = useNavigate();
 
@@ -39,28 +38,26 @@ const SearchFriendInput = () => {
     }
 
     return (
-        <RouteProtect>
-            <Autocomplete
-                sx={{  width:180, mr:2 }}
-                disableClearable
-                freeSolo
-                onChange={handleClick}
-                options={users? users.map(x => x.name) : []}
-                renderInput={(params) => (
-                    <>
-                    <WhiteBorderTextField
-                        {...params}
-                        onKeyDown={keyPress}
-                        label="Search for friends !"
-                        InputProps={{
-                            ...params.InputProps,
-                        }}
-                    />
-                    </>
-                )}
-            />
-        </RouteProtect>
+        <Autocomplete
+            sx={{  width:180, mr:2 }}
+            disableClearable
+            freeSolo
+            onChange={handleClick}
+            options={users? users.map(x => x.name) : []}
+            renderInput={(params) => (
+                <>
+                <WhiteBorderTextField
+                    {...params}
+                    onKeyDown={keyPress}
+                    label="Search for friends !"
+                    InputProps={{
+                        ...params.InputProps,
+                    }}
+                />
+                </>
+            )}
+        />
         );
     };
 
-export default SearchFriendInput;
+export default SearchFriendBar;

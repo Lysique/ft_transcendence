@@ -80,9 +80,9 @@ function App() {
               <Route
                 path="/game"
                 element={
-                  <HomeProtect loggedIn={loggedIn} setLoggedIn={setLoggedIn}>
+                  <RouteProtect>
                     <GamePage />
-                  </HomeProtect>
+                  </RouteProtect>
                 }
               />
               <Route
