@@ -27,10 +27,11 @@ export const Websocket = () => {
       socket.off('connect');
       socket.off('onMessage');
     };
-  }, []);
+  }, [socket]);
 
   const onSubmit = () => {
     socket.emit('newMessage', value, socket.id);
+    console.log('sengmes');
     setValue('');
   };
 
@@ -45,7 +46,8 @@ export const Websocket = () => {
             <div>
               {messages.map((msg) => (
                 <div>
-                  <p>{msg.socketid} : {msg.content}</p>
+                  <p>
+                    {msg.content[1]} : {msg.content[0]}</p>
                 </div>
               ))}
             </div>
