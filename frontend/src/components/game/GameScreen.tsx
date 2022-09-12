@@ -34,22 +34,9 @@ const GameScreen = (props: Dimensions & Ratio) => {
 
   /* Listen to Websocket server */
   const socket = useContext(WebsocketContext);
-  const [isConnected, setIsConnected] = useState(socket.connected);
   const [gameOn, setGameOn] = useState<string>("");
   const [gameState, setGameState] = useState<Game>();
-
-  useEffect(() => {
-    socket.on("connect", () => {
-      setIsConnected(true);
-    });
-    socket.on("disconnect", () => {
-      setIsConnected(false);
-    });
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-    };
-  }, [socket]);
+  const [winner, setWinner] = useState<string>("");
 
   useEffect(() => {
     socket.on("gameLaunched", (data: Game) => {
@@ -71,8 +58,9 @@ const GameScreen = (props: Dimensions & Ratio) => {
   });
 
   useEffect(() => {
-    socket.on("gameFinished", (status: string) => {
+    socket.on("gameFinished", (userName: string) => {
       setGameOn("gameOver");
+      setWinner(userName);
     });
     return () => {
       socket.off("gameFinished");
@@ -164,12 +152,11 @@ const GameScreen = (props: Dimensions & Ratio) => {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Game is over! Congrats to ADD_USER for winning!
+            Game is over! Congrats to {winner} for winning!
           </Typography>
           <Button href="/">Go to main menu</Button>
         </div>
       )}
-      {/* >} */}
       <div>
         <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} />
       </div>

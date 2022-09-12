@@ -4,6 +4,7 @@ import {
   WebSocketServer,
   ConnectedSocket,
   MessageBody,
+  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Inject } from '@nestjs/common';
@@ -16,20 +17,27 @@ import { PaddleInfo } from './interfaces/game.interfaces';
     credentials: true,
   },
 })
-export class GameGateway {
+export class GameGateway implements OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
   constructor(@Inject(GameService) private gameService: GameService) {}
 
+  async handleDisconnect(@ConnectedSocket() client: Socket) {
+    await this.gameService.removeFromQueue(client);
+	await this.gameService.updateGameStatus(client);
+  }
+
   @SubscribeMessage('joinQueue')
-  joinQueue(@ConnectedSocket() client: Socket) {
-    this.gameService.pushtoQueue(client);
-    let gameID: string = this.gameService.monitorQueue();
+  async joinQueue(@ConnectedSocket() client: Socket) {
+    await this.gameService.pushToQueue(client);
+    let gameID: string = await this.gameService.monitorQueue();
     if (typeof gameID !== 'undefined') {
+      this.server.to(gameID).emit('gameReady');
+      // add delay 2 seconds
       this.server
         .to(gameID)
         .emit('gameLaunched', this.gameService.gameSessions.get(gameID));
-      this.gameService.serverLoop(this.server, gameID);
+      await this.gameService.serverLoop(this.server, gameID);
     }
   }
 

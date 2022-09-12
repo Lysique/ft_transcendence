@@ -1,5 +1,6 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
+import { WebsocketContext } from "contexts/WebsocketContext";
 import Box from "@mui/material/Box";
 import ButtonBase from "@mui/material/ButtonBase";
 import Container from "@mui/material/Container";
@@ -9,27 +10,24 @@ import { styled, useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import Rules from "components/game/Rules";
 import Spectator from "components/game/Spectator";
+import { useNavigate } from "react-router-dom";
+import ConfirmationPopup from "components/utils/ConfirmationPopup";
 
 const images = [
   {
     url: "https://www.researchgate.net/profile/Niels-Henze/publication/238504468/figure/fig3/AS:298952734855187@1448287294969/PONGs-game-elements.png",
-    title: "ONE PLAYER",
-    width: "25%",
-  },
-  {
-    url: "https://www.esrb.org/wp-content/uploads/2020/04/V1_ESRB_blog_Playing-Multiplayer-Games_Artboard-2-1024x538.jpg",
     title: "TWO PLAYERS",
-    width: "25%",
+    width: "33%",
   },
   {
     url: "https://images.unsplash.com/photo-1474514644473-acc8f56361f1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8N3x8c3BlY3RhdG9yfGVufDB8fDB8fA%3D%3D&w=1000&q=80",
     title: "SPECTATOR",
-    width: "25%",
+    width: "33%",
   },
   {
     url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOrxa9Ae3EKiNjh2eUc2MnfFK1XnqNt9Ps_Q&usqp=CAU",
     title: "RULES",
-    width: "25%",
+    width: "33%",
   },
 ];
 
@@ -98,10 +96,24 @@ const ImageMarked = styled("span")(({ theme }) => ({
 }));
 
 const SelectMode = () => {
+  const theme = useTheme();
+
+  const [error, setError] = useState<boolean>(false);
+
+  useEffect(() => {
+    socket.on("errorMsg", () => {
+      setError(true);
+      setOpen(false);
+    });
+    return () => {
+      socket.off("errorMsg");
+    };
+  });
+
   /* Matchmaking screen */
   const [open, setOpen] = useState(false);
   const matchMaking = () => {
-    setOpen(!open);
+    setOpen(true);
   };
 
   /* Spectator screen */
@@ -116,7 +128,22 @@ const SelectMode = () => {
     setRules(!rules);
   };
 
-  const theme = useTheme();
+  /* Send info to Websocket server */
+  const socket = useContext(WebsocketContext);
+  const launchGame = () => {
+    socket.emit("joinQueue");
+  };
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    socket.on("gameReady", () => {
+      navigate("/game");
+    });
+    return () => {
+      socket.off("gameReady");
+    };
+  });
+
   return (
     <div className="Gamepage">
       <Container maxWidth="md">
@@ -151,9 +178,8 @@ const SelectMode = () => {
               focusRipple
               key={image.title}
               onClick={() => {
-                if (image.title === "ONE PLAYER") {
-                  alert("ONE PLAYER");
-                } else if (image.title === "TWO PLAYERS") {
+                if (image.title === "TWO PLAYERS") {
+                  launchGame();
                   matchMaking();
                 } else if (image.title === "SPECTATOR") {
                   showActiveGames();
@@ -194,7 +220,7 @@ const SelectMode = () => {
           <Backdrop
             sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
             open={open}
-            //   onClick={handleClose}
+            //   onClick={handleClose} // could add 'leave queue' if clicked
           >
             <CircularProgress color="inherit" />
             <Typography sx={{ m: 2 }}>
@@ -203,6 +229,7 @@ const SelectMode = () => {
           </Backdrop>
         )}
       </div>
+      <ConfirmationPopup open={error} setOpen={setError} message="You are already in queue" />
     </div>
   );
 };
