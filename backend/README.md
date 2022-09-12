@@ -34,15 +34,17 @@ $ npm install
 
 ##  Setup
 
-# Env file configuration :
+### Env file configuration :
 
 - Make a copy of the template.env in the src/common/envs folder and name it a .env file in the same folder.
 
 - DATABASE_PASSWORD and DATABASE_NAME should match the configuration of the .env in the root folder.
 
-- FORTYTWO_ID and FORTYTWO_APP_SECRET will be given when registrating the app on the intra
+- FORTYTWO_ID and FORTYTWO_APP_SECRET will be given when registrating the app on the intra.
 
-# Register the app on the intra
+- Copy constants.template.ts in src/auth/constants to constants.ts and choose a secret of your choice to configure the jwt strategy.
+
+### Register the app on the intra
 
 - Go on the intra -> settings -> api -> register a new app
 - Fill the form
