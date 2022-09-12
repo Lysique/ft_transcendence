@@ -96,10 +96,6 @@ const ResponsiveAppBar = ({ handleToggle, setLoggedIn }: ResponsiveAppBarProps) 
       link: "/"
     },
     {
-      name: "Play now",
-      link: "/game"
-    },
-    {
       name: "Chat with friends",
       link: "/chat"
     }
