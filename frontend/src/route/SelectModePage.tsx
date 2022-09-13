@@ -120,6 +120,9 @@ const SelectMode = () => {
   const [spectator, setSpectator] = useState(false);
   const showActiveGames = () => {
     setSpectator(!spectator);
+    if (spectator === false) {
+      socket.emit("getGameSessions");
+    }
   };
 
   /* Rules screen */

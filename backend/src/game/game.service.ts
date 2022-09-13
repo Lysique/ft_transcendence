@@ -105,19 +105,42 @@ export class GameService {
       ) {
         clearInterval(myInterval);
         if (this.gameSessions.get(gameID).gameStatus === 'stopped') {
-          server.to(gameID).emit('gameFinished', 'nobody'); // TODO: change
+          server
+            .to(gameID)
+            .emit('gameFinishedEarly', this.gameSessions.get(gameID).gameLoser);
         } else {
-          const winner: string =
-            this.gameSessions.get(gameID).player1.score >= 5
-              ? this.gameSessions.get(gameID).player1.userName
-              : this.gameSessions.get(gameID).player2.userName;
-          // TODO: ADD LOSER AND WINNER TO GAME INSTANCE
-          server.to(gameID).emit('gameFinished', winner);
+          if (this.gameSessions.get(gameID).player1.score >= 5) {
+            this.gameSessions.get(gameID).gameWinner =
+              this.gameSessions.get(gameID).player1.userName;
+            this.gameSessions.get(gameID).gameLoser =
+              this.gameSessions.get(gameID).player2.userName;
+          } else {
+            this.gameSessions.get(gameID).gameWinner =
+              this.gameSessions.get(gameID).player2.userName;
+            this.gameSessions.get(gameID).gameLoser =
+              this.gameSessions.get(gameID).player1.userName;
+          }
+          server
+            .to(gameID)
+            .emit('gameFinished', this.gameSessions.get(gameID).gameWinner);
         }
       } else {
         server.to(gameID).emit('gameUpdate', this.gameSessions.get(gameID));
       }
     }, 1000 / 60);
+  }
+
+  sendGameSessions(server: Server, client: Socket) {
+    console.log('test');
+	// TODO: Send all game sessions as an array of Game
+	const test = [ 1 ];
+    server
+      .to(client.id)
+      .emit('currentGameSessions', (Array.from(this.gameSessions)));
+  }
+
+  joinAsSpectator(client: Socket, roomID: string) {
+    client.join(this.gameSessions.get(roomID).gameID);
   }
 
   resetBall(ball: Ball) {

@@ -25,6 +25,7 @@ export interface Player {
   y: number;
   width: number;
   height: number;
+  userName: string;
   score: number;
 }
 

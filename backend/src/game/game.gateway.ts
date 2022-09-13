@@ -10,6 +10,8 @@ import { Server, Socket } from 'socket.io';
 import { Inject } from '@nestjs/common';
 import { GameService } from './game.service';
 import { PaddleInfo } from './interfaces/game.interfaces';
+import { RoutesMapper } from '@nestjs/core/middleware/routes-mapper';
+import { rootCertificates } from 'tls';
 
 @WebSocketGateway({
   cors: {
@@ -24,7 +26,7 @@ export class GameGateway implements OnGatewayDisconnect {
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
     await this.gameService.removeFromQueue(client);
-	await this.gameService.updateGameStatus(client);
+    await this.gameService.updateGameStatus(client);
   }
 
   @SubscribeMessage('joinQueue')
@@ -33,7 +35,6 @@ export class GameGateway implements OnGatewayDisconnect {
     let gameID: string = await this.gameService.monitorQueue();
     if (typeof gameID !== 'undefined') {
       this.server.to(gameID).emit('gameReady');
-      // add delay 2 seconds
       this.server
         .to(gameID)
         .emit('gameLaunched', this.gameService.gameSessions.get(gameID));
@@ -67,15 +68,19 @@ export class GameGateway implements OnGatewayDisconnect {
     );
   }
 
-  /* Allow spectator */
-  //   @SubscribeMessage('spectator')
-  //   joinSpectators(@ConnectedSocket() client: Socket) {}
+  @SubscribeMessage('getGameSessions')
+  retrieveGameSessions(
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.gameService.sendGameSessions(this.server, client);
+  }
+  
 
-  /* Deal with player leaving game early */
-  //   @SubscribeMessage('playerLeft')
-  //   interruptGame(
-  //     @ConnectedSocket() client: Socket,
-  //     @MessageBody() keyPress: boolean,
-  //   ) {
-  // }
+  @SubscribeMessage('spectator')
+  joinSpectators(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() roomID: string,
+  ) {
+    this.gameService.joinAsSpectator(client, roomID);
+  }
 }
