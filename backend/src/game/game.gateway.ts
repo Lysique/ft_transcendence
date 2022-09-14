@@ -10,8 +10,6 @@ import { Server, Socket } from 'socket.io';
 import { Inject } from '@nestjs/common';
 import { GameService } from './game.service';
 import { PaddleInfo } from './interfaces/game.interfaces';
-import { RoutesMapper } from '@nestjs/core/middleware/routes-mapper';
-import { rootCertificates } from 'tls';
 
 @WebSocketGateway({
   cors: {

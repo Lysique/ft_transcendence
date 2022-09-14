@@ -12,6 +12,8 @@ import Rules from "components/game/Rules";
 import Spectator from "components/game/Spectator";
 import { useNavigate } from "react-router-dom";
 import ConfirmationPopup from "components/utils/ConfirmationPopup";
+import { GameAPI } from "api/game.api";
+import { Game } from "interfaces/gameInterfaces";
 
 const images = [
   {
@@ -120,11 +122,20 @@ const SelectMode = () => {
 
   /* Spectator screen */
   const [spectator, setSpectator] = useState(false);
+  const [data, setData] = useState<Game[]>([]);
   const showActiveGames = () => {
     setSpectator(!spectator);
-    if (spectator === false) {
-      socket.emit("getGameSessions");
-    }
+    const fetchSessions = async () => {
+      const resp = await GameAPI.getGameSessions();
+      if (resp) {
+        setData(resp.games);
+      }
+	  console.log(resp?.games);
+    };
+    fetchSessions();
+    // if (spectator === false) {
+    //   socket.emit("getGameSessions");
+    // }
   };
 
   /* Rules screen */
@@ -218,7 +229,9 @@ const SelectMode = () => {
           ))}
         </Box>
       </Container>
-      <div>{spectator && <Spectator status={true} showActiveGames={showActiveGames} />}</div>
+      <div>
+        {spectator && <Spectator status={true} showActiveGames={showActiveGames} data={data} setData={setData} />}
+      </div>
       <div>{rules && <Rules status={true} showRules={showRules} />}</div>
       <div>
         {open && (

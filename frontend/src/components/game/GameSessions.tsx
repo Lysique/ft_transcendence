@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { WebsocketContext } from "../../contexts/WebsocketContext";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -11,10 +11,8 @@ import Paper from "@mui/material/Paper";
 import { Game } from "interfaces/gameInterfaces";
 import Link from "@mui/material/Link";
 
-export default function GameSessions() {
-  /* Listen to Websocket server */
+export default function GameSessions({ data, setData }: { data: Game[]; setData: Function }) {
   const socket = useContext(WebsocketContext);
-  const [data, setData] = useState<Game[]>([]);
 
   useEffect(() => {
     socket.on("currentGameSessions", (gameSessions: Game[]) => {

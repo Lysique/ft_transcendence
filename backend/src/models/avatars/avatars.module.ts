@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AvatarsService } from './avatars.service';
-import { AvatarsController } from './avatars.controller';
 import { Avatar } from './entities/avatar.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  controllers: [AvatarsController],
+  controllers: [],
   providers: [AvatarsService],
 
   //  Import repository for entity User

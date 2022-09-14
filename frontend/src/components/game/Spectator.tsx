@@ -8,6 +8,7 @@ import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import GameSessions from "./GameSessions";
+import { Game } from "interfaces/gameInterfaces";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -51,9 +52,11 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 export interface SpectatorProps {
   status: boolean;
   showActiveGames: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+  data: Game[];
+  setData: Function;
 }
 
-export default function Spectator({ status, showActiveGames }: SpectatorProps) {
+export default function Spectator({ status, showActiveGames, data, setData }: SpectatorProps) {
   return (
     <div>
       <BootstrapDialog
@@ -65,7 +68,7 @@ export default function Spectator({ status, showActiveGames }: SpectatorProps) {
           Current game sessions being played
         </BootstrapDialogTitle>
         <DialogContent dividers>
-          <GameSessions />
+          <GameSessions data={data} setData={setData} />
         </DialogContent>
         <DialogActions>
           <Button autoFocus onClick={showActiveGames}>

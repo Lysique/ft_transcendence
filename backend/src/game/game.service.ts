@@ -263,4 +263,16 @@ export class GameService {
     }
     return game;
   }
+
+  getCurrentGames() {
+    const gameSessions = [];
+
+    this.gameSessions.forEach((value: Game, key: string) => {
+      if (value.gameStatus === 'running') {
+        gameSessions.push(value);
+      }
+    });
+    return gameSessions;
+  }
+
 }

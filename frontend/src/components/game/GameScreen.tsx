@@ -55,7 +55,7 @@ const GameScreen = (props: Dimensions & Ratio) => {
     return () => {
       socket.off("gameLaunched");
     };
-  });
+  }, [socket]);
 
   useEffect(() => {
     socket.on("gameUpdate", (data: Game) => {
@@ -65,7 +65,7 @@ const GameScreen = (props: Dimensions & Ratio) => {
     return () => {
       socket.off("gameUpdate");
     };
-  });
+  }, [socket]);
 
   useEffect(() => {
     socket.on("gameFinished", (winner: string) => {
@@ -75,7 +75,7 @@ const GameScreen = (props: Dimensions & Ratio) => {
     return () => {
       socket.off("gameFinished");
     };
-  });
+  }, [socket]);
 
   useEffect(() => {
     socket.on("gameFinishedEarly", (leftEarly: string) => {
@@ -85,7 +85,7 @@ const GameScreen = (props: Dimensions & Ratio) => {
     return () => {
       socket.off("gameFinishedEarly");
     };
-  });
+  }, [socket]);
 
   /* Capture user inputs */
   const keyDownHandler = useCallback(
