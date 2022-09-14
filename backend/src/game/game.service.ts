@@ -239,4 +239,9 @@ export class GameService {
     }
     return game;
   }
+
+  getCurrentGames(): Map<string, Game> {
+    return this.gameSessions;
+  }
+
 }

@@ -9,6 +9,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Game } from "interfaces/gameInterfaces";
+import { GameAPI } from "api/game.api";
 
 // function createData(
 //   gameID: string,
@@ -30,15 +31,26 @@ export default function GameSessions() {
   const socket = useContext(WebsocketContext);
   const [data, setData] = useState<Game[]>([]); // setMyArray(oldArray => [...oldArray, newElement]);
 
+  // useEffect(() => {
+  //   socket.on("currentGameSessions", (gameSessions: Game[]) => {
+  //   setData(gameSessions);
+  //   });
+  //   return () => {
+  //     socket.off("currentGameSessions");
+  //   };
+  // });
+
   useEffect(() => {
-    socket.on("currentGameSessions", (gameSessions: Game[]) => {
-		console.log(gameSessions);
-    //   setData(gameSessions);
-    });
-    return () => {
-      socket.off("currentGameSessions");
+    const fetchSessions = async () => {
+      const resp = await GameAPI.getGameSessions();
+      console.log(resp);
+      if (resp) {
+        setData(resp);
+      }
     };
-  });
+    
+    fetchSessions();
+  }, []);
 
   return (
     <TableContainer component={Paper}>
@@ -58,10 +70,8 @@ export default function GameSessions() {
               <TableCell component="th" scope="row">
                 {row.gameID}
               </TableCell>
-              <TableCell align="right">{row.player1.userName}</TableCell>
-              <TableCell align="center">{row.player1.score}</TableCell>
-              <TableCell align="right">{row.player2.userName}</TableCell>
-              <TableCell align="center">{row.player2.score}</TableCell>
+              <TableCell align="right">{row.gameID}</TableCell>
+              <TableCell align="right">{row.gameID}</TableCell>
             </TableRow>
           ))}
         </TableBody>
