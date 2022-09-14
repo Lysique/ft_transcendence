@@ -11,6 +11,7 @@ import { render } from "./utils/game.draw";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useTheme } from "@mui/material/styles";
+import { useLocation } from "react-router-dom";
 
 const GameScreen = (props: Dimensions & Ratio) => {
   /* Initialize Canvas */
@@ -38,6 +39,13 @@ const GameScreen = (props: Dimensions & Ratio) => {
   const [gameOn, setGameOn] = useState<string>("");
   const [gameState, setGameState] = useState<Game>();
   const [winner, setWinner] = useState<string>("");
+  const { hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      socket.emit("spectator", hash.slice(1));
+    }
+  }, [hash, socket]);
 
   useEffect(() => {
     socket.on("gameLaunched", (data: Game) => {

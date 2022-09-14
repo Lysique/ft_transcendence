@@ -9,6 +9,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Game } from "interfaces/gameInterfaces";
+import Link from "@mui/material/Link";
 
 export default function GameSessions() {
   /* Listen to Websocket server */
@@ -38,7 +39,7 @@ export default function GameSessions() {
           {data.map((row) => (
             <TableRow key={row.gameID} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
               <TableCell component="th" scope="row">
-                {row.gameID}
+                <Link href={`/game#${row.gameID}`}>{row.gameID}</Link>
               </TableCell>
               <TableCell align="right">{row.player1.userName}</TableCell>
               <TableCell align="right">{row.player2.userName}</TableCell>
