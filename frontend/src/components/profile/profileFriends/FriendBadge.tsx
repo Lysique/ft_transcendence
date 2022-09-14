@@ -12,6 +12,7 @@ export const FriendBadge = ({friend}: {friend: UserDto}) => {
         <FriendButton friend={friend}>
 
         <Tooltip title={friend.name}>
+            <div>
             <UserStatusBadge status={friend.status}>
                 <Avatar
                     src={friend?.currentAvatar? `data:image/jpeg;base64,${friend.currentAvatar.data}`: defaultAvatar}
@@ -19,6 +20,7 @@ export const FriendBadge = ({friend}: {friend: UserDto}) => {
                     sx={{ width: 56, height: 56 }}                 
                 />
             </UserStatusBadge>
+            </div>
         </Tooltip>
 
         </FriendButton>

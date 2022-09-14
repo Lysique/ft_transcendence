@@ -28,7 +28,7 @@ export class UserAPI {
       return (resp.ok? resp.json() : null);
     }
 
-  public static async getVisitorProfile(id: string): Promise<UserDto | null> {
+  public static async getOneUserById(id: string): Promise<UserDto | null> {
     const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/${id}`, {
         credentials: "include",
         method: "GET"

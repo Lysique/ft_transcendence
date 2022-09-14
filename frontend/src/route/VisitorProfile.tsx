@@ -19,7 +19,7 @@ export const VisitorProfile = () => {
 
     React.useEffect(() => {
         const fetchProfile = async () => {
-            const resp = await UserAPI.getVisitorProfile(id? id: "");
+            const resp = await UserAPI.getOneUserById(id? id: "");
             if (!resp ||  Object.keys(resp).length === 0) {
                 navigate('/');
             }

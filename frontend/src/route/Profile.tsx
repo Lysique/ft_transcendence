@@ -9,6 +9,7 @@ import UserProfileImageModificator from "../components/profile/ProfileImage/User
 import ProfileImage from "../components/profile/ProfileImage/ProfileImage";
 import { StatBar } from "components/profile/profileStats/StatBar";
 import { HistoryBar } from "components/profile/profileHistory/HistoryBar";
+import { PlayerAvatars } from "components/game/PlayerAvatars";
 
 export const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
