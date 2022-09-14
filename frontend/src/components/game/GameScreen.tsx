@@ -6,6 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { genHexString } from "components/game/utils/game.color";
 import { WebsocketContext } from "../../contexts/WebsocketContext";
 import { Dimensions, Game, Ratio } from "../../interfaces/gameInterfaces";
+import { PlayerAvatars } from "./PlayerAvatars";
 import { render } from "./utils/game.draw";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -193,7 +194,9 @@ const GameScreen = (props: Dimensions & Ratio) => {
       <div>
         {gameOn !== "gameOver" && gameOn !== "gameInterrupted" && (
           <div>
-            {/* <GameUsers /> */}
+            {gameState && (
+              <PlayerAvatars id1={gameState.player1.userID} id2={gameState.player2.userID} />
+            )}
             <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} />
             <Box sx={{ "& > :not(style)": { m: 1 } }}>
               <Fab size="small" color="primary" aria-label="edit" onClick={updateColor}>

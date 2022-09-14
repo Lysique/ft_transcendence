@@ -30,7 +30,7 @@ export class GameGateway implements OnGatewayDisconnect {
   @SubscribeMessage('joinQueue')
   async joinQueue(@ConnectedSocket() client: Socket) {
     await this.gameService.pushToQueue(client);
-    let gameID: string = await this.gameService.monitorQueue();
+    let gameID: string = await this.gameService.monitorQueue(this.server);
     if (typeof gameID !== 'undefined') {
       this.server.to(gameID).emit('gameReady');
       this.server
@@ -67,12 +67,9 @@ export class GameGateway implements OnGatewayDisconnect {
   }
 
   @SubscribeMessage('getGameSessions')
-  retrieveGameSessions(
-    @ConnectedSocket() client: Socket,
-  ) {
+  retrieveGameSessions(@ConnectedSocket() client: Socket) {
     this.gameService.sendGameSessions(this.server, client);
   }
-  
 
   @SubscribeMessage('spectator')
   joinSpectators(

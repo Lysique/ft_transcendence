@@ -45,7 +45,7 @@ export class GameService {
     this.queue.delete(client.id);
   }
 
-  async monitorQueue(): Promise<string> {
+  async monitorQueue(server: Server): Promise<string> {
     let gameID: string;
     if (this.queue.size === 2) {
       gameID =
@@ -55,6 +55,7 @@ export class GameService {
       await this.setUpGame(
         this.queue.get(Array.from(this.queue.keys())[0]),
         this.queue.get(Array.from(this.queue.keys())[1]),
+        server,
       );
       this.queue.clear();
     }
@@ -78,6 +79,7 @@ export class GameService {
   async setUpGame(
     @ConnectedSocket() id1: Socket,
     @ConnectedSocket() id2: Socket,
+    server: Server,
   ) {
     const user1: UserDto | null = await this.authService.getUserFromSocket(id1);
     const user2: UserDto | null = await this.authService.getUserFromSocket(id2);
@@ -99,6 +101,16 @@ export class GameService {
 
     /* add that game info to the gameSessions */
     this.gameSessions.set(gameInfo.gameID, gameInfo);
+
+    /* send all active game sessions */
+    const gameSessions = [];
+
+    this.gameSessions.forEach((value: Game, key: string) => {
+      if (value.gameStatus === 'running') {
+        gameSessions.push(value);
+      }
+    });
+    server.emit('currentGameSessions', gameSessions);
   }
 
   async serverLoop(server: Server, gameID: string) {
@@ -126,10 +138,20 @@ export class GameService {
             this.gameSessions.get(gameID).gameLoser =
               this.gameSessions.get(gameID).player1.userName;
           }
+          this.gameSessions.get(gameID).gameStatus = 'stopped';
           server
             .to(gameID)
             .emit('gameFinished', this.gameSessions.get(gameID).gameWinner);
         }
+        /* send all active game sessions */
+        const gameSessions = [];
+
+        this.gameSessions.forEach((value: Game, key: string) => {
+          if (value.gameStatus === 'running') {
+            gameSessions.push(value);
+          }
+        });
+        server.emit('currentGameSessions', gameSessions);
       } else {
         server.to(gameID).emit('gameUpdate', this.gameSessions.get(gameID));
       }
@@ -137,12 +159,14 @@ export class GameService {
   }
 
   sendGameSessions(server: Server, client: Socket) {
-    console.log('test');
-    // TODO: Send all game sessions as an array of Game
-    // TODO: Send only ACTIVE GAMES (status !== 'stopped')
-    server
-      .to(client.id)
-      .emit('currentGameSessions', Array.from(this.gameSessions));
+    const gameSessions = [];
+
+    this.gameSessions.forEach((value: Game, key: string) => {
+      if (value.gameStatus === 'running') {
+        gameSessions.push(value);
+      }
+    });
+    server.to(client.id).emit('currentGameSessions', gameSessions);
   }
 
   joinAsSpectator(client: Socket, roomID: string) {
@@ -240,8 +264,15 @@ export class GameService {
     return game;
   }
 
-  getCurrentGames(): Map<string, Game> {
-    return this.gameSessions;
+  getCurrentGames() {
+    const gameSessions = [];
+
+    this.gameSessions.forEach((value: Game, key: string) => {
+      if (value.gameStatus === 'running') {
+        gameSessions.push(value);
+      }
+    });
+    return gameSessions;
   }
 
 }

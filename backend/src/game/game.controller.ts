@@ -11,8 +11,7 @@ export class GameController {
   public async getAll() {
 
     const games = this.gameService.getCurrentGames();
-    console.log(Array.from(games));
 
-    return Array.from(games);
+    return {games: games};
   }
 }
