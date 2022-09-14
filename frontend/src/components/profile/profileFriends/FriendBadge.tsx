@@ -11,17 +11,16 @@ export const FriendBadge = ({friend}: {friend: UserDto}) => {
     return (
         <FriendButton friend={friend}>
 
-        <Tooltip title={friend.name}>
-            <div>
-            <UserStatusBadge status={friend.status}>
+
+        <UserStatusBadge status={friend.status}>
+            <Tooltip title={friend.name}>
                 <Avatar
                     src={friend?.currentAvatar? `data:image/jpeg;base64,${friend.currentAvatar.data}`: defaultAvatar}
                     alt='avatar'
                     sx={{ width: 56, height: 56 }}                 
                 />
-            </UserStatusBadge>
-            </div>
-        </Tooltip>
+            </Tooltip>
+        </UserStatusBadge>
 
         </FriendButton>
     );

@@ -29,17 +29,15 @@ export const PlayerAvatars = ({id1, id2}: {id1: number, id2: number}) => {
             <Grid item xs={2}></Grid>
 
             <Grid item xs={2}>
-            <Tooltip title={player1? player1.name: ""}>
-                <div>
-                <UserStatusBadge status={player1? player1.status: 1}>
+            <UserStatusBadge status={player1? player1.status: 1}>
+                <Tooltip title={player1? player1.name: ""}>
                     <Avatar
                         src={player1?.currentAvatar? `data:image/jpeg;base64,${player1.currentAvatar.data}`: defaultAvatar}
                         alt='avatar'
                         sx={{ width: 56, height: 56 }}                 
                     />
-                </UserStatusBadge>
-                </div>
-            </Tooltip>
+                </Tooltip>
+            </UserStatusBadge>
 
             <Typography variant="h4" display="flex" >
                 {player1?.name.substring(0, 6)}
@@ -52,24 +50,22 @@ export const PlayerAvatars = ({id1, id2}: {id1: number, id2: number}) => {
             <Grid item xs={2}></Grid>
 
             <Grid item xs={2}>
-            <Tooltip title={player2? player2.name: ""}>
-                <div>
-                <UserStatusBadge status={player2? player2.status: 1}>
+            <UserStatusBadge status={player2? player2.status: 1}>
+                <Tooltip title={player2? player2.name: ""}>
                     <Avatar
                         src={player2?.currentAvatar? `data:image/jpeg;base64,${player2.currentAvatar.data}`: defaultAvatar}
                         alt='avatar'
                         sx={{ width: 56, height: 56 }}                 
                     />
-                </UserStatusBadge>
-                </div>
-            </Tooltip>
+                </Tooltip>
+            </UserStatusBadge>
 
             <Typography variant="h4" display="flex" >
                 {player2?.name.substring(0, 6)}
                 {player2 && player2.name.length > 6 ? '..' : ''}
             </Typography> 
             </Grid>
-            
+
             <Grid item xs={2}></Grid>
         </Grid>
     );
