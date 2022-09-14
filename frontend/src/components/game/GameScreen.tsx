@@ -193,6 +193,7 @@ const GameScreen = (props: Dimensions & Ratio) => {
       <div>
         {gameOn !== "gameOver" && gameOn !== "gameInterrupted" && (
           <div>
+            {/* <GameUsers /> */}
             <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} />
             <Box sx={{ "& > :not(style)": { m: 1 } }}>
               <Fab size="small" color="primary" aria-label="edit" onClick={updateColor}>

@@ -99,10 +99,12 @@ const SelectMode = () => {
   const theme = useTheme();
 
   const [error, setError] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string>("");
 
   useEffect(() => {
-    socket.on("errorMsg", () => {
+    socket.on("errorMsg", (errorMsg: string) => {
       setError(true);
+      setErrorMsg(errorMsg);
       setOpen(false);
     });
     return () => {
@@ -232,7 +234,7 @@ const SelectMode = () => {
           </Backdrop>
         )}
       </div>
-      <ConfirmationPopup open={error} setOpen={setError} message="You are already in queue" />
+      <ConfirmationPopup open={error} setOpen={setError} message={errorMsg} />
     </div>
   );
 };

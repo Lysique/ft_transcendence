@@ -24,6 +24,7 @@ export class Player1 {
   width: number;
   height: number;
   socketID: string;
+  userID: number;
   userName: string;
   arrowDown: boolean;
   arrowUp: boolean;
@@ -46,6 +47,7 @@ export class Player2 {
   width: number;
   height: number;
   socketID: string;
+  userID: number;
   userName: string;
   arrowDown: boolean;
   arrowUp: boolean;

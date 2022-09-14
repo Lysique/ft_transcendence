@@ -22,15 +22,18 @@ export class GameService {
   }
 
   async pushToQueue(client: Socket) {
+    const currentUser: UserDto | null =
+      await this.authService.getUserFromSocket(client);
+    if (!currentUser) {
+      client.emit('errorMsg', 'You have to be logged in to join a game!');
+    }
     if (this.queue.size === 1) {
-      const currentUser: UserDto | null =
-        await this.authService.getUserFromSocket(client);
       const userInQueue: UserDto | null =
         await this.authService.getUserFromSocket(
           this.queue.get(Array.from(this.queue.keys())[0]),
         );
       if (currentUser.id === userInQueue.id) {
-        client.emit('errorMsg');
+        client.emit('errorMsg', 'You are already in queue, sit tight!');
         return;
       }
     }
@@ -82,8 +85,10 @@ export class GameService {
     const gameInfo = new Game();
     gameInfo.player1.socketID = id1.id;
     gameInfo.player1.userName = user1.name;
+    gameInfo.player1.userID = user1.id;
     gameInfo.player2.socketID = id2.id;
     gameInfo.player2.userName = user2.name;
+    gameInfo.player2.userID = user2.id;
     gameInfo.gameStatus = 'running';
 
     /* set up room for game */
@@ -132,11 +137,11 @@ export class GameService {
 
   sendGameSessions(server: Server, client: Socket) {
     console.log('test');
-	// TODO: Send all game sessions as an array of Game
-	const test = [ 1 ];
+    // TODO: Send all game sessions as an array of Game
+    // TODO: Send only ACTIVE GAMES (status !== 'stopped')
     server
       .to(client.id)
-      .emit('currentGameSessions', (Array.from(this.gameSessions)));
+      .emit('currentGameSessions', Array.from(this.gameSessions));
   }
 
   joinAsSpectator(client: Socket, roomID: string) {
