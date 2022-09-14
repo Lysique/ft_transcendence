@@ -8,7 +8,6 @@ import { GameModule } from './game/game.module';
 import { getEnvPath } from './common/helper/env.helper';
 import { TypeOrmConfigService } from './config/typeorm/typeorm.service';
 import { AuthModule } from './auth/auth.module';
-import { GameGateway } from './game/game.gateway';
 import { GatewayModule } from './chat/gateway.module';
 
 
