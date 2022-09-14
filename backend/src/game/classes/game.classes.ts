@@ -24,6 +24,8 @@ export class Player1 {
   width: number;
   height: number;
   socketID: string;
+  userID: number;
+  userName: string;
   arrowDown: boolean;
   arrowUp: boolean;
   score: number;
@@ -45,6 +47,8 @@ export class Player2 {
   width: number;
   height: number;
   socketID: string;
+  userID: number;
+  userName: string;
   arrowDown: boolean;
   arrowUp: boolean;
   score: number;
@@ -56,7 +60,7 @@ export class Player2 {
     this.height = CANVAS_HEIGHT / 5;
     this.arrowDown = false;
     this.arrowUp = false;
-	this.score = 0;
+    this.score = 0;
   }
 }
 
@@ -65,6 +69,9 @@ export class Game {
   player2: Player2;
   ball: Ball;
   gameID: string;
+  gameStatus: string;
+  gameWinner: string;
+  gameLoser: string;
 
   constructor() {
     this.player1 = new Player1();

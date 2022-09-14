@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { WebSocketServer, ConnectedSocket } from '@nestjs/websockets';
+import { ConnectedSocket } from '@nestjs/websockets';
 import {
   Ball,
   CANVAS_HEIGHT,
@@ -9,6 +9,7 @@ import {
 } from './classes/game.classes';
 import { collision } from './utils/game.utils';
 import { AuthService } from 'src/auth/auth.service';
+import { UserDto } from 'src/models/users/dto/user.dto';
 
 @Injectable()
 export class GameService {
@@ -20,18 +21,38 @@ export class GameService {
     this.gameSessions = new Map();
   }
 
-  pushtoQueue(client: Socket) {
+  async pushToQueue(client: Socket) {
+    const currentUser: UserDto | null =
+      await this.authService.getUserFromSocket(client);
+    if (!currentUser) {
+      client.emit('errorMsg', 'You have to be logged in to join a game!');
+      return;
+    }
+    if (this.queue.size === 1) {
+      const userInQueue: UserDto | null =
+        await this.authService.getUserFromSocket(
+          this.queue.get(Array.from(this.queue.keys())[0]),
+        );
+      if (currentUser.id === userInQueue.id) {
+        client.emit('errorMsg', 'You are already in queue, sit tight!');
+        return;
+      }
+    }
     this.queue.set(client.id, client);
   }
 
-  monitorQueue(): string {
+  async removeFromQueue(client: Socket) {
+    this.queue.delete(client.id);
+  }
+
+  async monitorQueue(): Promise<string> {
     let gameID: string;
     if (this.queue.size === 2) {
       gameID =
         this.queue.get(Array.from(this.queue.keys())[0]).id +
         this.queue.get(Array.from(this.queue.keys())[1]).id;
 
-      this.setUpGame(
+      await this.setUpGame(
         this.queue.get(Array.from(this.queue.keys())[0]),
         this.queue.get(Array.from(this.queue.keys())[1]),
       );
@@ -40,13 +61,36 @@ export class GameService {
     return gameID;
   }
 
-  // should setUpGame be async?
-  setUpGame(@ConnectedSocket() id1: Socket, @ConnectedSocket() id2: Socket) {
-    // const user: UserDto | null = await this.authService.getUserFromSocket(client);
+  async updateGameStatus(@ConnectedSocket() client: Socket) {
+    for (const key of this.gameSessions.keys()) {
+      if (key.includes(client.id) === true) {
+        let gameInfo: Game = this.gameSessions.get(key);
+        const user: UserDto | null = await this.authService.getUserFromSocket(
+          client,
+        );
+        gameInfo.gameStatus = 'stopped';
+        gameInfo.gameLoser = user.name;
+        this.gameSessions.set(key, gameInfo);
+      }
+    }
+  }
 
+  async setUpGame(
+    @ConnectedSocket() id1: Socket,
+    @ConnectedSocket() id2: Socket,
+  ) {
+    const user1: UserDto | null = await this.authService.getUserFromSocket(id1);
+    const user2: UserDto | null = await this.authService.getUserFromSocket(id2);
+
+    /* set up game */
     const gameInfo = new Game();
     gameInfo.player1.socketID = id1.id;
+    gameInfo.player1.userName = user1.name;
+    gameInfo.player1.userID = user1.id;
     gameInfo.player2.socketID = id2.id;
+    gameInfo.player2.userName = user2.name;
+    gameInfo.player2.userID = user2.id;
+    gameInfo.gameStatus = 'running';
 
     /* set up room for game */
     gameInfo.gameID = id1.id + id2.id;
@@ -62,14 +106,47 @@ export class GameService {
       this.updateGame(this.gameSessions.get(gameID));
       if (
         this.gameSessions.get(gameID).player1.score >= 5 ||
-        this.gameSessions.get(gameID).player2.score >= 5
+        this.gameSessions.get(gameID).player2.score >= 5 ||
+        this.gameSessions.get(gameID).gameStatus === 'stopped'
       ) {
         clearInterval(myInterval);
-        server.to(gameID).emit('gameFinished', 'over');
+        if (this.gameSessions.get(gameID).gameStatus === 'stopped') {
+          server
+            .to(gameID)
+            .emit('gameFinishedEarly', this.gameSessions.get(gameID).gameLoser);
+        } else {
+          if (this.gameSessions.get(gameID).player1.score >= 5) {
+            this.gameSessions.get(gameID).gameWinner =
+              this.gameSessions.get(gameID).player1.userName;
+            this.gameSessions.get(gameID).gameLoser =
+              this.gameSessions.get(gameID).player2.userName;
+          } else {
+            this.gameSessions.get(gameID).gameWinner =
+              this.gameSessions.get(gameID).player2.userName;
+            this.gameSessions.get(gameID).gameLoser =
+              this.gameSessions.get(gameID).player1.userName;
+          }
+          server
+            .to(gameID)
+            .emit('gameFinished', this.gameSessions.get(gameID).gameWinner);
+        }
       } else {
         server.to(gameID).emit('gameUpdate', this.gameSessions.get(gameID));
       }
     }, 1000 / 60);
+  }
+
+  sendGameSessions(server: Server, client: Socket) {
+    console.log('test');
+    // TODO: Send all game sessions as an array of Game
+    // TODO: Send only ACTIVE GAMES (status !== 'stopped')
+    server
+      .to(client.id)
+      .emit('currentGameSessions', Array.from(this.gameSessions));
+  }
+
+  joinAsSpectator(client: Socket, roomID: string) {
+    client.join(this.gameSessions.get(roomID).gameID);
   }
 
   resetBall(ball: Ball) {

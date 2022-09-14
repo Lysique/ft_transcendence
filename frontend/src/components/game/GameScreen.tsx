@@ -34,22 +34,9 @@ const GameScreen = (props: Dimensions & Ratio) => {
 
   /* Listen to Websocket server */
   const socket = useContext(WebsocketContext);
-  const [isConnected, setIsConnected] = useState(socket.connected);
   const [gameOn, setGameOn] = useState<string>("");
   const [gameState, setGameState] = useState<Game>();
-
-  useEffect(() => {
-    socket.on("connect", () => {
-      setIsConnected(true);
-    });
-    socket.on("disconnect", () => {
-      setIsConnected(false);
-    });
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-    };
-  }, [socket]);
+  const [winner, setWinner] = useState<string>("");
 
   useEffect(() => {
     socket.on("gameLaunched", (data: Game) => {
@@ -63,6 +50,7 @@ const GameScreen = (props: Dimensions & Ratio) => {
 
   useEffect(() => {
     socket.on("gameUpdate", (data: Game) => {
+      setGameOn("gameOn");
       setGameState(data);
     });
     return () => {
@@ -71,11 +59,22 @@ const GameScreen = (props: Dimensions & Ratio) => {
   });
 
   useEffect(() => {
-    socket.on("gameFinished", (status: string) => {
+    socket.on("gameFinished", (winner: string) => {
       setGameOn("gameOver");
+      setWinner(winner);
     });
     return () => {
       socket.off("gameFinished");
+    };
+  });
+
+  useEffect(() => {
+    socket.on("gameFinishedEarly", (leftEarly: string) => {
+      setGameOn("gameInterrupted");
+      setWinner(leftEarly);
+    });
+    return () => {
+      socket.off("gameFinishedEarly");
     };
   });
 
@@ -164,21 +163,45 @@ const GameScreen = (props: Dimensions & Ratio) => {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Game is over! Congrats to ADD_USER for winning!
+            Game is over! Congrats to {winner} for winning!
           </Typography>
-          <Button href="/">Go to main menu</Button>
+          <Button href="/">Go back to main menu</Button>
         </div>
       )}
-      {/* >} */}
+      {gameOn === "gameInterrupted" && (
+        <div>
+          <Typography
+            variant="h2"
+            component="h2"
+            gutterBottom
+            align="center"
+            sx={{
+              backgroundcolor: "primary",
+              backgroundImage: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              backgroundSize: "100%",
+              backgroundRepeat: "repeat",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            Game is over! {winner} left the game before its end!
+          </Typography>
+          <Button href="/">Go back to main menu</Button>
+        </div>
+      )}
       <div>
-        <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} />
-      </div>
-      <div>
-        <Box sx={{ "& > :not(style)": { m: 1 } }}>
-          <Fab size="small" color="primary" aria-label="edit" onClick={updateColor}>
-            <EditIcon />
-          </Fab>
-        </Box>
+        {gameOn !== "gameOver" && gameOn !== "gameInterrupted" && (
+          <div>
+            {/* <GameUsers /> */}
+            <canvas ref={canvasRef} width={props.width * 0.5} height={props.height * 0.5} />
+            <Box sx={{ "& > :not(style)": { m: 1 } }}>
+              <Fab size="small" color="primary" aria-label="edit" onClick={updateColor}>
+                <EditIcon />
+              </Fab>
+            </Box>
+          </div>
+        )}
       </div>
     </div>
   );
