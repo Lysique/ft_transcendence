@@ -26,6 +26,7 @@ export class GameService {
       await this.authService.getUserFromSocket(client);
     if (!currentUser) {
       client.emit('errorMsg', 'You have to be logged in to join a game!');
+      return;
     }
     if (this.queue.size === 1) {
       const userInQueue: UserDto | null =
