@@ -55,6 +55,7 @@ function App() {
 
       const logged = await UserAPI.isLoggedIn();
       setLoggedIn(logged.loggedIn);
+      socket.emit('userUpdate');
     };
     
     fetchProfile();

@@ -6,7 +6,7 @@ import { CreateUserDto } from 'src/models/users/dto/create-user.dto';
 import { authenticator } from 'otplib';
 import { toFileStream } from 'qrcode';
 import { Response } from 'express';
-import { Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 import { parse } from "cookie";
 import { UserStatus } from 'src/models/users/entities/user.entity';
 
@@ -72,10 +72,10 @@ export class AuthService {
     }
 
     async modifyUserState(userDto: UserDto, status: UserStatus) {
-        this.usersService.setStatus(userDto.id, status)
+        await this.usersService.setStatus(userDto.id, status)
     }
 
-    async addToConnection(client: Socket) {
+    async addToConnection(client: Socket, server: Server) {
 
         const userDto: UserDto | null = await this.getUserFromSocket(client);
 
@@ -85,12 +85,13 @@ export class AuthService {
 
         if (!this.userSessions[userDto.id] || this.userSessions[userDto.id].length === 0) {
             this.userSessions[userDto.id] = [];
-            this.modifyUserState(userDto, UserStatus.Online);
+            await this.modifyUserState(userDto, UserStatus.Online);
+            server.emit('onUserChange');
         }
         this.userSessions[userDto.id].push(client.id);
     }
 
-    async removeFromConnection(client: Socket) {
+    async removeFromConnection(client: Socket, server: Server) {
 
         const userDto: UserDto | null = await this.getUserFromSocket(client);
 
@@ -101,13 +102,14 @@ export class AuthService {
         const index = this.userSessions[userDto.id].indexOf(client.id);
         this.userSessions[userDto.id].splice(index, 1);
         if (this.userSessions[userDto.id].length === 0) {
-            this.modifyUserState(userDto, UserStatus.Offline);
+            await this.modifyUserState(userDto, UserStatus.Offline);
+            server.emit('onUserChange');
         }
     }
 
     async clearSession(userDto: UserDto) {
         this.userSessions[userDto.id] = [];
-        this.modifyUserState(userDto, UserStatus.Offline);
+        await this.modifyUserState(userDto, UserStatus.Offline);
     }
 
     public async getUserFromSocket(socket: Socket): Promise<UserDto | null> {

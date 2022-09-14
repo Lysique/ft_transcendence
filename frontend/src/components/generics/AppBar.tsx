@@ -19,6 +19,7 @@ import { SetUserContext, UserContext } from "../../App";
 import { Link } from "react-router-dom";
 import SearchFriendBar from "./SearchFriendBar";
 import { UserDto } from "../../api/dto/user.dto";
+import { WebsocketContext } from "contexts/WebsocketContext";
 
 interface ResponsiveAppBarProps {
   handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
@@ -69,11 +70,13 @@ const ResponsiveAppBar = ({ handleToggle, setLoggedIn }: ResponsiveAppBarProps) 
     );
   };
 
+  const socket = React.useContext(WebsocketContext);
   async function Logout() {
     handleCloseUserMenu();
     await UserAPI.logout();
     setUser(null);
     setLoggedIn(false);
+    socket.emit('userUpdate');
   }
 
   function LogoutButton() {

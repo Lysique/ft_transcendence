@@ -17,16 +17,9 @@ import { Server } from 'socket.io';
     credentials: true,
   },
 })
-export class MyGateway implements OnModuleInit {
+export class MyGateway {
   @WebSocketServer()//listen to default api port
   server: Server;//socket instance
-
-  onModuleInit() {
-    this.server.on('connection', (socket) => {//listen to connection, d'instance socket
-      console.log(socket.id);
-      console.log('Connected');
-    });
-  }
 
   //client consuming websocket server
   //chat send event to socket

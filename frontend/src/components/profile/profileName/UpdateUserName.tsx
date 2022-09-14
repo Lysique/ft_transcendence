@@ -7,6 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import { SetUserContext } from '../../../App';
 import { UserAPI } from '../../../api/user.api';
+import { WebsocketContext } from 'contexts/WebsocketContext';
 
 interface UpdateUserNameProps {
     handleClose: Function
@@ -22,6 +23,7 @@ export const UpdateUserName = ({open,
 } : UpdateUserNameProps) => {
 
     const setUser = React.useContext(SetUserContext)
+    const socket = React.useContext(WebsocketContext);
 
     const [name, setName] = React.useState<string>("");
 
@@ -41,6 +43,7 @@ export const UpdateUserName = ({open,
             setUser(resp);
             setError(null);
             handleClose();
+            socket.emit('userUpdate')
         }
         else {
             setError('Already taken')
