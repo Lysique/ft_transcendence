@@ -59,7 +59,7 @@ export class AuthController {
       ) {
       response.clearCookie('jwt');
       const user: any = req.user;
-      this.authService.clearSession(user);
+      await this.authService.clearSession(user);
     }
     
     // Generate QrCode

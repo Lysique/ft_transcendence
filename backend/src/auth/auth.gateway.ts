@@ -39,13 +39,13 @@ import { AuthService } from './auth.service';
   async handleConnection(@ConnectedSocket() client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
 
-    this.authService.addToConnection(client);
+    this.authService.addToConnection(client, this.server);
 
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
 
-    this.authService.removeFromConnection(client);
+    this.authService.removeFromConnection(client, this.server);
   }
 }

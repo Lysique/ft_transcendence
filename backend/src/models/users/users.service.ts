@@ -7,6 +7,8 @@ import { AvatarDto } from '../avatars/dto/avatar.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserDto } from './dto/user.dto';
 import { User, UserStatus } from './entities/user.entity';
+import { Server } from 'socket.io';
+import { WebSocketServer } from '@nestjs/websockets';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +19,7 @@ export class UsersService {
     private avatarService: AvatarsService,
     @InjectRepository(User) private userRepository: Repository<User>,
     ) {}
+
 
   //  Utility method to get dto object from entity
   private entityToDto(user: User): UserDto {

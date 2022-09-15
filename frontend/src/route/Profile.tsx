@@ -1,6 +1,6 @@
 import { Card, Grid, Paper, styled, Typography } from "@mui/material";
 import React from "react";
-import { UserContext } from "../App";
+import { SetUserContext, UserContext } from "../App";
 import ProfileName from "../components/profile/profileName/ProfileName";
 import TfaToggle from "../components/profile/twoFactAuth/TfaToggle";
 import { UserDto } from "../api/dto/user.dto";
@@ -9,6 +9,8 @@ import UserProfileImageModificator from "../components/profile/ProfileImage/User
 import ProfileImage from "../components/profile/ProfileImage/ProfileImage";
 import { StatBar } from "components/profile/profileStats/StatBar";
 import { HistoryBar } from "components/profile/profileHistory/HistoryBar";
+import { UserAPI } from "api/user.api";
+import { WebsocketContext } from "contexts/WebsocketContext";
 
 export const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -20,6 +22,23 @@ export const Item = styled(Paper)(({ theme }) => ({
 
 export const Profile = () => {
   const user: UserDto | null = React.useContext(UserContext);
+  const setUser: Function = React.useContext(SetUserContext);
+
+  const socket = React.useContext(WebsocketContext);
+  React.useEffect(() => {
+    const fetchProfile = async() => {
+        const resp = await UserAPI.getUserProfile();
+        setUser(resp);
+    }
+    
+    socket.on("onUserChange", () => {
+        fetchProfile();
+    });
+
+    return () => {
+        socket.off("onUserChange");
+    };
+  }, [socket, setUser]);
 
   return (
     <>
