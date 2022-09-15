@@ -10,8 +10,6 @@ import { TypeOrmConfigService } from './config/typeorm/typeorm.service';
 import { AuthModule } from './auth/auth.module';
 import { GatewayModule } from './chat/gateway.module';
 
-
-
 //  Get the environment file
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 
