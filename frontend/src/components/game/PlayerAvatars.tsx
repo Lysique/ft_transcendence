@@ -40,8 +40,8 @@ export const PlayerAvatars = ({ id1, id2 }: { id1: number; id2: number }) => {
         </UserStatusBadge>
 
         <Typography variant="h4" display="flex">
-          {player1?.name.substring(0, 6)}
-          {player1 && player1.name.length > 6 ? ".." : ""}
+          {player1?.name.substring(0, 10)}
+          {player1 && player1.name.length > 10 ? ".." : ""}
         </Typography>
       </Grid>
 
@@ -65,8 +65,8 @@ export const PlayerAvatars = ({ id1, id2 }: { id1: number; id2: number }) => {
         </UserStatusBadge>
 
         <Typography variant="h4" display="flex">
-          {player2?.name.substring(0, 6)}
-          {player2 && player2.name.length > 6 ? ".." : ""}
+          {player2?.name.substring(0, 10)}
+          {player2 && player2.name.length > 10 ? ".." : ""}
         </Typography>
       </Grid>
 
