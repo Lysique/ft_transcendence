@@ -1,11 +1,6 @@
 import { User } from 'src/models/users/entities/user.entity';
 import { Games } from './game.entity';
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class GamePlayer {

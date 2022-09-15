@@ -12,8 +12,7 @@ import { VisitorProfile } from "./route/VisitorProfile";
 import SelectModeScreen from "route/SelectModePage";
 import ProTip from "components/generics/ProTip";
 import Copyright from "components/generics/CopyRight";
-import { socket, WebsocketProvider } from './contexts/WebsocketContext';
-import { Websocket } from './components/chat/Websocket';
+import { socket, WebsocketProvider } from "./contexts/WebsocketContext";
 import { Chat } from "components/chat/Chat";
 
 export const UserContext = React.createContext<UserDto | null>(null);
@@ -56,9 +55,9 @@ function App() {
 
       const logged = await UserAPI.isLoggedIn();
       setLoggedIn(logged.loggedIn);
-      socket.emit('userUpdate');
+      socket.emit("userUpdate");
     };
-    
+
     fetchProfile();
   }, []);
 

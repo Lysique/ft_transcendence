@@ -1,9 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, CreateDateColumn, OneToMany } from 'typeorm';
 import { GamePlayer } from './game_player.entity';
 
 @Entity()

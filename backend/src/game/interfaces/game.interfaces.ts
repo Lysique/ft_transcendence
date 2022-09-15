@@ -1,7 +1,5 @@
-export interface WindowInfo {
-  width: number;
-  height: number;
-}
+export const CANVAS_WIDTH = 500;
+export const CANVAS_HEIGHT = 500;
 
 export interface PaddleInfo {
   keyPress: boolean;

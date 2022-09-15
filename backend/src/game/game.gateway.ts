@@ -33,37 +33,19 @@ export class GameGateway implements OnGatewayDisconnect {
     let gameID: string = await this.gameService.monitorQueue(this.server);
     if (typeof gameID !== 'undefined') {
       this.server.to(gameID).emit('gameReady');
-      this.server
-        .to(gameID)
-        .emit('gameLaunched', this.gameService.gameSessions.get(gameID));
+      this.server.to(gameID).emit('gameLaunched', this.gameService.gameSessions.get(gameID));
       await this.gameService.serverLoop(this.server, gameID);
     }
   }
 
   @SubscribeMessage('paddleDown')
-  paddleDown(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() paddleInfo: PaddleInfo,
-  ) {
-    this.gameService.updatePaddle(
-      client.id,
-      paddleInfo[1],
-      'down',
-      paddleInfo[0],
-    );
+  paddleDown(@ConnectedSocket() client: Socket, @MessageBody() paddleInfo: PaddleInfo) {
+    this.gameService.updatePaddle(client.id, paddleInfo[1], 'down', paddleInfo[0]);
   }
 
   @SubscribeMessage('paddleUp')
-  paddleUp(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() paddleInfo: PaddleInfo,
-  ) {
-    this.gameService.updatePaddle(
-      client.id,
-      paddleInfo[1],
-      'up',
-      paddleInfo[0],
-    );
+  paddleUp(@ConnectedSocket() client: Socket, @MessageBody() paddleInfo: PaddleInfo) {
+    this.gameService.updatePaddle(client.id, paddleInfo[1], 'up', paddleInfo[0]);
   }
 
   @SubscribeMessage('getGameSessions')
@@ -72,10 +54,7 @@ export class GameGateway implements OnGatewayDisconnect {
   }
 
   @SubscribeMessage('spectator')
-  joinSpectators(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() roomID: string,
-  ) {
+  joinSpectators(@ConnectedSocket() client: Socket, @MessageBody() roomID: string) {
     this.gameService.joinAsSpectator(client, roomID);
   }
 }

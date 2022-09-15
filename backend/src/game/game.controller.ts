@@ -9,9 +9,8 @@ export class GameController {
   @Get()
   @UseGuards(JwtAuthGuard)
   public async getAll() {
-
     const games = this.gameService.getCurrentGames();
 
-    return {games: games};
+    return { games: games };
   }
 }

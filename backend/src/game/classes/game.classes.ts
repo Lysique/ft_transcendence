@@ -1,5 +1,5 @@
-export const CANVAS_WIDTH = 500;
-export const CANVAS_HEIGHT = 500;
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../interfaces/game.interfaces';
+
 export class Ball {
   x: number;
   y: number;
@@ -14,7 +14,7 @@ export class Ball {
     this.radius = CANVAS_WIDTH / 50;
     this.speed = CANVAS_WIDTH / 100;
     this.velocityX = CANVAS_WIDTH / 150;
-    this.velocityY = CANVAS_WIDTH / 150;
+    this.velocityY = 0;
   }
 }
 
