@@ -50,8 +50,8 @@ export class MyGateway implements OnModuleInit {
     function leaveRoomEraseSocket(room,roomowner,roomadmin,roompassword,maproom,socketid,socket,server,listRoom,listUserr){
             
             roomowner.get(room) === socketid ? roomowner.delete(room) : null
-            maproom.get(room).forEach(elem => { if (elem === socketid) {maproom.get(room).delete(socketid);}});
-            maproom.get(room).size > 0 ? null : (maproom.delete(room),roompassword.delete(room),roomadmin.delete(room))
+            maproom.has(room) ? (maproom.get(room).forEach(elem => { if (elem === socketid) {maproom.get(room).delete(socketid);}})) : null;
+            maproom.has(room) ? (maproom.get(room).size > 0 ? null : (maproom.delete(room),roompassword.delete(room),roomadmin.delete(room))) : null;
             for (var i = 0; i < listRoom.length + 5;i++) 
             {
               listRoom.pop()
@@ -89,11 +89,9 @@ export class MyGateway implements OnModuleInit {
     this.roomadmin.set('joinroomname', new Set<string>);
     
     this.server.on('connection', (socket) => {
- 
-      
+  
     socket.join('joinroomname');
 
-    // version simplifier pour eviter le ternaire
     if (maproom.has('joinroomname'))
     {
       if (maproom.get('joinroomname').has(socket.id) === false)
@@ -107,14 +105,6 @@ export class MyGateway implements OnModuleInit {
       maproom.get('joinroomname').add(socket.id);
       this.roomadmin.set('joinroomname',new Set<string>);
     }
-    
-
-    /* ancien ternaire fonctionnel
-    maproom.has('joinroomname') ? 
-      ((maproom.get('joinroomname').has(socket.id)) ?  null : maproom.get('joinroomname').add(socket.id))
-      :
-      ((maproom.set('joinroomname', new Set<string>)),(maproom.get('joinroomname').add(socket.id)),this.roomadmin.set('joinroomname',new Set<string>))
-    */
 
       console.log(socket.id + ' Connected');
       
@@ -126,7 +116,6 @@ export class MyGateway implements OnModuleInit {
         this.listRoom.lastIndexOf(key) === -1 ? this.listRoom.push(key) : null;
     }
     
-
       this.server.emit('connected',{
         listUser : this.listUserr,
         roomlist : this.listRoom,
@@ -138,9 +127,6 @@ export class MyGateway implements OnModuleInit {
       console.log(this.roompassword);
 
 
-
-
-
                            /*********************** JOIN ROOM  ************************/
       
 
@@ -148,7 +134,6 @@ export class MyGateway implements OnModuleInit {
         console.log('jetapeunefoisici');
         let success = 0;
 
-        // version propre sans le ternaire
         if (maproom.has(userinfo.room))
         {
           if (this.roompassword.get(userinfo.room) === userinfo.inputpassword)
@@ -178,41 +163,32 @@ export class MyGateway implements OnModuleInit {
             success=1;
         }
         
-        /* ternaire remplace par if else
-        maproom.has(userinfo.room) ? 
-          (this.roompassword.get(userinfo.room) === userinfo.inputpassword) ?
-            maproom.has(userinfo.room) ? 
-          ((maproom.get(userinfo.room).has(socket.id)) ?  null : (maproom.get(userinfo.room).add(socket.id),socket.join(userinfo.room),socket.leave(userinfo.oldroom),success=1))
-          :
-          (maproom.set(userinfo.room,new Set<string>),maproom.get(userinfo.room).add(socket.id),socket.join(userinfo.room),socket.leave(userinfo.oldroom),success=1)
-          :
-          console.log('mauvais password')
-          :        
-          (maproom.set(userinfo.room,new Set<string>),maproom.get(userinfo.room).add(socket.id),this.roompassword.set(userinfo.room,userinfo.inputpassword),this.roomowner.set(userinfo.room,socket.id),this.roomadmin.set(userinfo.room, new Set<string>),socket.join(userinfo.room),socket.leave(userinfo.oldroom),success=1)     
-*/
         for (let key of maproom.keys()) {
           this.listRoom.lastIndexOf(key) === -1 ? this.listRoom.push(key) : null;
       }
 
-      if (success === 1){
-       socket.leave("joinroomname");
-       this.server.to(socket.id).emit('roomMove',{
-        listUser : this.listUserr,
-        roomlist : this.listRoom,
-        roompassworda : this.roompassword,
-        roomowner : this.roomowner,
-        mynewroom : userinfo.room,
-    });
-    this.server.emit('connected',{
-      listUser : this.listUserr,
-      roomlist : this.listRoom,
-      roompassword : this.roompassword,
-      roomowner : this.roomowner
-    });
-    console.log(maproom);
-      console.log(this.roomowner);
-      console.log(this.roompassword);
-  }
+      if (success === 1)
+      {
+          success = 0;
+          socket.leave("joinroomname");
+          this.server.to(socket.id).emit('roomMove',{
+            listUser : this.listUserr,
+            roomlist : this.listRoom,
+            roompassworda : this.roompassword,
+            roomowner : this.roomowner,
+            mynewroom : userinfo.room,
+          });
+
+          this.server.emit('connected',{
+          listUser : this.listUserr,
+          roomlist : this.listRoom,
+          roompassword : this.roompassword,
+          roomowner : this.roomowner
+          });
+          console.log(maproom);
+          console.log(this.roomowner);
+          console.log(this.roompassword);
+    }
       });
 
 
@@ -301,33 +277,33 @@ export class MyGateway implements OnModuleInit {
         });
 
 
-                  /*********************** SET ADMIN MUTE EVENT  ************************/
+        /*********************** SET ADMIN MUTE EVENT  ************************/
 
 
-                  socket.on("muteadminevent" ,(body:any) =>{   
-                    
-                    if ( (body.adminmutelist !== this.roomowner.get(body.room)) 
-                            && ( (this.roomowner.get(body.room) === body.socketid) || (this.roomadmin.get(body.room).has(body.socketid)) ))
-                    {   
-                      let tempdemute = 30;
-                      console.log('je veux mute' + body.adminmutelist);
-                      let room =body.room;
-                      this.server.to(body.adminmutelist).emit('mutedfromroom',{room,tempdemute});
-                    }
-                    });
+        socket.on("muteadminevent" ,(body:any) =>{   
+          
+          if ( (body.adminmutelist !== this.roomowner.get(body.room)) 
+                  && ( (this.roomowner.get(body.room) === body.socketid) || (this.roomadmin.get(body.room).has(body.socketid)) ))
+          {   
+            let tempdemute = 30;
+            console.log('je veux mute' + body.adminmutelist);
+            let room =body.room;
+            this.server.to(body.adminmutelist).emit('mutedfromroom',{room,tempdemute});
+          }
+          });
 
-                    /*********************** CHANGE PASSWORD  ************************/
+          /*********************** CHANGE PASSWORD  ************************/
 
-                    socket.on('changepw', (body:any) =>{
-                      if (this.roomowner.get(body.room) == body.socketid)
-                      {
-                        this.roompassword.set(body.room,body.newpw);
-                      }
-                      else
-                      {
-                        console.log('No Admin rights to change Password');
-                      }
-                    });
+          socket.on('changepw', (body:any) =>{
+            if (this.roomowner.get(body.room) == body.socketid)
+            {
+              this.roompassword.set(body.room,body.newpw);
+            }
+            else
+            {
+              console.log('No Admin rights to change Password');
+            }
+          });
 
 
 
