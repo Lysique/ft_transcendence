@@ -1,15 +1,7 @@
-//import { Socket } from 'net';
-import { IOType } from 'child_process';
-import { useContext, useEffect, useState, ReactComponentElement } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import * as React from 'react';
 
-import { REPL_MODE_SLOPPY } from 'repl';
-import { io } from 'socket.io-client';
-import { Tracing } from 'trace_events';
-import { StringMappingType, TypePredicateKind } from 'typescript';
 import { WebsocketContext } from '../../contexts/WebsocketContext';
-import { setEngine } from 'crypto';
-import { Server } from 'http';
 
 type MessagePayload = {
   content: string;
@@ -34,8 +26,7 @@ export const Websocket = () => {
   const [messages, setMessages] = useState<MessagePayload[]>([]);
   const [users, setUsers] = useState<UserPayload[]>([]);
   const [listMute, setListMute] = useState<string[]>([]);
-  //const listMute : string[] = [];
-  //const [RoomList, setRoomList] = useState<RoomPayload[]>([]);
+  const [listroomimmuted, setlistroomimmuted] = useState<string[]>([]);
   const [room, setRoom] = useState('joinroomname');
   const [oldroom, setOldroom] = useState('joinroomname');
   const socket = useContext(WebsocketContext);
@@ -43,8 +34,11 @@ export const Websocket = () => {
   const [inputpassword, setInputpassword] = useState('');
   const [kicklist, setKickList] = useState('');
   const [dmreceiver, setDmreceiver] = useState('');
-
-  const listderoom = useState(new Map<string,Set<string>>);
+  const [bantime, setbantime] = useState(0);
+  const [listroomimban, setlistroomimban] = useState<string[]>([]);
+  const [storebantemp, setstorebantemp] = useState<Map<any,any>>(new Map());
+  const [storemutetemp, setstoremutetemp] = useState<Map<any,any>>(new Map());
+  //faire un gigantesque set et l'envoyer au serv si deco pour conserver data local
 
 
 
@@ -54,47 +48,72 @@ export const Websocket = () => {
       
     });
     socket.on('connected', (newUser: UserPayload) => {
-      console.log(newUser);
       setUsers((prev) => [...prev, newUser]);        
     });
     socket.on('onMessage', (newMessage: MessagePayload) => {
-      console.log('onMessage event received!');
       listMute.indexOf(newMessage.socketid) === -1 ? (setMessages((prev) => [...prev, newMessage])) : console.log('user mute')
     });
     socket.on('forceleaveroom', (body:any) => {
       let socketid = socket.id;
-      console.log('jesuisforcedeleave');
       setOldroom(room);
+      let myoldroom = room;
       setRoom('joinroomname');
-      socket.emit('leavecurrentroom',{value, socketid, oldroom, room, listMute,kicklist});
+      socket.emit('leavecurrentroom',{value, socketid, myoldroom, room, listMute,kicklist});
   });
-  
-    const onLeaveCurrentRoom = () => {
-      console.log(room);
-      let socketid = socket.id;
-      if (kicklist == socketid)
-        setRoom('');
-      socket.emit('leavecurrentroom',{value, socketid, oldroom, room, listMute,kicklist});
-    }
-    
-    
+  socket.on('banfromserver', (body:any) => {
+    console.log(body.banroom);
+    //fixe ici a 30 pour test
+    setbantime(30);
+    let currentban = listroomimban;
+    currentban.push(body.banroom);
+    setlistroomimban(currentban);
+    console.log(listroomimban);
+    console.log(body.datefromban);
+    console.log(body.secondfromban);
+    console.log(currentban);
+    const datebanned = Date.now();
+    let tempmap = new Map();
+    tempmap.set(body.banroom, new Map());
+    tempmap.get(body.banroom).set('dateban',datebanned);
+    tempmap.get(body.banroom).set('dureeban',body.secondfromban);
+    let cpy = storebantemp;
+    cpy.set(body.banroom,tempmap.get(body.banroom));
+    console.log(cpy.get(body.banroom));
+    setstorebantemp(cpy);
+
+    //tempmap.set(body.banrom,body.secondfromban);
+    console.log(tempmap);
+    console.log('baalors');
+
+    console.log(storebantemp);
+
+});
+    socket.on('mutedfromroom', (body:any) => {
+      if (body.tempdemute !== -1){
+          console.log('on essai de me mute');
+          setmylistroom(body.room);
+          const datemuted = Date.now();
+          let cpy = new Map();
+          cpy.set('datemute',datemuted);
+          cpy.set('dureemute', body.tempdemute);
+          let temp = storemutetemp;
+          temp.set(body.room,cpy);
+          setstoremutetemp(temp);
+      }else{
+        let temp = storemutetemp;
+        temp.delete(body.room);
+        let listtemp = listroomimmuted.filter(elem => elem !== body.room);
+        setlistroomimmuted(listtemp);
+      }
+    });
+
     socket.on('roomMove', (newUser: UserPayload)  => {
       console.log(newUser);
       
       setUsers((prev) => [...prev, newUser]);
-      console.log(oldroom);
       setOldroom(oldroom);
       setRoom(newUser.mynewroom);
-      console.log(room);
       setValue(newUser.mynewroom);
-      setRoom(newUser.mynewroom);
-      joinRoom();
-      //setOldroom(room);
-      //setRoom(newUser.mynewroom);
-      /*
-      if (newUser.mynewroom === undefined)
-        setRoom('');
-        */
       });
       
     return () => {
@@ -103,11 +122,30 @@ export const Websocket = () => {
       socket.off('onMessage');
       socket.off('connection');
     };
-  }, [socket,listMute]);
+  },[socket]);
 
   const onSubmit = () => {
     let socketid = socket.id;
-    if (value.length > 0)
+    console.log(room);
+    console.log(listroomimmuted);
+
+  if (listroomimmuted.indexOf(room) !== -1)
+  {
+    let nowdate = Date.now();
+    console.log((nowdate - storemutetemp.get(room).get('datemute'))/300);
+    if (nowdate - storemutetemp.get(room).get('datemute') >= (storemutetemp.get(room).get('dureemute')*300))
+    {
+      let tempunmute = storemutetemp;
+      tempunmute.delete(room);
+      setstoremutetemp(tempunmute);
+
+      const templistunmute = listroomimmuted.filter(elem => elem !== room);
+      setlistroomimmuted(templistunmute);
+    }
+  }
+  
+
+    if (value.length > 0 && listroomimmuted.indexOf(room) === -1)
       socket.emit('newMessage', {value, socketid, oldroom, room, listMute});
 
     setCount(count + 1);
@@ -115,25 +153,12 @@ export const Websocket = () => {
   }
 
   const onLeaveCurrentRoom = () => {
-    console.log(room);
     let socketid = socket.id;
-    if (kicklist == socketid)
-      setRoom('');
     socket.emit('leavecurrentroom',{value, socketid, oldroom, room, listMute,kicklist});
   }
 
-
-  const onKick = () => {
-    console.log(dmreceiver);
-    let socketid = socket.id;
-    if (kicklist == socketid)
-      setRoom('');
-    socket.emit('kickevent',{value, socketid, oldroom, room, listMute,kicklist});
-  }
-
   const onPrivatemessage = () => {
-    let socketid = socket.id;
-    console.log('id du destinataire ' + dmreceiver);
+    let socketid = socket.id;;
     if (value.length > 0 )
     {
     socket.emit("private message", {
@@ -148,22 +173,31 @@ export const Websocket = () => {
   }
 };
 
-const onSetAdmin = () => {
-  let socketid = socket.id;
-  let selecteduser = dmreceiver;
-  console.log(dmreceiver);
-  console.log('jessai de setupadmin');
-  if (value !== socketid){
-  socket.emit('setadmin',{
-    socketid,
-    room,
-    selecteduser
-    })
-  }
-};
-  
 
   const joinRoom = () => {
+    console.log(listroomimban);
+
+    if (listroomimban.indexOf(room) !== -1) 
+    {
+      let nowdate = Date.now();
+      console.log((nowdate - (storebantemp.get(room).get('dateban')))/300);
+      console.log((storebantemp.get(room).get('dureeban') ));
+      if (nowdate - storebantemp.get(room).get('dateban') >= (storebantemp.get(room).get('dureeban') * 300))
+      {
+        console.log('jesuisdeban');
+        let tempunban = storebantemp;
+        tempunban.delete(room);
+        setstorebantemp(tempunban);
+        
+       const templistunban = listroomimban.filter(elem => elem !== room);
+       setlistroomimban(templistunban);
+
+    }
+  }
+    
+    if (listroomimban.indexOf(room) === -1) {
+    
+      console.log('je join la room : ' + room);
     if (room !== "") {
       let mamamia = socket.id;
       let delvalue = value;
@@ -177,25 +211,82 @@ const onSetAdmin = () => {
       })
 
     }
-  };
+  }
+  
+    
+    if (listroomimban.indexOf(room) !== -1) 
+      console.log('je ne peux pas rentrer car je suis ban');
+      setRoom(oldroom);  
+  }
+  
+  ;
 
   const clickMute = () => {
     console.log(listMute);
     console.log(count);
   };
 
-  function f1(){  
-    alert(value);
-}
 function fonKick(body:any){
     let socketid = socket.id;
     let kicklist = body;
-    if (body == socketid){
-      setRoom('');
-    socket.emit('kickevent',{value, socketid, oldroom, room, listMute,kicklist});}
+    if (socketid === body)
+      console.log('cant kick yourself');
+    else
+      socket.emit('kickevent',{value, socketid, oldroom, room, listMute,kicklist});
   }
 
+  function fonBan(body:any){
+    let socketid = socket.id;
+    let kicklist = body;
+    if (socketid === body)
+      console.log('can t ban yourself');
+    else
+      socket.emit('banevent',{value, socketid, oldroom, room, listMute,kicklist,bantime});
+  }
 
+  function seterdudm(body:any){
+    setDmreceiver(body);
+    let socketid = socket.id;
+    let selecteduser = body;
+    if (value !== socketid)
+    {
+      socket.emit('setadmin',{
+      socketid,
+      room,
+      selecteduser})
+    }
+  }
+
+  function setmylistroom(body:string){
+    const newlistroomimmuted = listroomimmuted;
+    if (newlistroomimmuted.indexOf(body) === -1)
+    {
+      newlistroomimmuted.push(body);
+      setlistroomimmuted(newlistroomimmuted);
+      console.log(newlistroomimmuted);
+      console.log(listroomimmuted);
+      console.log(body);
+      console.log('list de room im mute' + listroomimmuted);
+    }
+  }
+
+  function muteAsAdmin(body:any){
+    console.log('try tomute as admin');
+    let socketid = socket.id;
+    let adminmutelist = body;
+    if (body === socketid) 
+      console.log('can t mute yourself');
+    else
+      socket.emit('muteadminevent',{value, socketid, oldroom, room, listMute,adminmutelist});
+  }
+
+    const changePw = () => {
+      let socketid = socket.id;
+      let newpw = value;
+      socket.emit('changepw',{newpw, socketid,room});
+    }
+      
+  
 
 
 
@@ -230,7 +321,7 @@ function fonKick(body:any){
                 <div>
                   {users[users.length - 1].listUser.map((user) => (
                     <div>
-                  {user}<input type='button' value='Mute' onClick={(e) => [(listMute.indexOf(user) === -1 ? (setListMute((prev) => [...prev,user]),clickMute()) : setListMute(listMute.filter(muted => muted != user))),console.log(listMute)]} />
+                  {user}<input type='button' value='Mute' onClick={(e) => [(listMute.indexOf(user) === -1 ? (setListMute((prev) => [...prev,user]),clickMute()) : setListMute(listMute.filter(muted => muted !== user))),console.log(listMute)]} />
                   <button onClick={(event) => [setKickList(''),setKickList(user),onLeaveCurrentRoom()]}> Leave current room</button>
                   <button value={user} onClick={(e) => {fonKick(e.currentTarget.value)}}> kick</button>
         
@@ -244,10 +335,16 @@ function fonKick(body:any){
             onChange={(e) => [setValue(e.target.value),setDmreceiver(user)]}
           />
       <button onClick={() => [[setDmreceiver(user)],[onPrivatemessage()]]}> Send</button>
-      <button onClick={joinRoom}> Mute as admin</button>
-      <button onClick={joinRoom}> Ban as admin</button>
-      <button onClick={(event) => [setDmreceiver(user),onSetAdmin()]}> Set admin</button>
-      <button onClick={joinRoom}> PW change</button>
+      <button value={user} onClick={(e) => {muteAsAdmin(e.currentTarget.value)}}> Mute as admin</button>
+      <button value={user} onClick={(e) => {fonBan(e.currentTarget.value)}}> Ban as admin</button>
+      <button value={user} onClick={(e) => [seterdudm(e.currentTarget.value)]}> Set admin</button>
+      <input
+            placeholder="new PW"
+            type="text"
+            value={value}
+            onChange={(e) => [setValue(e.target.value)]}
+          />
+      <button onClick={changePw}> PW change</button>
                   <div>
 
         
@@ -327,43 +424,4 @@ function fonKick(body:any){
   </div>
     
   );
-
-
-/*
-const socket = io('http://localhost:3000/test');
-
-socket.on('connect', () => {
-    console.log('Connected', socket.id);
-    socket.emit('joinRoom', { room: 'room0', username: 'name1', password: 'pass@1234' });
-})
-
-socket.on('passwordFeedback', (data) => {
-    console.log(data);
-})
-*/
-
-/**
-<div>
-        
-<h5 style={{textAlign: "center"}}>list room</h5>
-<p style={{textAlign: "center"}}>
-
-        {RoomList.roomlist.length == null ? (
-          <div>dsad</div>
-        ) : (
-    
-        <div>
-          {RoomList.roomlist.map((room) => (
-            <div>
-              {room}
-              </div>
-          ))}
-          
-        </div>
-        )}
-</p>
-        
-
-</div>
-
-          */}
+}
