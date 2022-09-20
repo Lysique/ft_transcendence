@@ -112,6 +112,13 @@ export class AuthService {
         await this.modifyUserState(userDto, UserStatus.Offline);
     }
 
+    public isUserConnected(userDto: UserDto): boolean {
+        if (this.userSessions[userDto.id].length == 0) {
+            return false;
+        }
+        return true;
+    }
+
     public async getUserFromSocket(socket: Socket): Promise<UserDto | null> {
         const cookies = socket.handshake.headers.cookie;
 
@@ -137,6 +144,5 @@ export class AuthService {
         catch {
             return null;
         }
-
     }
 }

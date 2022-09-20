@@ -40,7 +40,7 @@ export class AuthController {
       res.cookie('jwt', accessToken, { httpOnly: true, sameSite: 'strict' });
     
       //  Redirect to the frontend
-      res.redirect(req.headers.referer);
+      res.redirect(process.env.FRONT_URL);
     }
 
     @UseGuards(JwtTwoFactAuthGuard)
@@ -57,7 +57,7 @@ export class AuthController {
       @Res({passthrough: true}) response: Response,
       @Req() req: Request,
       ) {
-      response.clearCookie('jwt');
+      response.clearCookie('jwt', { httpOnly: true, sameSite: 'strict' });
       const user: any = req.user;
       await this.authService.clearSession(user);
     }
