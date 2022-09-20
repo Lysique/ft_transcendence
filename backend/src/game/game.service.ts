@@ -11,7 +11,6 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserDto } from 'src/models/users/dto/user.dto';
 import { CreateGamePlayerDto } from './models/dto/create-gamePlayer.dto';
 import { User } from 'src/models/users/entities/user.entity';
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from './interfaces/game.interfaces';
 
 @Injectable()
 export class GameService {
