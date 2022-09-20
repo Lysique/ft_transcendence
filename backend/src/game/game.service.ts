@@ -5,21 +5,22 @@ import { Games } from './models/entities/game.entity';
 import { GamePlayer } from './models/entities/game_player.entity';
 import { Server, Socket } from 'socket.io';
 import { ConnectedSocket } from '@nestjs/websockets';
-import { Ball, Game } from './classes/game.classes';
-import { collision, resetBall, updateGame } from './utils/game.utils';
+import { Game } from './classes/game.classes';
+import { updateGame } from './utils/game.utils';
 import { AuthService } from 'src/auth/auth.service';
 import { UserDto } from 'src/models/users/dto/user.dto';
 import { CreateGamePlayerDto } from './models/dto/create-gamePlayer.dto';
-import { User } from 'src/models/users/entities/user.entity';
+import { User, UserStatus } from 'src/models/users/entities/user.entity';
+import { UsersService } from 'src/models/users/users.service';
 
 @Injectable()
 export class GameService {
   constructor(
     private authService: AuthService,
+    private userService: UsersService,
     @InjectRepository(Games) private gamesRepository: Repository<Games>,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(GamePlayer) private gamePlayerRepository: Repository<GamePlayer>,
-    private dataSource: DataSource,
   ) {
     this.queue = new Map();
     this.gameSessions = new Map();
@@ -93,6 +94,10 @@ export class GameService {
     gameInfo.player2.userID = user2.id;
     gameInfo.gameStatus = 'running';
 
+    /* update player status to 'In game' */
+    await this.userService.setStatus(user1.id, UserStatus.InGame);
+    await this.userService.setStatus(user2.id, UserStatus.InGame);
+
     /* set up room for game */
     gameInfo.gameID = id1.id + id2.id;
     id1.join(gameInfo.gameID);
@@ -142,7 +147,6 @@ export class GameService {
     }
   }
 
-
   /*
    **
    ** @Server loop
@@ -151,48 +155,52 @@ export class GameService {
 
   async serverLoop(server: Server, gameID: string) {
     const myInterval = setInterval(() => {
-      updateGame(this.gameSessions.get(gameID));
-      if (
-        this.gameSessions.get(gameID).player1.score >= 5 ||
-        this.gameSessions.get(gameID).player2.score >= 5 ||
-        this.gameSessions.get(gameID).gameStatus === 'stopped'
-      ) {
+      const gameSession: Game = this.gameSessions.get(gameID);
+      updateGame(gameSession);
+      if (gameSession.player1.score >= 5 || gameSession.player2.score >= 5 || gameSession.gameStatus === 'stopped') {
         clearInterval(myInterval);
-        if (this.gameSessions.get(gameID).gameStatus === 'stopped') {
-          server.to(gameID).emit('gameFinishedEarly', this.gameSessions.get(gameID).gameLoser);
+        if (gameSession.gameStatus === 'stopped') {
+          server.to(gameID).emit('gameFinishedEarly', gameSession.gameLoser);
         } else {
-          if (this.gameSessions.get(gameID).player1.score >= 5) {
-            this.gameSessions.get(gameID).gameWinner = this.gameSessions.get(gameID).player1.userName;
-            this.gameSessions.get(gameID).gameLoser = this.gameSessions.get(gameID).player2.userName;
+          if (gameSession.player1.score >= 5) {
+            gameSession.gameWinner = gameSession.player1.userName;
+            gameSession.gameLoser = gameSession.player2.userName;
           } else {
-            this.gameSessions.get(gameID).gameWinner = this.gameSessions.get(gameID).player2.userName;
-            this.gameSessions.get(gameID).gameLoser = this.gameSessions.get(gameID).player1.userName;
+            gameSession.gameWinner = gameSession.player2.userName;
+            gameSession.gameLoser = gameSession.player1.userName;
           }
-          this.gameSessions.get(gameID).gameStatus = 'stopped';
-          server.to(gameID).emit('gameFinished', this.gameSessions.get(gameID).gameWinner);
+          gameSession.gameStatus = 'stopped';
+          server.to(gameID).emit('gameFinished', gameSession.gameWinner);
           this.createGame().then(async (game) => {
             const player1Dto: CreateGamePlayerDto = {
               user: await this.userRepository.findOneBy({
-                id: this.gameSessions.get(gameID).player1.userID,
+                id: gameSession.player1.userID,
               }),
               game: game,
-              score: this.gameSessions.get(gameID).player1.score,
-              winner: this.gameSessions.get(gameID).player1.score > this.gameSessions.get(gameID).player2.score,
+              score: gameSession.player1.score,
+              winner: gameSession.player1.score > gameSession.player2.score,
             };
 
             const player2Dto: CreateGamePlayerDto = {
               user: await this.userRepository.findOneBy({
-                id: this.gameSessions.get(gameID).player2.userID,
+                id: gameSession.player2.userID,
               }),
               game: game,
-              score: this.gameSessions.get(gameID).player2.score,
-              winner: this.gameSessions.get(gameID).player2.score > this.gameSessions.get(gameID).player1.score,
+              score: gameSession.player2.score,
+              winner: gameSession.player2.score > gameSession.player1.score,
             };
 
             await this.createGamePlayer(player1Dto);
             await this.createGamePlayer(player2Dto);
+
+            console.log(await this.getGameStatForPlayer(gameSession.player1.userID));
           });
         }
+
+		 /* update player status to 'Online' */
+		 this.userService.setStatus(gameSession.player1.userID, UserStatus.Online);
+		 this.userService.setStatus(gameSession.player2.userID, UserStatus.Online);
+
         /* send all active game sessions */
         const gameSessions = [];
 
@@ -256,26 +264,43 @@ export class GameService {
     return this.gamePlayerRepository.save(newGamePlayer);
   }
 
-  //   customQuery(): any {
-  // 	return this.gamesRepository.createQueryBuilder("games").select("id").where()
-  //   }
+  async getGameStatForPlayer(userID: number): Promise<GamePlayer[]> {
+    const gameStats: GamePlayer[] = await this.gamePlayerRepository
+      .createQueryBuilder('gamePlayer')
+      .leftJoinAndSelect('gamePlayer.user', 'user')
+      .leftJoinAndSelect('gamePlayer.game', 'game')
+      .select(['gamePlayer.id', 'gamePlayer.score', 'gamePlayer.winner', 'user.name', 'game.id', 'game.date'])
+      .orderBy('game.date', 'ASC')
+      .where((qb) => {
+        const subQuery = qb
+          .subQuery()
+          .from(Games, 'game')
+          .leftJoin('game.gamePlayer', 'gamePlayer')
+          .leftJoin('gamePlayer.user', 'user')
+          .select(['game.id'])
+          .where('user.id = :id', { id: userID })
+          .getQuery();
+        return 'game.id IN ' + subQuery;
+      })
+      .getMany();
 
-  // async createMany(games: Games[]) {
-  // 	const queryRunner = this.dataSource.createQueryRunner();
+    const result = gameStats;
 
-  // 	await queryRunner.connect();
-  // 	await queryRunner.startTransaction();
-  // 	try {
-  // 	  await queryRunner.manager.save(games[0]);
-  // 	  await queryRunner.manager.save(games[1]);
-
-  // 	  await queryRunner.commitTransaction();
-  // 	} catch (err) {
-  // 	  // since we have errors lets rollback the changes we made
-  // 	  await queryRunner.rollbackTransaction();
-  // 	} finally {
-  // 	  // you need to release a queryRunner which was manually instantiated
-  // 	  await queryRunner.release();
-  // 	}
-  //   }
+    return gameStats;
+    /* {
+        key: 1,
+        date: "05/06/22",
+        winner: "tamighi",
+        loser: "patrick",
+        score: "5-3"
+    },
+    {
+        key: 2,
+        date: "05/06/22",
+        winner: "tamighi",
+        loser: "jean",
+        score: "5-2"
+    },
+	*/
+  }
 }

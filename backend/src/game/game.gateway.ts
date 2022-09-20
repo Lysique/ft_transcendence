@@ -38,6 +38,11 @@ export class GameGateway implements OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage('leaveQueue')
+  async leaveQueue(@ConnectedSocket() client: Socket) {
+    await this.gameService.removeFromQueue(client);
+  }
+
   @SubscribeMessage('paddleDown')
   paddleDown(@ConnectedSocket() client: Socket, @MessageBody() paddleInfo: PaddleInfo) {
     this.gameService.updatePaddle(client.id, paddleInfo[1], 'down', paddleInfo[0]);

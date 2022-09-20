@@ -105,8 +105,6 @@ export class MyGateway implements OnModuleInit {
       maproom.get('joinroomname').add(socket.id);
       this.roomadmin.set('joinroomname',new Set<string>);
     }
-
-      console.log(socket.id + ' Connected');
       
       this.listUserr.push(socket.id);
       for (var i = 0; i < this.listRoom.length;i++) {
@@ -122,9 +120,6 @@ export class MyGateway implements OnModuleInit {
         roompassword : this.roompassword,
         roomowner : this.roomowner
       });
-      console.log(maproom);
-      console.log(this.roomowner);
-      console.log(this.roompassword);
 
 
                            /*********************** JOIN ROOM  ************************/

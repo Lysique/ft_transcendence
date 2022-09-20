@@ -130,12 +130,9 @@ const SelectMode = () => {
       if (resp) {
         setData(resp.games);
       }
-	  console.log(resp?.games);
+      console.log(resp?.games);
     };
     fetchSessions();
-    // if (spectator === false) {
-    //   socket.emit("getGameSessions");
-    // }
   };
 
   /* Rules screen */
@@ -148,6 +145,11 @@ const SelectMode = () => {
   const socket = useContext(WebsocketContext);
   const launchGame = () => {
     socket.emit("joinQueue");
+  };
+
+  const handleClose = () => {
+    socket.emit("leaveQueue");
+	setOpen(false);
   };
 
   const navigate = useNavigate();
@@ -230,7 +232,14 @@ const SelectMode = () => {
         </Box>
       </Container>
       <div>
-        {spectator && <Spectator status={true} showActiveGames={showActiveGames} data={data} setData={setData} />}
+        {spectator && (
+          <Spectator
+            status={true}
+            showActiveGames={showActiveGames}
+            data={data}
+            setData={setData}
+          />
+        )}
       </div>
       <div>{rules && <Rules status={true} showRules={showRules} />}</div>
       <div>
@@ -238,7 +247,7 @@ const SelectMode = () => {
           <Backdrop
             sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
             open={open}
-            //   onClick={handleClose} // could add 'leave queue' if clicked
+            onClick={handleClose} // could add 'leave queue' if clicked
           >
             <CircularProgress color="inherit" />
             <Typography sx={{ m: 2 }}>
