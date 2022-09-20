@@ -57,7 +57,7 @@ export class AuthController {
       @Res({passthrough: true}) response: Response,
       @Req() req: Request,
       ) {
-      response.clearCookie('jwt');
+      response.clearCookie('jwt', { httpOnly: true, sameSite: 'strict' });
       const user: any = req.user;
       await this.authService.clearSession(user);
     }
