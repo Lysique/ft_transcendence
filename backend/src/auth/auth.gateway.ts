@@ -40,7 +40,6 @@ import { AuthService } from './auth.service';
     this.logger.log(`Client connected: ${client.id}`);
 
     this.authService.addToConnection(client, this.server);
-
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {

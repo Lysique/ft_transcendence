@@ -40,7 +40,7 @@ export class AuthController {
       res.cookie('jwt', accessToken, { httpOnly: true, sameSite: 'strict' });
     
       //  Redirect to the frontend
-      res.redirect(req.headers.referer);
+      res.redirect(process.env.FRONT_URL);
     }
 
     @UseGuards(JwtTwoFactAuthGuard)
