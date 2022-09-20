@@ -12,6 +12,7 @@ import { UserDto } from 'src/models/users/dto/user.dto';
 import { CreateGamePlayerDto } from './models/dto/create-gamePlayer.dto';
 import { User, UserStatus } from 'src/models/users/entities/user.entity';
 import { UsersService } from 'src/models/users/users.service';
+import { Result } from './interfaces/game.interfaces';
 
 @Injectable()
 export class GameService {
@@ -197,9 +198,9 @@ export class GameService {
           });
         }
 
-		 /* update player status to 'Online' */
-		 this.userService.setStatus(gameSession.player1.userID, UserStatus.Online);
-		 this.userService.setStatus(gameSession.player2.userID, UserStatus.Online);
+        /* update player status to 'Online' */
+        this.userService.setStatus(gameSession.player1.userID, UserStatus.Online);
+        this.userService.setStatus(gameSession.player2.userID, UserStatus.Online);
 
         /* send all active game sessions */
         const gameSessions = [];
@@ -264,7 +265,7 @@ export class GameService {
     return this.gamePlayerRepository.save(newGamePlayer);
   }
 
-  async getGameStatForPlayer(userID: number): Promise<GamePlayer[]> {
+  async getGameStatForPlayer(userID: number): Promise<Result[]> {
     const gameStats: GamePlayer[] = await this.gamePlayerRepository
       .createQueryBuilder('gamePlayer')
       .leftJoinAndSelect('gamePlayer.user', 'user')
@@ -284,9 +285,41 @@ export class GameService {
       })
       .getMany();
 
-    const result = gameStats;
+    let results: Result[] = [];
 
-    return gameStats;
+    for (let i: number = 0; i < gameStats.length - 1; i++) {
+      if (gameStats[i].game.id == gameStats[i + 1].game.id) {
+		let result = {
+			"key" : i,
+			"date" : gameStats[i].game.date,
+			"winner" : gameStats[i].winner ? gameStats[i].user.name : gameStats[i + 1].user.name,
+			"loser" : gameStats[i].winner ? gameStats[i + 1].user.name : gameStats[i].user.name,
+			"scoreWinner" : gameStats[i].winner ? gameStats[i].score : gameStats[i + 1].score,
+			"scoreLoser" : gameStats[i].winner ? gameStats[i + 1].score : gameStats[i].score,
+		}
+		results.push(result);
+      }
+    }
+
+    return results;
+
+    // [
+    // 	GamePlayer {
+    // 	  id: 22,
+    // 	  score: 0,
+    // 	  winner: false,
+    // 	  user: User { name: 'tamighi' },
+    // 	  game: Games { id: 11, date: 2022-09-20T10:40:36.352Z }
+    // 	},
+    // 	GamePlayer {
+    // 	  id: 21,
+    // 	  score: 5,
+    // 	  winner: true,
+    // 	  user: User { name: 'sgoffaux' },
+    // 	  game: Games { id: 11, date: 2022-09-20T10:40:36.352Z }
+    // 	},
+    // ]
+
     /* {
         key: 1,
         date: "05/06/22",
