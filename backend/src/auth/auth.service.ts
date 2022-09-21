@@ -106,29 +106,38 @@ export class AuthService {
     await this.modifyUserState(userDto, UserStatus.Offline);
   }
 
-  public async getUserFromSocket(socket: Socket): Promise<UserDto | null> {
-    const cookies = socket.handshake.headers.cookie;
-
-    if (!cookies) {
-      return null;
+    public isUserConnected(userDto: UserDto): boolean {
+        if (this.userSessions[userDto.id].length == 0) {
+            return false;
+        }
+        return true;
     }
 
-    const token = parse(cookies)['jwt'];
-    if (!token) {
-      return null;
-    }
+    public async getUserFromSocket(socket: Socket): Promise<UserDto | null> {
+        const cookies = socket.handshake.headers.cookie;
 
-    try {
-      const sub = this.jwtService.verify(token);
-      if (!sub) {
-        return null;
-      }
+        if (!cookies) {
+            return null;
+        }
+        
+        const token = parse(cookies)['jwt'];
+        if (!token) {
+            return null;
+        }
 
-      const userDto: UserDto | null = await this.usersService.findOneById(sub.sub);
-
-      return userDto;
-    } catch {
-      return null;
+        try {
+            const sub = this.jwtService.verify(token);
+            if (!sub) {
+                return null;
+            }
+    
+            const userDto: UserDto | null = await this.usersService.findOneById(sub.sub);
+    
+            return userDto;
+        }
+        catch {
+            return null;
+        }
     }
   }
 }

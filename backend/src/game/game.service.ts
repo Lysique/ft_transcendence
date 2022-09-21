@@ -39,7 +39,7 @@ export class GameService {
 
   async pushToQueue(client: Socket) {
     const currentUser: UserDto | null = await this.authService.getUserFromSocket(client);
-    if (!currentUser) {
+    if (!currentUser || !this.authService.isUserConnected(currentUser)) {
       client.emit('errorMsg', 'You have to be logged in to join a game!');
       return;
     }
