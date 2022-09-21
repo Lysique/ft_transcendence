@@ -36,3 +36,12 @@ export interface Game {
   player2: Player;
   gameID: string;
 }
+
+export interface Result {
+	key: number;
+	date: string;
+	winner: string;
+	loser: string;
+	scoreWinner: number;
+	scoreLoser: number;
+  }

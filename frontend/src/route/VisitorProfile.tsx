@@ -92,7 +92,7 @@ export const VisitorProfile = () => {
                 </Grid>
                 <Grid item >
                     <Item >
-                        <HistoryBar />
+                        {visited ? <HistoryBar userId={ visited.id}/> : '' }
                     </Item>
                 </Grid>
 

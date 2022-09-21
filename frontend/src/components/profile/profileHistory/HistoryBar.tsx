@@ -1,90 +1,77 @@
 import { Divider, List, ListItem, ListItemText, Typography } from "@mui/material";
-import React from "react";
+import { GameAPI } from "api/game.api";
+import { Result } from "interfaces/gameInterfaces";
+import React, { useEffect, useState } from "react";
 
-const historyList = [
-    {
-        key: 1,
-        date: "05/06/22",
-        winner: "tamighi",
-        loser: "patrick",
-        score: "5-3"
-    },
-    {
-        key: 2,
-        date: "05/06/22",
-        winner: "tamighi",
-        loser: "jean",
-        score: "5-2"
-    },
-    {
-        key: 3,
-        date: "05/06/22",
-        winner: "tamighi",
-        loser: "gilbert",
-        score: "5-3"
-    },
-    {
-        key: 4,
-        date: "05/06/22",
-        winner: "tamighi",
-        loser: "Alicia",
-        score: "5-3"
-    },
-    {
-        key: 5,
-        date: "05/06/22",
-        winner: "tamighi",
-        loser: "ImTheBest6969",
-        score: "5-1"
-    },
-    {
-        key: 6,
-        date: "05/06/22",
-        winner: "tamighi",
-        loser: "LouisDu59",
-        score: "5-0"
-    }
-]
+// const historyList = [
+//     {
+//         key: 1,
+//         date: "05/06/22",
+//         winner: "tamighi",
+//         loser: "patrick",
+//         score: "5-3"
+//     },
+//     {
+//         key: 2,
+//         date: "05/06/22",
+//         winner: "tamighi",
+//         loser: "jean",
+//         score: "5-2"
+//     },
+// ]
 
 
 
-export const HistoryBar = () => {
-    
-    return (
-        <>
-            <Typography variant="h6" display="flex" >
-                History: 
-            </Typography>
+export const HistoryBar = ({ userId }: {userId : number}) => {
+  const [historyList, setHistoryList] = useState<null | Result[]>(null);
 
-            <List
-                sx={{
-                    width: '100%',
-                    bgcolor: 'background.paper',
-                    overflow: 'auto',
-                    maxHeight: 300,
-                    '& ul': { padding: 1 },
-                    }}
-            >
-        {historyList.map((match) => (
-        <li key={`match-${match.key}`}>
-          <ul>
-              <ListItem key={`match-${match.key}`}>
-                <ListItemText primary={`${match.date}`}/>
-                <ListItemText 
-                primary={`Score : ${match.score}`} 
-                secondary={
-                <>
-                    Winner: {match.winner}
-                    <br/>
-                    Loser: {match.loser}
-                </>
-                } />
-              </ListItem>
-              <Divider component="li" />
-          </ul>
-        </li>
-      ))}
-            </List>
-        </>
-    );
-}
+  useEffect(() => {
+    const retrieveGameStats = async () => {
+      const resp: { games: Result[] } | null = await GameAPI.getGameStats(userId);
+	  console.log(resp, userId);
+      setHistoryList(resp ? resp.games : null);
+    };
+    retrieveGameStats();
+  }, [userId]);
+
+  return (
+    <>
+      <Typography variant="h6" display="flex">
+        History:
+      </Typography>
+
+      <List
+        sx={{
+          width: "100%",
+          bgcolor: "background.paper",
+          overflow: "auto",
+          maxHeight: 300,
+          "& ul": { padding: 1 },
+        }}
+      >
+        {historyList
+          ? historyList.map((match: any) => (
+              <li key={`match-${match.key}`}>
+                <ul>
+                  <ListItem key={`match-${match.key}`}>
+                    <ListItemText primary={`${match.date}`} />
+                    <ListItemText
+                      primary={`Score : ${match.scoreWinner} - ${match.scoreLoser}`}
+                      secondary={
+                        <>
+                          Winner: {match.winner}
+                          <br />
+                          Loser: {match.loser}
+                        </>
+                      }
+                    />
+                  </ListItem>
+                  <Divider component="li" />
+                </ul>
+              </li>
+            ))
+          : ""}
+      </List>
+    </>
+  );
+};

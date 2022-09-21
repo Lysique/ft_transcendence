@@ -88,7 +88,7 @@ export const Profile = () => {
           </Grid>
           <Grid item>
             <Item >
-              <HistoryBar />
+              {user? <HistoryBar userId={user.id}/> : ''}
             </Item>
           </Grid>
           <Grid item>

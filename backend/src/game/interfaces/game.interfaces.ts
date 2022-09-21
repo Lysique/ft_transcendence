@@ -8,7 +8,7 @@ export interface PaddleInfo {
 
 export interface Result {
   key: number;
-  date: Date;
+  date: string;
   winner: string;
   loser: string;
   scoreWinner: number;
