@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { UserDto } from "./api/dto/user.dto";
 import { UserAPI } from "./api/user.api";
@@ -12,8 +12,9 @@ import { VisitorProfile } from "./route/VisitorProfile";
 import SelectModeScreen from "route/SelectModePage";
 import ProTip from "components/generics/ProTip";
 import Copyright from "components/generics/CopyRight";
-import { socket, WebsocketProvider } from "./contexts/WebsocketContext";
+import { WebsocketContext, WebsocketProvider } from "./contexts/WebsocketContext";
 import { Chat } from "components/chat/Chat";
+import PlayWithMe from "components/generics/PlayWithMe";
 
 export const UserContext = React.createContext<UserDto | null>(null);
 export const SetUserContext = React.createContext<any>(null);
@@ -48,6 +49,7 @@ function App() {
 
   const [loggedIn, setLoggedIn] = React.useState(false);
 
+  const socket = useContext(WebsocketContext);
   React.useEffect(() => {
     const fetchProfile = async () => {
       const resp = await UserAPI.getUserProfile();
@@ -59,7 +61,7 @@ function App() {
     };
 
     fetchProfile();
-  }, []);
+  }, [socket]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -113,6 +115,8 @@ function App() {
                 }
               />
             </Routes>
+
+            <PlayWithMe />
             <ProTip />
             <Copyright />
           </div>

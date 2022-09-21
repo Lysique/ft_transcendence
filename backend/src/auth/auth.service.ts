@@ -12,7 +12,7 @@ import { UserStatus } from 'src/models/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
-  private userSessions: Map<number, number[]>;
+  private userSessions: Map<number, Socket[]>;
 
   constructor(private usersService: UsersService, private jwtService: JwtService) {
     this.userSessions = new Map();
@@ -83,7 +83,7 @@ export class AuthService {
       await this.modifyUserState(userDto, UserStatus.Online);
       server.emit('onUserChange');
     }
-    this.userSessions[userDto.id].push(client.id);
+    this.userSessions[userDto.id].push(client);
   }
 
   async removeFromConnection(client: Socket, server: Server) {
@@ -93,7 +93,7 @@ export class AuthService {
       return;
     }
 
-    const index = this.userSessions[userDto.id].indexOf(client.id);
+    const index = this.userSessions[userDto.id].indexOf(client);
     this.userSessions[userDto.id].splice(index, 1);
     if (this.userSessions[userDto.id].length === 0) {
       await this.modifyUserState(userDto, UserStatus.Offline);
@@ -106,37 +106,40 @@ export class AuthService {
     await this.modifyUserState(userDto, UserStatus.Offline);
   }
 
-    public isUserConnected(userDto: UserDto): boolean {
-        if (this.userSessions[userDto.id].length == 0) {
-            return false;
-        }
-        return true;
+  public isUserConnected(userDto: UserDto): boolean {
+    if (this.userSessions[userDto.id].length == 0) {
+      return false;
+    }
+    return true;
+  }
+
+  public async getUserFromSocket(socket: Socket): Promise<UserDto | null> {
+    const cookies = socket.handshake.headers.cookie;
+
+    if (!cookies) {
+      return null;
     }
 
-    public async getUserFromSocket(socket: Socket): Promise<UserDto | null> {
-        const cookies = socket.handshake.headers.cookie;
+    const token = parse(cookies)['jwt'];
+    if (!token) {
+      return null;
+    }
 
-        if (!cookies) {
-            return null;
-        }
-        
-        const token = parse(cookies)['jwt'];
-        if (!token) {
-            return null;
-        }
+    try {
+      const sub = this.jwtService.verify(token);
+      if (!sub) {
+        return null;
+      }
 
-        try {
-            const sub = this.jwtService.verify(token);
-            if (!sub) {
-                return null;
-            }
-    
-            const userDto: UserDto | null = await this.usersService.findOneById(sub.sub);
-    
-            return userDto;
-        }
-        catch {
-            return null;
-        }
+      const userDto: UserDto | null = await this.usersService.findOneById(sub.sub);
+
+      return userDto;
+    } catch {
+      return null;
     }
   }
+
+  getSocketsFromUser(userId: number): Socket[] {
+    return this.userSessions[userId];
+  }
+}

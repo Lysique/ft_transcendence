@@ -62,4 +62,24 @@ export class GameGateway implements OnGatewayDisconnect {
   joinSpectators(@ConnectedSocket() client: Socket, @MessageBody() roomID: string) {
     this.gameService.joinAsSpectator(client, roomID);
   }
+
+  @SubscribeMessage('inviteGame')
+  async inviteGame(@ConnectedSocket() client: Socket, @MessageBody() userID: number) {
+    const clients = this.gameService.inviteGame(client, userID);
+    if (clients.length) {
+      for (let i: number = 0; i < clients.length; i++) {
+        clients[i].join(userID.toString());
+      }
+      this.server.to(userID.toString()).emit('wantToPlay', await this.gameService.getUserNameFromSocket(client));
+    }
+  }
+
+  @SubscribeMessage('answerToInvite')
+  async answerToInvite(@ConnectedSocket() client: Socket, @MessageBody() body: {answer: boolean, id: number}) {
+   
+	console.log(body);
+
+
+
+  }
 }

@@ -246,6 +246,21 @@ export class GameService {
   joinAsSpectator(client: Socket, roomID: string) {
     client.join(this.gameSessions.get(roomID).gameID);
   }
+  /*
+   **
+   ** @InviteToGame
+   **
+   */
+
+  inviteGame(client: Socket, userID: number): Socket[] {
+    return this.authService.getSocketsFromUser(userID);
+  }
+
+  async getUserNameFromSocket(client: Socket) {
+    const { name, id } = await this.authService.getUserFromSocket(client);
+
+    return { name, id };
+  }
 
   /*
    **

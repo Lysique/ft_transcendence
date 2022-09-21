@@ -3,32 +3,12 @@ import { GameAPI } from "api/game.api";
 import { Result } from "interfaces/gameInterfaces";
 import React, { useEffect, useState } from "react";
 
-// const historyList = [
-//     {
-//         key: 1,
-//         date: "05/06/22",
-//         winner: "tamighi",
-//         loser: "patrick",
-//         score: "5-3"
-//     },
-//     {
-//         key: 2,
-//         date: "05/06/22",
-//         winner: "tamighi",
-//         loser: "jean",
-//         score: "5-2"
-//     },
-// ]
-
-
-
-export const HistoryBar = ({ userId }: {userId : number}) => {
+export const HistoryBar = ({ userId }: { userId: number }) => {
   const [historyList, setHistoryList] = useState<null | Result[]>(null);
 
   useEffect(() => {
     const retrieveGameStats = async () => {
       const resp: { games: Result[] } | null = await GameAPI.getGameStats(userId);
-	  console.log(resp, userId);
       setHistoryList(resp ? resp.games : null);
     };
     retrieveGameStats();
