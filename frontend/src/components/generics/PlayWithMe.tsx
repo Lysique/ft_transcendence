@@ -1,4 +1,5 @@
-import ValidationPopup from "components/utils/ValidationPopup";
+import ConfirmationPopup from "components/utils/ConfirmationPopup";
+import PwMPopUp from "components/utils/PwMPopUp";
 import { WebsocketContext } from "contexts/WebsocketContext";
 import { useContext, useEffect, useState } from "react";
 
@@ -21,24 +22,52 @@ function PlayWithMe() {
 
   const [open, setOpen] = useState<boolean>(false);
   const [validation, setValidation] = useState<boolean>(false);
+  const [answered, setAnswered] = useState<boolean>(false);
 
   useEffect(() => {
-    if (validation === true) {
+    if (answered === true) {
       socket.emit("answerToInvite", { answer: validation, id: userId });
       setValidation(false);
-    } else {
-      console.log("TO be fixed");
+      setAnswered(false);
     }
-  }, [validation, userId, socket]);
+  }, [validation, userId, socket, answered]);
+
+  useEffect(() => {
+    socket.on("closeInvite", () => {
+      setOpen(false);
+    });
+    return () => {
+      socket.off("closeInvite");
+    };
+  }, [socket]);
+
+  const [openRefused, setOpenRefused] = useState<boolean>(false);
+
+  useEffect(() => {
+    socket.on("inviteRefused", () => {
+      setOpenRefused(true);
+    });
+    return () => {
+      socket.off("inviteRefused");
+    };
+  }, [socket]);
 
   return (
-    <ValidationPopup
-      open={open}
-      setOpen={setOpen}
-      setValidation={setValidation}
-      title={"Wanna play with me?"}
-      message={`${inviter} wants to play a little game with you, up for the challenge?`}
-    />
+    <div>
+      <PwMPopUp
+        open={open}
+        setOpen={setOpen}
+        setValidation={setValidation}
+        setAnswered={setAnswered}
+        title={"Wanna play with me?"}
+        message={`${inviter} wants to play a little game with you, up for the challenge?`}
+      />
+      <ConfirmationPopup
+        open={openRefused}
+        setOpen={setOpenRefused}
+        message={"Your invite was declined!"}
+      />
+    </div>
   );
 }
 

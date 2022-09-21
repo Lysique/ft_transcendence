@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Games } from './models/entities/game.entity';
 import { GamePlayer } from './models/entities/game_player.entity';
 import { Server, Socket } from 'socket.io';
@@ -25,11 +25,13 @@ export class GameService {
   ) {
     this.queue = new Map();
     this.gameSessions = new Map();
+    this.invitationList = new Map();
   }
 
   /* Queue and game sessions */
   public queue: Map<string, Socket>;
   public gameSessions: Map<string, Game>;
+  public invitationList: Map<number, number[]>;
 
   /*
    **
@@ -252,13 +254,36 @@ export class GameService {
    **
    */
 
-  inviteGame(client: Socket, userID: number): Socket[] {
+  async addToInvitationList(client: Socket, invitedId: number) {
+    const currentUser: UserDto | null = await this.authService.getUserFromSocket(client);
+
+    let ids: number[] = this.invitationList.get(currentUser.id);
+    if (!ids) {
+      ids = [invitedId];
+    } else {
+      ids.push(invitedId);
+    }
+    this.invitationList.set(currentUser.id, ids);
+  }
+
+  async removeFromInvitationList(client: Socket, invitedId: number) {
+    const currentUser: UserDto | null = await this.authService.getUserFromSocket(client);
+
+    let ids: number[] = this.invitationList.get(invitedId);
+    console.log(ids);
+    const index = ids.indexOf(currentUser.id);
+    if (index > -1) {
+      ids.splice(index, 1);
+      this.invitationList.set(currentUser.id, ids);
+    }
+  }
+
+  getSocketsFromUser(userID: number): Socket[] {
     return this.authService.getSocketsFromUser(userID);
   }
 
-  async getUserNameFromSocket(client: Socket) {
+  async getUserFromSocket(client: Socket) {
     const { name, id } = await this.authService.getUserFromSocket(client);
-
     return { name, id };
   }
 
