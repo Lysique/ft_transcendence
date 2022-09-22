@@ -25,14 +25,14 @@ export class GameService {
   ) {
     this.queue = new Map();
     this.gameSessions = new Map();
-    this.invitationList = new Map();
+    this.newInvitationList = new Map();
   }
 
   /* Queue and game sessions */
   //  TODO: invitationList -> Map<number, {userIds: number[], socketId: number}[]>
   public queue: Map<string, Socket>;
   public gameSessions: Map<string, Game>;
-  public invitationList: Map<number, number[]>;
+  public newInvitationList: Map<number, {userIds: number[], userSocket: Socket}[]>;
 
   /*
    **
@@ -112,6 +112,7 @@ export class GameService {
     /* update player status to 'In game' */
     await this.userService.setStatus(user1.id, UserStatus.InGame);
     await this.userService.setStatus(user2.id, UserStatus.InGame);
+    server.emit('onUserChange');
 
     /* set up room for game */
     gameInfo.gameID = id1.id + id2.id;
@@ -176,6 +177,8 @@ export class GameService {
     const myInterval = setInterval(() => {
       const gameSession: Game = this.gameSessions.get(gameID);
       updateGame(gameSession);
+
+      //  TODO: Put end logic in an other function
       if (gameSession.player1.score >= 5 || gameSession.player2.score >= 5 || gameSession.gameStatus === 'stopped') {
         clearInterval(myInterval);
         if (gameSession.gameStatus === 'stopped') {
@@ -220,6 +223,7 @@ export class GameService {
         if (this.authService.isUserConnected(gameSession.player2.userID)) {
           this.userService.setStatus(gameSession.player2.userID, UserStatus.Online);
         }
+        server.emit('onUserChange');
 
         /* send all active game sessions */
         const gameSessions = [];
@@ -274,18 +278,26 @@ export class GameService {
    */
 
   closeAllInvitationsFromUser(server: Server, userID: number) {
-    const invitedUsers: number[] = this.invitationList.get(userID);
+
+    const invitedUsers: {userIds: number[], userSocket: Socket}[] = this.newInvitationList.get(userID);
+
     if (!invitedUsers) {
       return;
     }
-    for (let i = 0; i < invitedUsers.length; ++i) {
-      const invitedSockets = this.getSocketsFromUser(invitedUsers[i]);
 
-      for (let j = 0; j < invitedSockets.length; ++j) {
-        invitedSockets[j].join(userID.toString());
+    for (let i = 0; i < invitedUsers.length; ++i) {
+
+      for (let k = 0; k < invitedUsers[i].userIds.length; ++k) {
+
+        const invitedSockets = this.getSocketsFromUser(invitedUsers[i].userIds[k]);
+
+        for (let j = 0; j < invitedSockets.length; ++j) {
+          invitedSockets[j].join(userID.toString());
+        }
       }
     }
-    this.invitationList.delete(userID);
+
+    this.newInvitationList.delete(userID);
     server.to(userID.toString()).emit('closeInvite');
     server.socketsLeave(userID.toString());
   }
@@ -293,26 +305,35 @@ export class GameService {
   async addToInvitationList(client: Socket, invitedId: number) {
     const currentUser: UserDto | null = await this.authService.getUserFromSocket(client);
 
-    let ids: number[] = this.invitationList.get(currentUser.id);
+    let ids: {userIds: number[], userSocket: Socket}[] = this.newInvitationList.get(currentUser.id);
     if (!ids) {
-      ids = [invitedId];
+      ids = [{userIds: [invitedId], userSocket: client}];
     } else {
-      ids.push(invitedId);
+      for (let i = 0; i < ids.length; ++i) {
+        if (ids[i].userSocket.id === client.id)
+        ids[i].userIds.push(invitedId);
+      }
     }
-    this.invitationList.set(currentUser.id, ids);
+    this.newInvitationList.set(currentUser.id, ids);
   }
 
   //TODO: inviteeId instead of socket
   async removeFromInvitationList(inviteeSocket: Socket, inviterId: number) {
     const currentUser: UserDto | null = await this.authService.getUserFromSocket(inviteeSocket);
 
-    let ids: number[] = this.invitationList.get(inviterId);
-    console.log(ids);
-    const index = ids.indexOf(currentUser.id);
-    if (index > -1) {
-      ids.splice(index, 1);
-      this.invitationList.set(currentUser.id, ids);
+    let ids: {userIds: number[], userSocket: Socket}[] = this.newInvitationList.get(inviterId);
+
+    for (let i = 0; i < ids.length; ++i) {
+
+      const index = ids[i].userIds.indexOf(currentUser.id);
+
+      if (index > -1) {
+        ids.splice(index, 1);
+        this.newInvitationList.set(currentUser.id, ids);
+      }
+
     }
+
   }
 
   getSocketsFromUser(userID: number): Socket[] {

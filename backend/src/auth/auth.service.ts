@@ -119,7 +119,7 @@ export class AuthService {
   }
 
   public isUserConnected(userId: number): boolean {
-    if (this.userSessions.get(userId).length == 0) {
+    if (!this.userSessions.get(userId) || this.userSessions.get(userId).length == 0) {
       return false;
     }
     return true;

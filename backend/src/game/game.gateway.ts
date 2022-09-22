@@ -28,12 +28,12 @@ export class GameGateway implements OnGatewayDisconnect {
     await this.gameService.updateGameStatus(client);
   }
 
-  //TODO: logging out during game
-  //   @SubscribeMessage('loggedOut')
-  //   async loggedOut(@ConnectedSocket() client: Socket) {
-  // 	await this.gameService.removeFromQueue(client);
-  //     await this.gameService.updateGameStatus(client);
-  //   }
+  // TODO: logging out during game
+    @SubscribeMessage('userLogout')
+    async loggedOut(@ConnectedSocket() client: Socket) {
+      await this.gameService.removeFromQueue(client);
+      await this.gameService.updateGameStatus(client);
+    }
 
   @SubscribeMessage('joinQueue')
   async joinQueue(@ConnectedSocket() client: Socket) {
@@ -104,7 +104,14 @@ export class GameGateway implements OnGatewayDisconnect {
   @SubscribeMessage('answerToInvite')
   async answerToInvite(@ConnectedSocket() inviteeSocket: Socket, @MessageBody() body: { answer: boolean; inviterId: number }) {
     const inviteeUser = await this.gameService.getUserFromSocket(inviteeSocket);
+
+    const inviteeSockets = this.gameService.getSocketsFromUser(inviteeUser.id);
+    for (let i: number = 0; i < inviteeSockets.length; i++) {
+      inviteeSockets[i].join(inviteeUser.id.toString());
+    }
+
     this.server.to(inviteeUser.id.toString()).emit('closeInvite');
+    this.server.socketsLeave(inviteeUser.id.toString());
 
     //TODO: Only socket of inviter, not all sockets
     const inviterSockets = this.gameService.getSocketsFromUser(body.inviterId);
