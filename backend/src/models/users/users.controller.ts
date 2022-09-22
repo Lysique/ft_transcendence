@@ -46,7 +46,7 @@ export class UsersController {
   public async getAll() {
     const userDtos: UserDto[] = await this.usersService.findAll();
 
-    return userDtos;
+    return {users: userDtos};
   }
 
   @Post('/friend')
