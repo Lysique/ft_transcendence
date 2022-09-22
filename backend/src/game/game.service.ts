@@ -87,6 +87,10 @@ export class GameService {
     const user1: UserDto | null = await this.authService.getUserFromSocket(id1);
     const user2: UserDto | null = await this.authService.getUserFromSocket(id2);
 
+    /* close all invitations */
+    this.closeAllInvitationsFromUser(server, user1.id);
+    this.closeAllInvitationsFromUser(server, user2.id);
+
     /* set up game */
     const gameInfo = new Game();
     gameInfo.player1.socketID = id1.id;
@@ -254,6 +258,22 @@ export class GameService {
    **
    */
 
+
+  closeAllInvitationsFromUser(server: Server, userID: number) {
+    const invitedUsers: number[] = this.invitationList.get(userID);
+    if (!invitedUsers) {
+      return ;
+    }
+    for (let i = 0; i < invitedUsers.length; ++i) {
+      const invitedSockets = this.getSocketsFromUser(invitedUsers[i]);
+
+      for (let j = 0; j < invitedSockets.length; ++j) {
+        invitedSockets[j].join(userID.toString());
+      }
+    }
+    server.to(userID.toString()).emit('closeInvite');
+  }
+
   async addToInvitationList(client: Socket, invitedId: number) {
     const currentUser: UserDto | null = await this.authService.getUserFromSocket(client);
 
@@ -338,7 +358,8 @@ export class GameService {
         results.push(result);
       }
     }
-
     return results;
   }
+
+
 }

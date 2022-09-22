@@ -66,6 +66,11 @@ export class GameGateway implements OnGatewayDisconnect {
   @SubscribeMessage('inviteGame')
   async inviteGame(@ConnectedSocket() client: Socket, @MessageBody() userID: number) {
     const clients = this.gameService.getSocketsFromUser(userID);
+
+    if (!clients || clients.length === 0) {
+      //  TODO: Send error message
+      return ;
+    }
     await this.gameService.addToInvitationList(client, userID);
     if (clients.length) {
       for (let i: number = 0; i < clients.length; i++) {
@@ -77,7 +82,7 @@ export class GameGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage('answerToInvite')
   async answerToInvite(@ConnectedSocket() client: Socket, @MessageBody() body: { answer: boolean; id: number }) {
-    const { id } = await this.gameService.getUserFromSocket(client);
+    const { id, name } = await this.gameService.getUserFromSocket(client);
     this.server.to(id.toString()).emit('closeInvite');
 
     const clients = this.gameService.getSocketsFromUser(body.id);
@@ -88,11 +93,10 @@ export class GameGateway implements OnGatewayDisconnect {
     }
     if (body.answer === false) {
       await this.gameService.removeFromInvitationList(client, body.id);
-      this.server.to(body.id.toString()).emit('inviteRefused');
-	  //TODO: ???
+      this.server.to(body.id.toString()).emit('inviteRefused', { userName: name });
     } else {
-      //TODO: launch game with player who accepted invite
-      console.log('launch game');
+      //TODO: Launch game for all sockets from user
+      this.gameService.setUpGame(client, clients[0], this.server);
     }
   }
 }

@@ -44,7 +44,8 @@ function PlayWithMe() {
   const [openRefused, setOpenRefused] = useState<boolean>(false);
 
   useEffect(() => {
-    socket.on("inviteRefused", () => {
+    socket.on("inviteRefused", ({ userName }) => {
+      console.log(userName);
       setOpenRefused(true);
     });
     return () => {
