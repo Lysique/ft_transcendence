@@ -78,12 +78,15 @@ export class AuthService {
       return;
     }
 
-    if (!this.userSessions[userDto.id] || this.userSessions[userDto.id].length === 0) {
-      this.userSessions[userDto.id] = [];
+	let sockets = this.userSessions.get(userDto.id);
+
+    if (!sockets || sockets.length === 0) {
+      sockets = [];
       await this.modifyUserState(userDto, UserStatus.Online);
       server.emit('onUserChange');
     }
-    this.userSessions[userDto.id].push(client);
+	sockets.push(client);
+    this.userSessions.set(userDto.id, sockets);
   }
 
   async removeFromConnection(client: Socket, server: Server) {
@@ -93,21 +96,25 @@ export class AuthService {
       return;
     }
 
-    const index = this.userSessions[userDto.id].indexOf(client);
-    this.userSessions[userDto.id].splice(index, 1);
-    if (this.userSessions[userDto.id].length === 0) {
+	let sockets = this.userSessions.get(userDto.id);
+    const index = sockets.indexOf(client);
+    sockets.splice(index, 1);
+
+    if (sockets.length === 0) {
       await this.modifyUserState(userDto, UserStatus.Offline);
       server.emit('onUserChange');
     }
+
+	this.userSessions.set(userDto.id, sockets);
   }
 
   async clearSession(userDto: UserDto) {
-    this.userSessions[userDto.id] = [];
+    this.userSessions.delete(userDto.id);
     await this.modifyUserState(userDto, UserStatus.Offline);
   }
 
   public isUserConnected(userDto: UserDto): boolean {
-    if (this.userSessions[userDto.id].length == 0) {
+    if (this.userSessions.get(userDto.id).length == 0) {
       return false;
     }
     return true;
@@ -140,6 +147,6 @@ export class AuthService {
   }
 
   getSocketsFromUser(userId: number): Socket[] {
-    return this.userSessions[userId];
+    return this.userSessions.get(userId);
   }
 }

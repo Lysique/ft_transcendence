@@ -44,6 +44,7 @@ export const FriendButton = ({ friend, children }: FriendButtonProps) => {
 
   const inviteGame = () => {
     handleClose();
+	//TODO: Popup to say invite was succesfully launched
     socket.emit("inviteGame", friend.id);
   };
 

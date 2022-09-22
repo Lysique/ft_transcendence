@@ -61,7 +61,7 @@ export class GameService {
     this.queue.delete(client.id);
   }
 
-  async monitorQueue(server: Server): Promise<string> {
+  async monitorQueue(server: Server) {
     let gameID: string;
     if (this.queue.size === 2) {
       gameID = this.queue.get(Array.from(this.queue.keys())[0]).id + this.queue.get(Array.from(this.queue.keys())[1]).id;
@@ -73,7 +73,6 @@ export class GameService {
       );
       this.queue.clear();
     }
-    return gameID;
   }
 
   /*
@@ -122,6 +121,10 @@ export class GameService {
       }
     });
     server.emit('currentGameSessions', gameSessions);
+
+    server.to(gameInfo.gameID).emit('gameReady');
+    server.to(gameInfo.gameID).emit('gameLaunched', this.gameSessions.get(gameInfo.gameID));
+    await this.serverLoop(server, gameInfo.gameID);
   }
 
   /* Update game status in case one player left early or got disconnected */
@@ -258,11 +261,10 @@ export class GameService {
    **
    */
 
-
   closeAllInvitationsFromUser(server: Server, userID: number) {
     const invitedUsers: number[] = this.invitationList.get(userID);
     if (!invitedUsers) {
-      return ;
+      return;
     }
     for (let i = 0; i < invitedUsers.length; ++i) {
       const invitedSockets = this.getSocketsFromUser(invitedUsers[i]);
@@ -271,6 +273,7 @@ export class GameService {
         invitedSockets[j].join(userID.toString());
       }
     }
+    this.invitationList.delete(userID);
     server.to(userID.toString()).emit('closeInvite');
   }
 
@@ -286,10 +289,11 @@ export class GameService {
     this.invitationList.set(currentUser.id, ids);
   }
 
-  async removeFromInvitationList(client: Socket, invitedId: number) {
-    const currentUser: UserDto | null = await this.authService.getUserFromSocket(client);
+  //TODO: inviteeId instead of socket
+  async removeFromInvitationList(inviteeSocket: Socket, inviterId: number) {
+    const currentUser: UserDto | null = await this.authService.getUserFromSocket(inviteeSocket);
 
-    let ids: number[] = this.invitationList.get(invitedId);
+    let ids: number[] = this.invitationList.get(inviterId);
     console.log(ids);
     const index = ids.indexOf(currentUser.id);
     if (index > -1) {
@@ -299,9 +303,11 @@ export class GameService {
   }
 
   getSocketsFromUser(userID: number): Socket[] {
-    return this.authService.getSocketsFromUser(userID);
+    const sockets: Socket[] = this.authService.getSocketsFromUser(userID);
+    return sockets;
   }
 
+  //TODO: return whole user instead of partial data
   async getUserFromSocket(client: Socket) {
     const { name, id } = await this.authService.getUserFromSocket(client);
     return { name, id };
@@ -360,6 +366,4 @@ export class GameService {
     }
     return results;
   }
-
-
 }

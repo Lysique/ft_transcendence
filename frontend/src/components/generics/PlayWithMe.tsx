@@ -2,50 +2,51 @@ import ConfirmationPopup from "components/utils/ConfirmationPopup";
 import PwMPopUp from "components/utils/PwMPopUp";
 import { WebsocketContext } from "contexts/WebsocketContext";
 import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function PlayWithMe() {
   const socket = useContext(WebsocketContext);
 
-  const [inviter, setInviter] = useState<string>("");
-  const [userId, setUserId] = useState<number>(0);
+  const [inviterName, setInviterName] = useState<string>("");
+  const [inviterId, setInviterId] = useState<number>(0);
+  const [openInvitation, setOpenInvitation] = useState<boolean>(false);
+  const [validation, setValidation] = useState<boolean>(false);
+  const [answered, setAnswered] = useState<boolean>(false);
 
   useEffect(() => {
     socket.on("wantToPlay", ({ name, id }: { name: string; id: number }) => {
-      setInviter(name);
-      setUserId(id);
-      setOpen(true);
+      setInviterName(name);
+      setInviterId(id);
+      setOpenInvitation(true);
     });
     return () => {
       socket.off("wantToPlay");
     };
   }, [socket]);
 
-  const [open, setOpen] = useState<boolean>(false);
-  const [validation, setValidation] = useState<boolean>(false);
-  const [answered, setAnswered] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (answered === true) {
-      socket.emit("answerToInvite", { answer: validation, id: userId });
-      setValidation(false);
-      setAnswered(false);
-    }
-  }, [validation, userId, socket, answered]);
-
   useEffect(() => {
     socket.on("closeInvite", () => {
-      setOpen(false);
+      setOpenInvitation(false);
     });
     return () => {
       socket.off("closeInvite");
     };
   }, [socket]);
 
+  useEffect(() => {
+    if (answered === true) {
+      socket.emit("answerToInvite", { answer: validation, inviterId: inviterId });
+      setValidation(false);
+      setAnswered(false);
+    }
+  }, [validation, inviterId, socket, answered]);
+
   const [openRefused, setOpenRefused] = useState<boolean>(false);
 
   useEffect(() => {
     socket.on("inviteRefused", ({ userName }) => {
       console.log(userName);
+      //TODO: popup to tell inviter that userName declined his request to play
       setOpenRefused(true);
     });
     return () => {
@@ -53,15 +54,25 @@ function PlayWithMe() {
     };
   }, [socket]);
 
+  const navigate = useNavigate();
+  useEffect(() => {
+    socket.on("gameReady", () => {
+      navigate("/game");
+    });
+    return () => {
+      socket.off("gameReady");
+    };
+  });
+
   return (
     <div>
       <PwMPopUp
-        open={open}
-        setOpen={setOpen}
+        open={openInvitation}
+        setOpen={setOpenInvitation}
         setValidation={setValidation}
         setAnswered={setAnswered}
         title={"Wanna play with me?"}
-        message={`${inviter} wants to play a little game with you, up for the challenge?`}
+        message={`${inviterName} wants to play a little game with you, up for the challenge?`}
       />
       <ConfirmationPopup
         open={openRefused}
