@@ -5,6 +5,7 @@ import {
     OnGatewayConnection,
     ConnectedSocket,
     OnGatewayInit,
+    SubscribeMessage,
   } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
@@ -47,5 +48,16 @@ import { AuthService } from './auth.service';
     this.logger.log(`Client disconnected: ${client.id}`);
 
     await this.authService.removeFromConnection(client, this.server);
+  }
+
+  @SubscribeMessage('userUpdate')
+  emitUpdate() {
+    this.server.emit('onUserChange');
+  }
+
+
+  @SubscribeMessage('userLogout')
+  userLogout() {
+    this.server.emit('onUserChange');
   }
 }

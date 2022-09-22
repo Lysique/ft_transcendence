@@ -97,6 +97,9 @@ export class AuthService {
     }
 
     let sockets = this.userSessions.get(userDto.id);
+    if (!sockets) {
+      return ;
+    }
     const index = sockets.indexOf(client);
     if (index > -1) {
       sockets.splice(index, 1);

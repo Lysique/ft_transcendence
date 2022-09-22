@@ -18,9 +18,4 @@ import { UsersService } from './users.service';
 
   @WebSocketServer()
   server: Server;
-
-  @SubscribeMessage('userUpdate')
-  emitUpdate() {
-    this.server.emit('onUserChange');
-  }
 }

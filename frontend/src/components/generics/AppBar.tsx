@@ -76,7 +76,7 @@ const ResponsiveAppBar = ({ handleToggle, setLoggedIn }: ResponsiveAppBarProps) 
     await UserAPI.logout();
     setUser(null);
     setLoggedIn(false);
-    socket.emit('userUpdate');
+    socket.emit('userLogout');
   }
 
   function LogoutButton() {

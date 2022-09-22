@@ -29,6 +29,7 @@ export class GameService {
   }
 
   /* Queue and game sessions */
+  //  TODO: invitationList -> Map<number, {userIds: number[], socketId: number}[]>
   public queue: Map<string, Socket>;
   public gameSessions: Map<string, Game>;
   public invitationList: Map<number, number[]>;

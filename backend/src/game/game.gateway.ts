@@ -76,12 +76,6 @@ export class GameGateway implements OnGatewayDisconnect {
       return;
     }
 
-    //  ADDED: Check if inviter is already in game
-    if (inviterUser.status === UserStatus.InGame) {
-      this.server.to(inviterSocket.id).emit('errorGameInvite', { errorMsg: 'You are already in a game!' });
-      return;
-    }
-
     const inviteeSockets = this.gameService.getSocketsFromUser(inviteeID);
 
     if (!inviteeSockets || inviteeSockets.length === 0) {

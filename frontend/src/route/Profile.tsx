@@ -40,6 +40,16 @@ export const Profile = () => {
     };
   }, [socket, setUser]);
 
+  React.useEffect(() => {    
+    socket.on("forceLogout", () => {
+        setUser(null);
+    });
+
+    return () => {
+        socket.off("foceLogout");
+    };
+  }, [socket, setUser]);
+
   return (
     <>
       <Grid container spacing={3} sx={{ ml: 1, mt: 1 }}>

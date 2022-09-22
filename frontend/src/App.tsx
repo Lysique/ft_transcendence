@@ -50,17 +50,49 @@ function App() {
   const [loggedIn, setLoggedIn] = React.useState(false);
 
   const socket = useContext(WebsocketContext);
+
   React.useEffect(() => {
     const fetchProfile = async () => {
-      const resp = await UserAPI.getUserProfile();
-      setUser(resp);
+      const respUser = await UserAPI.getUserProfile();
+      setUser(respUser);
 
-      const logged = await UserAPI.isLoggedIn();
-      setLoggedIn(logged.loggedIn);
-      socket.emit("userUpdate");
+      if (!respUser) {
+        const logged = await UserAPI.isLoggedIn();
+        setLoggedIn(logged.loggedIn);
+      }
+      else {
+        setLoggedIn(true);
+      }
+
+      if (respUser) {
+        socket.emit("userUpdate");
+      }
     };
 
     fetchProfile();
+    // eslint-disable-next-line
+  }, []);
+
+  React.useEffect(() => {
+    socket.on("onUserChange", () => {
+      const fetchProfile = async () => {
+        const respUser = await UserAPI.getUserProfile();
+        setUser(respUser);
+  
+        if (!respUser) {
+          const logged = await UserAPI.isLoggedIn();
+          setLoggedIn(logged.loggedIn);
+        }
+        else {
+          setLoggedIn(true);
+        }
+      };
+  
+      fetchProfile();
+    });
+    return () => {
+      socket.off("onUserChange");
+    };
   }, [socket]);
 
   return (
