@@ -68,6 +68,20 @@ export class GameGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage('inviteGame')
   async inviteGame(@ConnectedSocket() inviterSocket: Socket, @MessageBody() inviteeID: number) {
+
+    //  ADDED: Check if inviter has logout from other browser before inviting
+    const inviterUser = await this.gameService.getUserFromSocket(inviterSocket);
+    if (!inviterUser || inviterUser.status === UserStatus.Offline) {
+      this.server.to(inviterSocket.id).emit('errorGameInvite', { errorMsg: 'An error has occured, please refresh the page.' });
+      return;
+    }
+
+    //  ADDED: Check if inviter is already in game
+    if (inviterUser.status === UserStatus.InGame) {
+      this.server.to(inviterSocket.id).emit('errorGameInvite', { errorMsg: 'You are already in a game!' });
+      return;
+    }
+
     const inviteeSockets = this.gameService.getSocketsFromUser(inviteeID);
 
     if (!inviteeSockets || inviteeSockets.length === 0) {

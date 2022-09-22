@@ -45,6 +45,14 @@ export class GameService {
       client.emit('errorMsg', 'You have to be logged in to join a game!');
       return;
     }
+
+    //  ADDED: Check if user try to do matchmaking while in game
+    //  TODO: Group error messages ? (errorGameInvite vs errorMsg => same -> errorGameMessage)
+    if (currentUser.status === UserStatus.InGame) {
+      client.emit('errorMsg', 'You are already in a game!');
+      return;
+    }
+
     if (this.queue.size === 1) {
       const userInQueue: UserDto | null = await this.authService.getUserFromSocket(
         this.queue.get(Array.from(this.queue.keys())[0]),
