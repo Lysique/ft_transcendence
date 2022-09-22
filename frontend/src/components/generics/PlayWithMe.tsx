@@ -41,16 +41,29 @@ function PlayWithMe() {
     }
   }, [validation, inviterId, socket, answered]);
 
-  const [openRefused, setOpenRefused] = useState<boolean>(false);
+  const [openNotif, setOpenNotif] = useState<boolean>(false);
+  const [notifMessage, setNotifMessage] = useState<string>("");
 
   useEffect(() => {
-    socket.on("inviteRefused", ({ userName }) => {
-      console.log(userName);
-      //TODO: popup to tell inviter that userName declined his request to play
-      setOpenRefused(true);
+    socket.on("inviteSuccessfullySent", () => {
+      setNotifMessage(`Invitation successfully sent!`);
+      setOpenNotif(true);
     });
+
+    socket.on("errorGameInvite", ({ errorMsg }) => {
+      setNotifMessage(`${errorMsg}`);
+      setOpenNotif(true);
+    });
+
+    socket.on("inviteRefused", ({ userName }) => {
+      setNotifMessage(`${userName} declined your invitation to play a game!`);
+      setOpenNotif(true);
+    });
+
     return () => {
       socket.off("inviteRefused");
+      socket.off("errorGameInvite");
+      socket.off("inviteSuccessfullySent");
     };
   }, [socket]);
 
@@ -74,11 +87,7 @@ function PlayWithMe() {
         title={"Wanna play with me?"}
         message={`${inviterName} wants to play a little game with you, up for the challenge?`}
       />
-      <ConfirmationPopup
-        open={openRefused}
-        setOpen={setOpenRefused}
-        message={"Your invite was declined!"}
-      />
+      <ConfirmationPopup open={openNotif} setOpen={setOpenNotif} message={notifMessage} />
     </div>
   );
 }

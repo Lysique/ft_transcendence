@@ -44,7 +44,6 @@ export const FriendButton = ({ friend, children }: FriendButtonProps) => {
 
   const inviteGame = () => {
     handleClose();
-	//TODO: Popup to say invite was succesfully launched
     socket.emit("inviteGame", friend.id);
   };
 
@@ -56,8 +55,7 @@ export const FriendButton = ({ friend, children }: FriendButtonProps) => {
     if (validation === true) {
       removeFriend();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [validation]);
+  }, [validation, friend.id, setUser]);
 
   return (
     <>

@@ -41,7 +41,7 @@ export class GameService {
 
   async pushToQueue(client: Socket) {
     const currentUser: UserDto | null = await this.authService.getUserFromSocket(client);
-    if (!currentUser || !this.authService.isUserConnected(currentUser)) {
+    if (!currentUser || !this.authService.isUserConnected(currentUser.id)) {
       client.emit('errorMsg', 'You have to be logged in to join a game!');
       return;
     }
@@ -204,10 +204,13 @@ export class GameService {
             await this.createGamePlayer(player2Dto);
           });
         }
-
         /* update player status to 'Online' */
-        this.userService.setStatus(gameSession.player1.userID, UserStatus.Online);
-        this.userService.setStatus(gameSession.player2.userID, UserStatus.Online);
+        if (this.authService.isUserConnected(gameSession.player1.userID)) {
+          this.userService.setStatus(gameSession.player1.userID, UserStatus.Online);
+        }
+        if (this.authService.isUserConnected(gameSession.player2.userID)) {
+          this.userService.setStatus(gameSession.player2.userID, UserStatus.Online);
+        }
 
         /* send all active game sessions */
         const gameSessions = [];
@@ -275,6 +278,7 @@ export class GameService {
     }
     this.invitationList.delete(userID);
     server.to(userID.toString()).emit('closeInvite');
+    server.socketsLeave(userID.toString());
   }
 
   async addToInvitationList(client: Socket, invitedId: number) {
@@ -309,8 +313,8 @@ export class GameService {
 
   //TODO: return whole user instead of partial data
   async getUserFromSocket(client: Socket) {
-    const { name, id } = await this.authService.getUserFromSocket(client);
-    return { name, id };
+    const userDto = await this.authService.getUserFromSocket(client);
+    return userDto;
   }
 
   /*

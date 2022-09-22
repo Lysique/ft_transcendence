@@ -78,14 +78,14 @@ export class AuthService {
       return;
     }
 
-	let sockets = this.userSessions.get(userDto.id);
+    let sockets = this.userSessions.get(userDto.id);
 
     if (!sockets || sockets.length === 0) {
       sockets = [];
       await this.modifyUserState(userDto, UserStatus.Online);
       server.emit('onUserChange');
     }
-	sockets.push(client);
+    sockets.push(client);
     this.userSessions.set(userDto.id, sockets);
   }
 
@@ -96,16 +96,18 @@ export class AuthService {
       return;
     }
 
-	let sockets = this.userSessions.get(userDto.id);
+    let sockets = this.userSessions.get(userDto.id);
     const index = sockets.indexOf(client);
-    sockets.splice(index, 1);
+    if (index > -1) {
+      sockets.splice(index, 1);
+    }
 
-    if (sockets.length === 0) {
+    if (!sockets || sockets.length === 0) {
       await this.modifyUserState(userDto, UserStatus.Offline);
       server.emit('onUserChange');
     }
 
-	this.userSessions.set(userDto.id, sockets);
+    this.userSessions.set(userDto.id, sockets);
   }
 
   async clearSession(userDto: UserDto) {
@@ -113,8 +115,8 @@ export class AuthService {
     await this.modifyUserState(userDto, UserStatus.Offline);
   }
 
-  public isUserConnected(userDto: UserDto): boolean {
-    if (this.userSessions.get(userDto.id).length == 0) {
+  public isUserConnected(userId: number): boolean {
+    if (this.userSessions.get(userId).length == 0) {
       return false;
     }
     return true;

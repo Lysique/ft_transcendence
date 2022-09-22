@@ -10,7 +10,6 @@ import { styled, useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import Rules from "components/game/Rules";
 import Spectator from "components/game/Spectator";
-import { useNavigate } from "react-router-dom";
 import ConfirmationPopup from "components/utils/ConfirmationPopup";
 import { GameAPI } from "api/game.api";
 import { Game } from "interfaces/gameInterfaces";
@@ -149,18 +148,8 @@ const SelectMode = () => {
 
   const handleClose = () => {
     socket.emit("leaveQueue");
-	setOpen(false);
+    setOpen(false);
   };
-
-  const navigate = useNavigate();
-  useEffect(() => {
-    socket.on("gameReady", () => {
-      navigate("/game");
-    });
-    return () => {
-      socket.off("gameReady");
-    };
-  });
 
   return (
     <div className="Gamepage">
@@ -247,7 +236,7 @@ const SelectMode = () => {
           <Backdrop
             sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
             open={open}
-            onClick={handleClose} // could add 'leave queue' if clicked
+            onClick={handleClose}
           >
             <CircularProgress color="inherit" />
             <Typography sx={{ m: 2 }}>
