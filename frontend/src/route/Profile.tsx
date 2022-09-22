@@ -26,27 +26,27 @@ export const Profile = () => {
 
   const socket = React.useContext(WebsocketContext);
   React.useEffect(() => {
-    const fetchProfile = async() => {
-        const resp = await UserAPI.getUserProfile();
-        setUser(resp);
-    }
-    
+    const fetchProfile = async () => {
+      const resp = await UserAPI.getUserProfile();
+      setUser(resp);
+    };
+
     socket.on("onUserChange", () => {
-        fetchProfile();
+      fetchProfile();
     });
 
     return () => {
-        socket.off("onUserChange");
+      socket.off("onUserChange");
     };
   }, [socket, setUser]);
 
-  React.useEffect(() => {    
+  React.useEffect(() => {
     socket.on("forceLogout", () => {
-        setUser(null);
+      setUser(null);
     });
 
     return () => {
-        socket.off("foceLogout");
+      socket.off("foceLogout");
     };
   }, [socket, setUser]);
 
@@ -65,7 +65,7 @@ export const Profile = () => {
           <Grid item xs={1}></Grid>
 
           <Grid item xs={6}>
-            <Item >
+            <Item>
               <Typography variant="h2" display="flex">
                 {user?.name}'s profile
               </Typography>
@@ -97,9 +97,7 @@ export const Profile = () => {
             </Item>
           </Grid>
           <Grid item>
-            <Item >
-              {user? <HistoryBar userId={user.id}/> : ''}
-            </Item>
+            <Item>{user ? <HistoryBar userId={user.id} /> : ""}</Item>
           </Grid>
           <Grid item>
             <Item>

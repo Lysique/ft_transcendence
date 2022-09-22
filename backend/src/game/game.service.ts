@@ -29,10 +29,9 @@ export class GameService {
   }
 
   /* Queue and game sessions */
-  //  TODO: invitationList -> Map<number, {userIds: number[], socketId: number}[]>
   public queue: Map<string, Socket>;
   public gameSessions: Map<string, Game>;
-  public newInvitationList: Map<number, {userIds: number[], userSocket: Socket}[]>;
+  public newInvitationList: Map<number, { userIds: number[]; userSocket: Socket }[]>;
 
   /*
    **
@@ -47,8 +46,6 @@ export class GameService {
       return;
     }
 
-    //  ADDED: Check if user try to do matchmaking while in game
-    //  TODO: Group error messages ? (errorGameInvite vs errorMsg => same -> errorGameMessage)
     if (currentUser.status === UserStatus.InGame) {
       client.emit('errorMsg', 'You are already in a game!');
       return;
@@ -173,67 +170,72 @@ export class GameService {
    **
    */
 
+  async endGame(myInterval: any, gameSession: Game, server: Server, gameID: string) {
+    clearInterval(myInterval);
+    if (gameSession.gameStatus === 'stopped') {
+      server.to(gameID).emit('gameFinishedEarly', gameSession.gameLoser);
+    } else {
+      if (gameSession.player1.score >= 5) {
+        gameSession.gameWinner = gameSession.player1.userName;
+        gameSession.gameLoser = gameSession.player2.userName;
+      } else {
+        gameSession.gameWinner = gameSession.player2.userName;
+        gameSession.gameLoser = gameSession.player1.userName;
+      }
+      gameSession.gameStatus = 'stopped';
+      server.to(gameID).emit('gameFinished', gameSession.gameWinner);
+      this.createGame().then(async (game) => {
+        const player1Dto: CreateGamePlayerDto = {
+          user: await this.userRepository.findOneBy({
+            id: gameSession.player1.userID,
+          }),
+          game: game,
+          score: gameSession.player1.score,
+          winner: gameSession.player1.score > gameSession.player2.score,
+        };
+
+        const player2Dto: CreateGamePlayerDto = {
+          user: await this.userRepository.findOneBy({
+            id: gameSession.player2.userID,
+          }),
+          game: game,
+          score: gameSession.player2.score,
+          winner: gameSession.player2.score > gameSession.player1.score,
+        };
+
+        await this.createGamePlayer(player1Dto);
+        await this.createGamePlayer(player2Dto);
+      });
+    }
+
+    /* update player status to 'Online' */
+    if (this.authService.isUserConnected(gameSession.player1.userID)) {
+      await this.userService.setStatus(gameSession.player1.userID, UserStatus.Online);
+    }
+    if (this.authService.isUserConnected(gameSession.player2.userID)) {
+      await this.userService.setStatus(gameSession.player2.userID, UserStatus.Online);
+    }
+    server.emit('onUserChange');
+
+    /* send all active game sessions */
+    const gameSessions = [];
+
+    this.gameSessions.forEach((value: Game, key: string) => {
+      if (value.gameStatus === 'running') {
+        gameSessions.push(value);
+      }
+    });
+
+    server.emit('currentGameSessions', gameSessions);
+  }
+
   async serverLoop(server: Server, gameID: string) {
     const myInterval = setInterval(() => {
       const gameSession: Game = this.gameSessions.get(gameID);
       updateGame(gameSession);
 
-      //  TODO: Put end logic in an other function
       if (gameSession.player1.score >= 5 || gameSession.player2.score >= 5 || gameSession.gameStatus === 'stopped') {
-        clearInterval(myInterval);
-        if (gameSession.gameStatus === 'stopped') {
-          server.to(gameID).emit('gameFinishedEarly', gameSession.gameLoser);
-        } else {
-          if (gameSession.player1.score >= 5) {
-            gameSession.gameWinner = gameSession.player1.userName;
-            gameSession.gameLoser = gameSession.player2.userName;
-          } else {
-            gameSession.gameWinner = gameSession.player2.userName;
-            gameSession.gameLoser = gameSession.player1.userName;
-          }
-          gameSession.gameStatus = 'stopped';
-          server.to(gameID).emit('gameFinished', gameSession.gameWinner);
-          this.createGame().then(async (game) => {
-            const player1Dto: CreateGamePlayerDto = {
-              user: await this.userRepository.findOneBy({
-                id: gameSession.player1.userID,
-              }),
-              game: game,
-              score: gameSession.player1.score,
-              winner: gameSession.player1.score > gameSession.player2.score,
-            };
-
-            const player2Dto: CreateGamePlayerDto = {
-              user: await this.userRepository.findOneBy({
-                id: gameSession.player2.userID,
-              }),
-              game: game,
-              score: gameSession.player2.score,
-              winner: gameSession.player2.score > gameSession.player1.score,
-            };
-
-            await this.createGamePlayer(player1Dto);
-            await this.createGamePlayer(player2Dto);
-          });
-        }
-        /* update player status to 'Online' */
-        if (this.authService.isUserConnected(gameSession.player1.userID)) {
-          this.userService.setStatus(gameSession.player1.userID, UserStatus.Online);
-        }
-        if (this.authService.isUserConnected(gameSession.player2.userID)) {
-          this.userService.setStatus(gameSession.player2.userID, UserStatus.Online);
-        }
-        server.emit('onUserChange');
-
-        /* send all active game sessions */
-        const gameSessions = [];
-
-        this.gameSessions.forEach((value: Game, key: string) => {
-          if (value.gameStatus === 'running') {
-            gameSessions.push(value);
-          }
-        });
-        server.emit('currentGameSessions', gameSessions);
+        this.endGame(myInterval, gameSession, server, gameID);
       } else {
         server.to(gameID).emit('gameUpdate', this.gameSessions.get(gameID));
       }
@@ -278,17 +280,14 @@ export class GameService {
    */
 
   closeAllInvitationsFromUser(server: Server, userID: number) {
-
-    const invitedUsers: {userIds: number[], userSocket: Socket}[] = this.newInvitationList.get(userID);
+    const invitedUsers: { userIds: number[]; userSocket: Socket }[] = this.newInvitationList.get(userID);
 
     if (!invitedUsers) {
       return;
     }
 
     for (let i = 0; i < invitedUsers.length; ++i) {
-
       for (let k = 0; k < invitedUsers[i].userIds.length; ++k) {
-
         const invitedSockets = this.getSocketsFromUser(invitedUsers[i].userIds[k]);
 
         for (let j = 0; j < invitedSockets.length; ++j) {
@@ -305,35 +304,30 @@ export class GameService {
   async addToInvitationList(client: Socket, invitedId: number) {
     const currentUser: UserDto | null = await this.authService.getUserFromSocket(client);
 
-    let ids: {userIds: number[], userSocket: Socket}[] = this.newInvitationList.get(currentUser.id);
+    let ids: { userIds: number[]; userSocket: Socket }[] = this.newInvitationList.get(currentUser.id);
     if (!ids) {
-      ids = [{userIds: [invitedId], userSocket: client}];
+      ids = [{ userIds: [invitedId], userSocket: client }];
     } else {
       for (let i = 0; i < ids.length; ++i) {
-        if (ids[i].userSocket.id === client.id)
-        ids[i].userIds.push(invitedId);
+        if (ids[i].userSocket.id === client.id) ids[i].userIds.push(invitedId);
       }
     }
     this.newInvitationList.set(currentUser.id, ids);
   }
 
-  //TODO: inviteeId instead of socket
   async removeFromInvitationList(inviteeSocket: Socket, inviterId: number) {
     const currentUser: UserDto | null = await this.authService.getUserFromSocket(inviteeSocket);
 
-    let ids: {userIds: number[], userSocket: Socket}[] = this.newInvitationList.get(inviterId);
+    let ids: { userIds: number[]; userSocket: Socket }[] = this.newInvitationList.get(inviterId);
 
     for (let i = 0; i < ids.length; ++i) {
-
       const index = ids[i].userIds.indexOf(currentUser.id);
 
       if (index > -1) {
         ids.splice(index, 1);
         this.newInvitationList.set(currentUser.id, ids);
       }
-
     }
-
   }
 
   getSocketsFromUser(userID: number): Socket[] {
@@ -341,7 +335,6 @@ export class GameService {
     return sockets;
   }
 
-  //TODO: return whole user instead of partial data
   async getUserFromSocket(client: Socket) {
     const userDto = await this.authService.getUserFromSocket(client);
     return userDto;

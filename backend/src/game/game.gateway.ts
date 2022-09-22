@@ -28,12 +28,11 @@ export class GameGateway implements OnGatewayDisconnect {
     await this.gameService.updateGameStatus(client);
   }
 
-  // TODO: logging out during game
-    @SubscribeMessage('userLogout')
-    async loggedOut(@ConnectedSocket() client: Socket) {
-      await this.gameService.removeFromQueue(client);
-      await this.gameService.updateGameStatus(client);
-    }
+  @SubscribeMessage('userLogout')
+  async loggedOut(@ConnectedSocket() client: Socket) {
+    await this.gameService.removeFromQueue(client);
+    await this.gameService.updateGameStatus(client);
+  }
 
   @SubscribeMessage('joinQueue')
   async joinQueue(@ConnectedSocket() client: Socket) {
@@ -68,11 +67,14 @@ export class GameGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage('inviteGame')
   async inviteGame(@ConnectedSocket() inviterSocket: Socket, @MessageBody() inviteeID: number) {
-
-    //  ADDED: Check if inviter has logout from other browser before inviting
     const inviterUser = await this.gameService.getUserFromSocket(inviterSocket);
     if (!inviterUser || inviterUser.status === UserStatus.Offline) {
       this.server.to(inviterSocket.id).emit('errorGameInvite', { errorMsg: 'An error has occured, please refresh the page.' });
+      return;
+    }
+
+    if (inviterUser.status === UserStatus.InGame) {
+      this.server.to(inviterSocket.id).emit('errorGameInvite', { errorMsg: 'You are already in game!' });
       return;
     }
 
@@ -92,17 +94,27 @@ export class GameGateway implements OnGatewayDisconnect {
     for (let i: number = 0; i < inviteeSockets.length; i++) {
       inviteeSockets[i].join(inviteeID.toString());
     }
-    //TODO: retrieve name and id after call to getUserFromSocket
-    this.server.to(inviteeID.toString()).emit('wantToPlay', await this.gameService.getUserFromSocket(inviterSocket));
+
+    const inviter = await this.gameService.getUserFromSocket(inviterSocket);
+    this.server
+      .to(inviteeID.toString())
+      .emit('wantToPlay', { name: inviter.name, userId: inviter.id, inviterSocketId: inviterSocket.id });
     this.server.socketsLeave(inviteeID.toString());
     this.server.to(inviterSocket.id).emit('inviteSuccessfullySent');
 
-    //TODO: change map invitationList to store socket instead of userID
     await this.gameService.addToInvitationList(inviterSocket, inviteeID);
   }
 
   @SubscribeMessage('answerToInvite')
-  async answerToInvite(@ConnectedSocket() inviteeSocket: Socket, @MessageBody() body: { answer: boolean; inviterId: number }) {
+  async answerToInvite(
+    @ConnectedSocket() inviteeSocket: Socket,
+    @MessageBody()
+    body: {
+      answer: boolean;
+      inviterId: number;
+      inviterSocketId: string;
+    },
+  ) {
     const inviteeUser = await this.gameService.getUserFromSocket(inviteeSocket);
 
     const inviteeSockets = this.gameService.getSocketsFromUser(inviteeUser.id);
@@ -113,24 +125,30 @@ export class GameGateway implements OnGatewayDisconnect {
     this.server.to(inviteeUser.id.toString()).emit('closeInvite');
     this.server.socketsLeave(inviteeUser.id.toString());
 
-    //TODO: Only socket of inviter, not all sockets
     const inviterSockets = this.gameService.getSocketsFromUser(body.inviterId);
     if (!inviterSockets || inviterSockets.length === 0) {
-      //	TODO: Error message inviter deconnected
+      this.server.to(inviteeSocket.id).emit('errorGameInvite', { errorMsg: 'User disconnected!' });
+      return;
+    }
+
+    let inviterSocket: Socket;
+    for (let i = 0; i < inviterSockets.length; ++i) {
+      if (inviterSockets[i].id === body.inviterSocketId) {
+        inviterSocket = inviterSockets[i];
+        break;
+      }
+    }
+
+    if (!inviterSocket) {
+      this.server.to(inviteeSocket.id).emit('errorGameInvite', { errorMsg: 'User has left his browser session!' });
       return;
     }
 
     if (body.answer === false) {
-      for (let i: number = 0; i < inviterSockets.length; i++) {
-        inviterSockets[i].join(body.inviterId.toString());
-      }
-
       await this.gameService.removeFromInvitationList(inviteeSocket, body.inviterId);
-      this.server.to(body.inviterId.toString()).emit('inviteRefused', { userName: inviteeUser.name });
-      this.server.socketsLeave(body.inviterId.toString());
+      this.server.to(inviterSocket.id).emit('inviteRefused', { userName: inviteeUser.name });
     } else {
-      //TODO: Launch game for ONE socket from inviter (the one that sent the request). inviterSockets[0] must change
-      this.gameService.setUpGame(inviteeSocket, inviterSockets[0], this.server);
+      this.gameService.setUpGame(inviteeSocket, inviterSocket, this.server);
     }
   }
 }

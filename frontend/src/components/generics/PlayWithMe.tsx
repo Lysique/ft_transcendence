@@ -9,16 +9,29 @@ function PlayWithMe() {
 
   const [inviterName, setInviterName] = useState<string>("");
   const [inviterId, setInviterId] = useState<number>(0);
+  const [socketId, setSocketId] = useState<string>('');
   const [openInvitation, setOpenInvitation] = useState<boolean>(false);
   const [validation, setValidation] = useState<boolean>(false);
   const [answered, setAnswered] = useState<boolean>(false);
 
   useEffect(() => {
-    socket.on("wantToPlay", ({ name, id }: { name: string; id: number }) => {
-      setInviterName(name);
-      setInviterId(id);
-      setOpenInvitation(true);
-    });
+    socket.on(
+      "wantToPlay",
+      ({
+        userName,
+        userId,
+        inviterSocketId,
+      }: {
+        userName: string;
+        userId: number;
+        inviterSocketId: string;
+      }) => {
+        setInviterName(userName);
+        setInviterId(userId);
+        setSocketId(inviterSocketId);
+        setOpenInvitation(true);
+      }
+    );
     return () => {
       socket.off("wantToPlay");
     };
@@ -35,11 +48,16 @@ function PlayWithMe() {
 
   useEffect(() => {
     if (answered === true) {
-      socket.emit("answerToInvite", { answer: validation, inviterId: inviterId });
+      console.log(socketId);
+      socket.emit("answerToInvite", {
+        answer: validation,
+        inviterId: inviterId,
+        inviterSocketId: socketId,
+      });
       setValidation(false);
       setAnswered(false);
     }
-  }, [validation, inviterId, socket, answered]);
+  }, [validation, inviterId, socket, answered, socketId]);
 
   const [openNotif, setOpenNotif] = useState<boolean>(false);
   const [notifMessage, setNotifMessage] = useState<string>("");

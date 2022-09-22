@@ -12,94 +12,81 @@ import { HistoryBar } from "components/profile/profileHistory/HistoryBar";
 import { StatBar } from "components/profile/profileStats/StatBar";
 
 export const VisitorProfile = () => {
+  const [visited, setVisited] = React.useState<UserDto | null>(null);
+  const { id } = useParams<"id">();
+  const navigate = useNavigate();
 
-    const [visited, setVisited] = React.useState<UserDto | null>(null);
-    const { id } = useParams<"id">();
-    const navigate = useNavigate();
+  React.useEffect(() => {
+    const fetchProfile = async () => {
+      const resp = await UserAPI.getOneUserById(id ? id : "");
+      if (!resp || Object.keys(resp).length === 0) {
+        navigate("/");
+      }
+      setVisited(resp);
+    };
+    fetchProfile();
+    // eslint-disable-next-line
+  }, [id]);
 
-    React.useEffect(() => {
-        const fetchProfile = async () => {
-            const resp = await UserAPI.getOneUserById(id? id: "");
-            if (!resp ||  Object.keys(resp).length === 0) {
-                navigate('/');
-            }
-            setVisited(resp);
-        }
-        fetchProfile();
-        // eslint-disable-next-line
-      }, [id])
+  return (
+    <>
+      <Grid container spacing={3} sx={{ ml: 1, mt: 1 }}>
+        <Grid item xs={12} container spacing={3} alignItems={"center"}>
+          <Grid item xs={4}>
+            <Card>
+              <ProfileImage profileImage={visited?.currentAvatar} />
+              <CardContent>
+                Status:
+                {visited?.status === UserStatus.Offline
+                  ? " Offline"
+                  : visited?.status === UserStatus.Online
+                  ? " Online"
+                  : " In game"}
+              </CardContent>
+            </Card>
+          </Grid>
 
-    return (
-        <>
+          <Grid item xs={1}></Grid>
 
-        <Grid container spacing={3} sx={{ml:1, mt:1}}>
+          <Grid item xs={6}>
+            <Item>
+              <Typography variant="h2" display="flex">
+                {visited?.name}'s profile
+              </Typography>
+            </Item>
+          </Grid>
 
-            <Grid item xs={12} container spacing={3} alignItems={'center'}>
-
-                <Grid item xs={4} >
-
-                    <Card >
-                        <ProfileImage
-                            profileImage={visited?.currentAvatar}
-                        />
-                        <CardContent>
-                            Status: 
-                        {visited?.status === UserStatus.Offline? ' Offline' 
-                        :visited?.status === UserStatus.Online? ' Online'
-                        : ' In game'}
-                        </CardContent>
-                    </Card>
-
-                </Grid>
-
-                <Grid item xs={1}></Grid>
-
-                <Grid item xs={6}>
-                    <Item>
-                        <Typography variant="h2" display="flex" >
-                            {visited?.name}'s profile
-                        </Typography>
-                    </Item>
-                </Grid>
-
-                <Grid item xs={1}></Grid>
-
-            </Grid>
-
-            <Grid item xs={4} container spacing={3} direction={'column'} sx={{ mt:5 }}>
-
-                <Grid item >
-                    <Item>
-                        <AddFriendButton visited={visited}/>
-                    </Item>
-                </Grid>
-
-                <Grid item >
-                    <Item>
-                        <BlockButton visited={visited}/>
-                    </Item>
-                </Grid>
-
-            </Grid>
-
-            <Grid item xs={1}></Grid>
-
-            <Grid item xs={6} container spacing={3} direction={"column"}>
-                <Grid item>
-                    <Item>
-                        <StatBar />
-                    </Item>
-                </Grid>
-                <Grid item >
-                    <Item >
-                        {visited ? <HistoryBar userId={ visited.id}/> : '' }
-                    </Item>
-                </Grid>
-
-            </Grid>
-            <Grid item xs={1}></Grid>
+          <Grid item xs={1}></Grid>
         </Grid>
 
-        </>
-    );
-}
+        <Grid item xs={4} container spacing={3} direction={"column"} sx={{ mt: 5 }}>
+          <Grid item>
+            <Item>
+              <AddFriendButton visited={visited} />
+            </Item>
+          </Grid>
+
+          <Grid item>
+            <Item>
+              <BlockButton visited={visited} />
+            </Item>
+          </Grid>
+        </Grid>
+
+        <Grid item xs={1}></Grid>
+
+        <Grid item xs={6} container spacing={3} direction={"column"}>
+          <Grid item>
+            <Item>
+              <StatBar />
+            </Item>
+          </Grid>
+          <Grid item>
+            <Item>{visited ? <HistoryBar userId={visited.id} /> : ""}</Item>
+          </Grid>
+        </Grid>
+        <Grid item xs={1}></Grid>
+      </Grid>
+    </>
+  );
+};
