@@ -68,6 +68,8 @@ export class GameService {
   }
 
   async monitorQueue(server: Server) {
+
+    //  TODO: GameID needed ??
     let gameID: string;
     if (this.queue.size === 2) {
       gameID = this.queue.get(Array.from(this.queue.keys())[0]).id + this.queue.get(Array.from(this.queue.keys())[1]).id;
@@ -279,6 +281,37 @@ export class GameService {
    **
    */
 
+  deleteUserData(socket: Socket, server: Server) {
+    for (const [key, data] of this.newInvitationList) {
+      for (let i = 0; i < data.length; ++i) {
+        if (data[i].userSocket.id === socket.id)
+        {
+          this.closeAllInvitationsFromUser(server, key);
+          return ;
+        }
+      }
+    }
+  }
+
+  deleteSocketData(socket: Socket, server: Server) {
+    for (const [key, data] of this.newInvitationList) {
+      for (let i = 0; i < data.length; ++i) {
+        if (data[i].userSocket.id === socket.id)
+        {
+          const userSocketData = this.newInvitationList.get(key);
+
+          for (let j = 0; j < userSocketData[i].userIds.length; ++j) {
+            server.to('user_' + userSocketData[i].userIds[j].toString()).emit('closeInvite');
+          }
+
+          userSocketData.splice(i, 1);
+          this.newInvitationList.set(key, userSocketData);
+          return ;
+        }
+      }
+    }
+  }
+
   closeAllInvitationsFromUser(server: Server, userID: number) {
     const invitedUsers: { userIds: number[]; userSocket: Socket }[] = this.newInvitationList.get(userID);
 
@@ -288,17 +321,10 @@ export class GameService {
 
     for (let i = 0; i < invitedUsers.length; ++i) {
       for (let k = 0; k < invitedUsers[i].userIds.length; ++k) {
-        const invitedSockets = this.getSocketsFromUser(invitedUsers[i].userIds[k]);
-
-        for (let j = 0; j < invitedSockets.length; ++j) {
-          invitedSockets[j].join(userID.toString());
-        }
+        server.to('user_' + invitedUsers[i].userIds[k].toString()).emit('closeInvite');
       }
     }
-
     this.newInvitationList.delete(userID);
-    server.to(userID.toString()).emit('closeInvite');
-    server.socketsLeave(userID.toString());
   }
 
   async addToInvitationList(client: Socket, invitedId: number) {
@@ -318,7 +344,7 @@ export class GameService {
   async removeFromInvitationList(inviteeSocket: Socket, inviterId: number) {
     const currentUser: UserDto | null = await this.authService.getUserFromSocket(inviteeSocket);
 
-    let ids: { userIds: number[]; userSocket: Socket }[] = this.newInvitationList.get(inviterId);
+    const ids: { userIds: number[]; userSocket: Socket }[] = this.newInvitationList.get(inviterId);
 
     for (let i = 0; i < ids.length; ++i) {
       const index = ids[i].userIds.indexOf(currentUser.id);
@@ -330,14 +356,33 @@ export class GameService {
     }
   }
 
-  getSocketsFromUser(userID: number): Socket[] {
-    const sockets: Socket[] = this.authService.getSocketsFromUser(userID);
-    return sockets;
-  }
-
   async getUserFromSocket(client: Socket) {
     const userDto = await this.authService.getUserFromSocket(client);
     return userDto;
+  }
+
+  getSocketFromId(userID: number, socketID: string): Socket | null {
+    const data: { userIds: number[]; userSocket: Socket }[] = this.newInvitationList.get(userID);
+
+    if (!data) {
+      return null;
+    }
+
+    for (let i = 0; i < data.length; ++i) {
+      if (data[i].userSocket.id == socketID) {
+        return data[i].userSocket;
+      }
+    }
+    return null;
+  }
+
+  isUserConnected(userID: number) {
+    return this.authService.isUserConnected(userID);
+  }
+
+  async isUserInGame(userID: number) {
+    const { status } = await this.userService.findOneById(userID);
+    return (status === UserStatus.InGame);
   }
 
   /*

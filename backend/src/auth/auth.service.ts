@@ -87,6 +87,7 @@ export class AuthService {
     }
     sockets.push(client);
     this.userSessions.set(userDto.id, sockets);
+    client.join('user_' + userDto.id.toString());
   }
 
   async removeFromConnection(client: Socket, server: Server) {
