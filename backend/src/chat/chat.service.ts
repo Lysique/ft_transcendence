@@ -1,71 +1,273 @@
 import { Injectable } from '@nestjs/common';
 import { userInfo } from 'os';
+import { VirtualAction } from 'rxjs';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { UserDto } from 'src/models/users/dto/user.dto';
+import { UsersService } from 'src/models/users/users.service';
 
 type roomType = {
   roomName : string;
-  owner : string;//number id
-  admin : Set<string>;//number id
+  owner : number;
+  admin : Set<number>;
   password : string;
-  userSet : Set<string>;//userdto
-  mutedMap : Map<string,number>;//number id datetype
-  banMap : Map<string,number>;//number id datetype
-  //listMsg : Array<string>;//message
+  userSet : Set<UserDto>;//userdto
+  mutedMap : Map<number,number>;
+  banMap : Map<number,number>;
+  listMsg : Array<string>;
 };
 
 
 @Injectable()
 export class ChatService {
 
-    constructor(
-        /*
-        private authService: AuthService,
-        @InjectRepository(Games) private gamesRepository: Repository<Games>,
-        @InjectRepository(User) private userRepository: Repository<User>,
-        @InjectRepository(GamePlayer) private gamePlayerRepository: Repository<GamePlayer>,
-        private dataSource: DataSource,
-        */
-        
-      ) {this.listRoom = new Array();}
-//renvoi de larray avec la presence de l;utilisateur dans les room
-      public listRoom: Array<roomType>;
-      //principal
+    constructor(      
+      //private authService: AuthService,
+      private userService: UsersService
+    ) {
+      this.listRoom = new Array();
+    }
 
-      joinRoom(userId : string, roomName : string, password : string, client : Socket) {
-      }
+    /* list all room */
+    public listRoom: Array<roomType>;
 
-      // UTILS    
+    /*
+    **
+    ** @Principal
+    **
+    */
 
-      roomUserPresence(client : Socket)
-      {
-        let temparray = this.listRoom.filter(elem => elem.userSet.has(client.id));
-        return temparray;//tableau vide si pas de presence
-      }
-
-      roomExist(roomname : string)
-      {
-        if (this.getLaRoom(roomname) !== undefined)
-          return true;
-      
-        else
+    async joinRoom(userId : number, roomName : string, password : string) {
+      if (this.getLaRoom(roomName) === undefined)
+        {
+          console.log('cant join, room doesnt exist');
           return false;
+        }
+
+      const room = this.getLaRoom(roomName);
+      const userDto: UserDto = await this.userService.findOneById(userId);
+   
+      //update et check le banmap en utils pour rendre ca plus lisible
+      if (room.password === password)
+        {
+          if (room.banMap.has(userId))
+          {
+            let datenow = Date.now();
+            if (datenow - room.banMap.get(userId) <= 0)
+            {
+              room.banMap.delete(userId);
+              room.userSet.add(userDto);
+              return true;
+            }
+              else
+              {
+                console.log('cant join because user is ban for ' + (datenow - room.banMap.get(userId)));
+                return false;
+              }
+          }
+          else
+          {
+            room.userSet.add(userDto);
+            return true;
+          }
+        }
+        else
+        {
+          console.log('mauvais password');
+          return false;
+        }
       }
 
-      //checkpass
-      //checkmute
-      //check ban
-      //
-
-
+    async leaveRoom(roomName : string, userId : number)
+    {
+      if (this.getLaRoom(roomName) === undefined)
+        {
+          console.log('cant leave, room doesnt exist');
+          return false;
+        }
+      const room = this.getLaRoom(roomName);
+      const userDto: UserDto = await this.userService.findOneById(userId);
+      
+      if (!room.userSet.has(userDto))
+      {
+        console.log('cant leave because he is not in the room');
+        return false;
+      }
+      room.userSet.add(userDto);
+      this.tryDeleteRoom(roomName);
+      return true;
+      }
       
 
-      
+    async setAdmin(roomName : string, userId : number, victim : number)
+    {
+      if (this.getLaRoom(roomName) === undefined)
+        {
+          console.log('cant leave, room doesnt exist');
+          return false;
+        }
+        const room = this.getLaRoom(roomName);
+      if (userId === room.owner && victim !== room.owner)
+      {
+        const userDto: UserDto = await this.userService.findOneById(userId);
+        room.admin.add(userId);
+        console.log('on a bien setup ladmin pour notre ami ' + victim);
+        return true;
+      }
+      console.log('impossible de mettre admin lutilisateur');
+      return false;
+    }
 
+    createRoom(room,password,userId){
+      if (this.getLaRoom(room) !== undefined)
+      {
+        console.log('cant create room , duplicate room name');
+        return false;
+      }
+
+      console.log('im creating the room : ' + room);
+      this.addRoomToList(
+        {
+        roomName : room, 
+        owner : userId, 
+        admin : new Set<number>, 
+        password : password, 
+        userSet : new Set<UserDto>().add(userId), 
+        mutedMap : new Map<number,number>(), 
+        banMap : new Map<number,number>(),
+        listMsg : new Array<string>(),
+        },
+        this.listRoom
+        );
+    
+      return true;
+    }
+
+    async kickFunction(userId : number, victim : number, roomArg : string)
+    {
+      const room = this.getLaRoom(roomArg);
+      const userDto: UserDto = await this.userService.findOneById(victim);
+      if (room.owner !== victim   &&    ( room.admin.has(userId) || room.owner === userId ))
+      {
+        console.log('kick successfull , good bye ' + victim);
+        room.userSet.delete(userDto);
+        this.tryDeleteRoom(roomArg);
+        return true;
+      }
+      else
+      {
+        console.log('you cant kick the user ' + victim);
+      }
+      return false;
+    }
+
+    async banFunction(userId : number, victim : number, roomArg : string, timeBan : number)
+    {
+      const room = this.getLaRoom(roomArg);
+      const userDto: UserDto = await this.userService.findOneById(victim);
+      if (room.owner !== victim   &&    ( room.admin.has(userId) || room.owner === userId ))
+      {
+        console.log('user ' + victim + ' is ban from the channel');
+        room.userSet.delete(userDto);
+        room.banMap.set(victim,timeBan);
+        this.tryDeleteRoom(roomArg);
+        return true;
+      }
+      else
+      {
+        console.log(userId + ' you cant ban the user : ' + victim);
+      }
+      return false;
+    }
+
+    changePw(userId : number, roomName : string, password : string)
+    {
+      if (this.getLaRoom(roomName) === undefined)
+        {
+          console.log('cant change pw, room doesnt exist');
+          return false;
+        }
+        const room = this.getLaRoom(roomName);
+      if (userId === room.owner)
+      {
+        room.password = password;
+        console.log('on a bien setup le nouveau password ' + password);
+        return true;
+      }
+      console.log('impossible de changer le password');
+      return false;
+    }
+
+    async muteFunction(userId : number, victim : number, roomArg : string, timeMute : number)
+    {
+      if (this.getLaRoom(roomArg) === undefined)
+        {
+          console.log('cant mute this guy , room doesnt exist');
+          return false;
+        }
+      const room = this.getLaRoom(roomArg);
+      const userDto: UserDto = await this.userService.findOneById(victim);
+      if (room.owner !== victim   &&    ( room.admin.has(userId) || room.owner === userId ))
+      {
+        console.log('user ' + victim + ' is mute from the channel');
+        room.mutedMap.set(victim,timeMute);
+        return true;
+      }
+      else
+      {
+        console.log(userId + ' you cant mute the user : ' + victim);
+      }
+      return false;
+    }
+
+    async sendMessage(userId : number, victim : number, roomName : string, timeBan : number, message : string)
+    {
+      if (this.getLaRoom(roomName) === undefined)
+        {
+          console.log('cant send a message to this room , room doesnt exist');
+          return false;
+        }
+
+      const room = this.getLaRoom(roomName);
+
+      //can send message ?
+
+      let datenow = Date.now();
+      if ( (!room.mutedMap.has(userId)) || (datenow - room.mutedMap.get(userId) <= 0))
+      {
+        let coconcatname : string = userId + message;
+        room.listMsg.push(coconcatname);
+        return true;
+      }
+      return false;
+    }
+
+
+    /*
+    **
+    ** @Utils
+    **
+    */   
+
+    async roomUserPresence(userId : number)
+    {
+      const userDto: UserDto = await this.userService.findOneById(userId);
+      let temparray = this.listRoom.filter(elem => elem.userSet.has(userDto));
+      return temparray;//tableau vide si pas de presence
+    }
+
+    roomExist(roomname : string)
+    {
+      if (this.getLaRoom(roomname) !== undefined)
+        return true;
+    
+      else
+        return false;
+    }
 
     addRoomToList(roomObject : roomType, listRoom : Array<roomType>)
     {
+      console.log('add de la room' + roomObject.roomName);
       listRoom.push(roomObject);
     }
 
@@ -76,83 +278,19 @@ export class ChatService {
 
     //LEAVEROOM CHECK 1 PERSON
 
-    async leaveRoomEraseSocket(room,roomowner,roomadmin,roompassword,maproom,socketid,socket,server,listRoom,listUserr){
+    async tryDeleteRoom(room : string){
             
       let listroomtemp;
       //delete la room si ya personne
-      this.getLaRoom(room).userSet.size === 1 ? (listroomtemp = listRoom.filter(elem => elem.roomName !== room),listRoom = listroomtemp) : null
-
-
-
-
-      // roomowner.get(room) === socketid ? roomowner.delete(room) : null
-      // maproom.has(room) ? (maproom.get(room).forEach(elem => { if (elem === socketid) {maproom.get(room).delete(socketid);}})) : null;
-      // maproom.has(room) ? (maproom.get(room).size > 0 ? null : (maproom.delete(room),roompassword.delete(room),roomadmin.delete(room))) : null;
-      // for (var i = 0; i < listRoom.length + 5;i++) 
-      // {
-      //   listRoom.pop()
-      // }
-
-      // for (let key of maproom.keys()) 
-      // {
-      //   listRoom.lastIndexOf(key) === -1 ? listRoom.push(key) : null;
-      // }
-
-      server.to(socketid).emit('roomMove',{
-        listUser : listUserr,
-        roomlist : listRoom,
-        roompassworda : roompassword,
-        roomowner : roomowner,
-        oldroom : room,
-        mynewroom : 'joinroomname',
-      });
-
-      server.emit('connected',{
-        listUser : listUserr,
-        roomlist : listRoom,
-        roompassword : roompassword,
-        roomowner : roomowner
-      });
-
-}
-
-// JOINROOM
-
-// joinroom(){
-//   if (this.getLaRoom(room).password === inputpassword)
-//   {
-//     this.getLaRoom(room).userSet.add(socketid);
-//   }
-//   else
-//   {
-//     console.log('Wrong Password');
-//   }
-// }
-
-createRoom(room,password,socketid){
-  if (this.getLaRoom(room) !== undefined)
-  {
-    console.log('room already created');
-  }
-  else
-  {
-    this.addRoomToList(
+      if (this.getLaRoom(room).userSet.size === 0)
       {
-      roomName : room, 
-      owner : socketid, 
-      admin : new Set<string>, 
-      password : password, 
-      userSet : new Set<string>().add(socketid), 
-      mutedMap : new Map<string,number>(), 
-      banMap : new Map<string,number>()
-      },
-      this.listRoom
-      );
-  }
+        listroomtemp = this.listRoom.filter(elem => elem.roomName !== room);
+        this.listRoom = listroomtemp;
+        return true;
+       }
+       else
+        return false
+
 }
-
-
-
-
 
 }

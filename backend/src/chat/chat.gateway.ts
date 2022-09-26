@@ -12,6 +12,7 @@ import { ChatService } from './chat.service';
 import { Inject } from '@nestjs/common';
 import { stringify } from 'querystring';
 import { timingSafeEqual } from 'crypto';
+import { UserDto } from 'src/models/users/dto/user.dto';
 
 type UserPayload = {
   delvalue: string;
@@ -32,12 +33,13 @@ let listRoom : Array<roomType> = [];
 
 type roomType = {
   roomName : string;
-  owner : string;
-  admin : Set<string>;
+  owner : number;
+  admin : Set<number>;
   password : string;
   userSet : Set<string>;
-  mutedMap : Map<string,number>;
-  banMap : Map<string,number>;//not number date
+  mutedMap : Map<number,number>;
+  banMap : Map<number,number>;
+  //listMsg : Array<string>;//message
 };
 
 function addRoomToList(roomObject : roomType, listRoom : Array<roomType>) : void {
@@ -47,12 +49,12 @@ function addRoomToList(roomObject : roomType, listRoom : Array<roomType>) : void
 addRoomToList(
   {
   roomName : 'joinroom', 
-  owner : '', 
-  admin : new Set<string>, 
+  owner : 11, 
+  admin : new Set<number>, 
   password : '', 
   userSet : new Set<string>().add('jeanvaljean'), 
-  mutedMap : new Map<string,number>().set('leconnard', 300), 
-  banMap : new Map<string,number>
+  mutedMap : new Map<number,number>().set(14, Date.now()), 
+  banMap : new Map<number,number>()
   },
   listRoom
   );
@@ -122,61 +124,31 @@ export class ChatGateway implements OnGatewayConnection {
 
   handleConnection(@ConnectedSocket() socket: Socket) {
 
+    /*  Beta Program , test connection on connect with 'joinroomname'*/
+
     this.chatService.addRoomToList(
       {roomName : 'joinroomname',
-    owner : '',
-    admin : new Set<string>,
+    owner : 11,
+    admin : new Set<number>(),
     password : '',
-    userSet : new Set<string>,
-    mutedMap : new Map<string,number>,
-    banMap : new Map<string,number>}, listRoom);
-
-    socket.join('joinroomname');
-
-    if (this.chatService.getLaRoom('joinroomname'))
-      this.chatService.getLaRoom('joinroomname').userSet.add(socket.id);
-    console.log(socket.id + ' Connected');
-
-    // old 
-    // this.roompassword.set('joinroomname','');
-    
-    
-
-
-                       /* INITALIZATION  */
-
+    userSet : new Set<UserDto>(),
+    mutedMap : new Map<number,number>(),
+    banMap : new Map<number,number>(),
+    listMsg : new Array<string>()
+  }, this.chatService.listRoom);
 
     
-    // this.maproom.set('joinroomname', new Set<string>);
-    // this.roomadmin.set('joinroomname', new Set<string>);
-    
-    
-  
-    // socket.join('joinroomname');
 
-    // if (this.maproom.has('joinroomname'))
-    // {
-    //   if (this.maproom.get('joinroomname').has(socket.id) === false)
-    //   {
-    //     this.maproom.get('joinroomname').add(socket.id);
-    //   }
-    // }
-    // else
-    // {
-    //   this.maproom.set('joinroomname', new Set<string>);
-    //   this.maproom.get('joinroomname').add(socket.id);
-    //   this.roomadmin.set('joinroomname',new Set<string>);
-    // }
+    if (this.chatService.joinRoom(996,'joinroomname',''))
+    {
+      socket.join('joinroomname');
+      console.log(996 + ' Connected');
+    }
 
-    //   console.log(socket.id + ' Connected');
-      
-    //   this.listUserr.push(socket.id);
-    //   for (var i = 0; i < this.listRoom.length;i++) {
-    //     this.listRoom.pop
-    //   }
-    //   for (let key of this.maproom.keys()) {
-    //     this.listRoom.lastIndexOf(key) === -1 ? this.listRoom.push(key) : null;
-    // }
+
+
+
+    // UPDATE CLIENT =>tamighi to fill
     let arr
     if (this.chatService.getLaRoom('joinroomname'))
     {
@@ -189,10 +161,7 @@ export class ChatGateway implements OnGatewayConnection {
         roomowner : ''
       });
     }
-      // console.log(this.maproom);
-      // console.log(this.roomowner);
-      // console.log(this.roompassword);
-    
+
   }
     
 
@@ -201,6 +170,17 @@ export class ChatGateway implements OnGatewayConnection {
       
       @SubscribeMessage('joinRoom')
       async joinRoom(@ConnectedSocket() socket: Socket, @MessageBody() userinfo: UserPayload) {
+
+        //async joinRoom(userId : number, roomName : string, password : string)
+        if (this.chatService.joinRoom(34,userinfo.room, '' ))
+        {
+          // emit vers le client
+        }
+        
+        //if (undefined) -> error
+        //if (is Banned) -> cant
+        //if (pw === false) -> cant
+        //else ok add et emit
        
 
 
@@ -219,7 +199,7 @@ export class ChatGateway implements OnGatewayConnection {
         {
           if (room.password === userinfo.inputpassword)
           {
-            room.userSet.add(socket.id);
+            room.userSet.add(new UserDto);
             socket.join(userinfo.room);
             socket.leave(userinfo.oldroom);
             success = 1;
@@ -300,35 +280,33 @@ export class ChatGateway implements OnGatewayConnection {
       @SubscribeMessage('leavecurrentroom')
       async leaveCurrentRoom(@ConnectedSocket() socket: Socket, @MessageBody() body: any) {
       
-            //this.chatService.leaveRoomEaseSocket((body.room,this.roomowner,this.roomadmin,this.roompassword,this.maproom,body.socketid,socket,this.server,this.listRoom,this.listUserr);
-            //  chatService.leaveRoom(userId, room, Socket for now)
-          //  leaveRoomEraseSocket(body.room,this.roomowner,this.roomadmin,this.roompassword,this.maproom,body.socketid,socket,this.server,this.listRoom,this.listUserr);
-            console.log(this.maproom);console.log(this.roomowner);console.log(this.roompassword);
-            console.log('je leave la room ');
-            socket.leave(body.room);
-            socket.join('joinroomname');
 
+        await this.chatService.leaveRoom(body.room, 13);
+          console.log('jai bien leave la room');
+        
+        if (this.chatService.tryDeleteRoom(body.room))
+            console.log('room est delete car elle est vice');
+        else
+            console.log('client leave mais room pas delete car pas vide');
+
+        //update client server emit
       };
 
       @SubscribeMessage('kickevent')
       async kickEvent(@ConnectedSocket() socket: Socket, @MessageBody() body: any) {
 
-        //check si emiter admin/owner , cant kick owner
-      
-
-        let socketid = body.kicklist;
-
-        if ( (body.kicklist !== this.roomowner.get(body.room)) 
-                && ((this.roomowner.get(body.room) === body.socketid) || (this.roomadmin.get(body.room).has(body.socketid)) ))
-        {      
-          console.log('je kick ' + body.kicklist + 'de la room suivante ' + body.room);
-         // leaveRoomEraseSocket(body.room,this.roomowner,this.roomadmin,this.roompassword,this.maproom,socketid,socket,this.server,this.listRoom,this.listUserr);
-          console.log(this.maproom);console.log(this.roomowner);console.log(this.roompassword);
-          this.server.to(body.kicklist).emit('forceleaveroom',body.room);
-          //this.server.in(body.kicklist).emit('leavecurrentroom')
-          this.server.in(body.kicklist).socketsLeave(body.room);
+        
+        if (this.chatService.kickFunction(15, body.value, body.room))
+        {
+          console.log('le kick est reussit');
+          //update client
         }
-      
+        else
+        {
+          console.log('le kick n est pas possible');
+        }
+
+        //update client server emit
       };
 
         /*********************** BAN EVENT  ************************/
@@ -337,6 +315,8 @@ export class ChatGateway implements OnGatewayConnection {
         @SubscribeMessage('banevent')
         async banEvent(@ConnectedSocket() socket: Socket,@MessageBody() body: any) {
           //check si emiter admin/owner , cant kick owner
+
+          this.chatService.banFunction(17, body.victim, body.room, body.bantime);
 
         
 
