@@ -104,7 +104,7 @@ console.log(getLaRoom('joinroom', listRoom).userSet.size);
   },
 })
 
-export class MyGateway implements OnGatewayConnection {
+export class ChatGateway implements OnGatewayConnection {
   public listUserr : string[] = [];
   public listRoom : string[] = [];
   public roomowner : Map<string,string> = new Map<string,string>;
