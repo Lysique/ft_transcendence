@@ -29,42 +29,39 @@ type UserPayload = {
 //new payload : socketid,room,pass
 
 
-let listRoom : Array<roomType> = [];
+// let listRoom : Array<roomType> = [];
 
-type roomType = {
-  roomName : string;
-  owner : number;
-  admin : Set<number>;
-  password : string;
-  userSet : Set<string>;
-  mutedMap : Map<number,number>;
-  banMap : Map<number,number>;
-  //listMsg : Array<string>;//message
-};
+// type roomType = {
+//   roomName : string;
+//   owner : string;
+//   admin : Set<string>;
+//   password : string;
+//   userSet : Set<UserDto>;
+//   mutedMap : Map<string,number>;
+//   banMap : Map<string,number>;//not number date
+// };
 
-function addRoomToList(roomObject : roomType, listRoom : Array<roomType>) : void {
-  listRoom.push(roomObject);
-}
+// function addRoomToList(roomObject : roomType, listRoom : Array<roomType>) : void {
+//   listRoom.push(roomObject);
+// }
 
-addRoomToList(
-  {
-  roomName : 'joinroom', 
-  owner : 11, 
-  admin : new Set<number>, 
-  password : '', 
-  userSet : new Set<string>().add('jeanvaljean'), 
-  mutedMap : new Map<number,number>().set(14, Date.now()), 
-  banMap : new Map<number,number>()
-  },
-  listRoom
-  );
+// addRoomToList(
+//   {
+//   roomName : 'joinroom', 
+//   owner : '', 
+//   admin : new Set<string>, 
+//   password : '', 
+//   userSet : new Set<string>().add('jeanvaljean'), 
+//   mutedMap : new Map<string,number>().set('leconnard', 300), 
+//   banMap : new Map<string,number>
+//   },
+//   listRoom
+//   );
 
-function getLaRoom(name :string, mylist : Array<roomType>) : roomType
-{
-  return (mylist.find(room => (room.roomName === name)));
-}
-
-console.log(getLaRoom('joinroom', listRoom).userSet.size);
+// function getLaRoom(name :string, mylist : Array<roomType>) : roomType
+// {
+//   return (mylist.find(room => (room.roomName === name)));
+// }
 
 
 // function leaveRoomEraseSocket(room,roomowner,roomadmin,roompassword,maproom,socketid,socket,server,listRoom,listUserr){
@@ -492,62 +489,62 @@ export class ChatGateway implements OnGatewayConnection {
   };
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
-    console.log('asfsdsfsf');
+  //   console.log('asfsdsfsf');
       
-    /*             
+  //   /*             
 
-                tout le clean dans cette fonction est inutile car chaque leave de channel est manuel selon l'ennonce
-    */
+  //               tout le clean dans cette fonction est inutile car chaque leave de channel est manuel selon l'ennonce
+  //   */
 
-    let result : string[] = this.listUserr.filter(user => user !== socket.id);
-    this.listUserr = result;
+  //   let result : string[] = this.listUserr.filter(user => user !== socket.id);
+  //   this.listUserr = result;
 
 
-    function leaveChannel(value, key, map) {
-      map.has(key) ?
-          (map.get(key).has(socket.id)) ?
-              (map.get(key).size == 1) ?  
-                  map.delete(key) : map.get(key).delete(socket.id)
-              :
-                  console.log('bug leave mais pas de socket id present')
-          :
-          console.log('bug na pas le leaveroom')
-    }
+  //   function leaveChannel(value, key, map) {
+  //     map.has(key) ?
+  //         (map.get(key).has(socket.id)) ?
+  //             (map.get(key).size == 1) ?  
+  //                 map.delete(key) : map.get(key).delete(socket.id)
+  //             :
+  //                 console.log('bug leave mais pas de socket id present')
+  //         :
+  //         console.log('bug na pas le leaveroom')
+  //   }
 
     
-    this.maproom.forEach(leaveChannel);
+  //   this.maproom.forEach(leaveChannel);
 
 
-    /* + 5 car sinon pop bug ... */
-    for (var i = 0; i < this.listRoom.length + 5;i++) {
-      this.listRoom.pop()
-    }
-    for (let key of this.maproom.keys()) {
-      this.listRoom.lastIndexOf(key) === -1 ? this.listRoom.push(key) : null;
-  }
+  //   /* + 5 car sinon pop bug ... */
+  //   for (var i = 0; i < this.listRoom.length + 5;i++) {
+  //     this.listRoom.pop()
+  //   }
+  //   for (let key of this.maproom.keys()) {
+  //     this.listRoom.lastIndexOf(key) === -1 ? this.listRoom.push(key) : null;
+  // }
 
-  function eraseadmin(value,key,map){
-    value === socket.id ? 
-    map.delete(key) 
-    : null
-  }
-  this.roomowner.forEach(eraseadmin);
+  // function eraseadmin(value,key,map){
+  //   value === socket.id ? 
+  //   map.delete(key) 
+  //   : null
+  // }
+  // this.roomowner.forEach(eraseadmin);
 
-  function eraseroompassword(value,key,map){
-    map.has(key) ? null : map.delete(key)
-  }
-  this.roompassword.forEach(eraseroompassword);
-
-
+  // function eraseroompassword(value,key,map){
+  //   map.has(key) ? null : map.delete(key)
+  // }
+  // this.roompassword.forEach(eraseroompassword);
 
 
 
-    this.server.emit('connected',{
-      listUser : this.listUserr,
-      roomlist : this.listRoom,
-      roompassword : this.roompassword,
-      roomowner : this.roomowner
-    });
+
+
+  //   this.server.emit('connected',{
+  //     listUser : this.listUserr,
+  //     roomlist : this.listRoom,
+  //     roompassword : this.roompassword,
+  //     roomowner : this.roomowner
+  //   });
  
-  };
+   };
 }
