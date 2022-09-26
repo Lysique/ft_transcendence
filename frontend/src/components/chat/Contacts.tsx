@@ -128,10 +128,10 @@ export const Contacts = () => {
         subheader={<li />}
         >
           <li key={`members`}>
-            <ul>
+            <ul >
               <ListSubheader style={{textAlign:'center'}}>{`Members`}</ListSubheader>
               {contacts_arr.map((contact) => (
-                <div>
+                <div key={contact}>
                 
                 <ListItem key={contact}>
                     <ListItemAvatar>

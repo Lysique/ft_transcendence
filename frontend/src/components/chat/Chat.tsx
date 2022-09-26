@@ -145,7 +145,7 @@ export const Chat = () => {
                             channelType === ChannelType.publicChannel ?
                             tabIndex
                             :
-                            null
+                            0
                           }
 
                           onChange={handleChangeChannel}
@@ -156,7 +156,7 @@ export const Chat = () => {
                             {rooms.map((channel: any, index: any) => {
                               return (
                                 // <Tab label={channel} {...a11yProps(index)} icon={<Badge><CircleNotificationsIcon/></Badge>} iconPosition="end"></Tab>
-                                <Tab label={channel.roomName.length > 20 ? 
+                                <Tab key={index} label={channel.roomName.length > 20 ? 
                                   channel.roomName.substr(0,20) + '...'
                                   : 
                                   channel.roomName
@@ -190,7 +190,7 @@ export const Chat = () => {
                             channelType === ChannelType.privateMessage ?
                             tabIndex
                             :
-                            null
+                            0
                           }
                           onChange={handleChangeDicussion}
                           aria-label="Vertical tabs example"
@@ -199,7 +199,7 @@ export const Chat = () => {
                            {privateMsgs.map((channel, index) => {
                               return (
                                 // <Tab label={channel} {...a11yProps(index)} icon={<Badge><CircleNotificationsIcon/></Badge>} iconPosition="end"></Tab>
-                                <Tab label={channel.userName.length > 20 ? 
+                                <Tab key={index} label={channel.userName.length > 20 ? 
                                   channel.userName.substr(0,20) + '...'
                                   : 
                                   channel.userName
@@ -231,6 +231,7 @@ export const Chat = () => {
                 handleOpenSettings={handleOpenSettings}
                 handleCloseSettings={handleCloseSettings}
                 settings={settings as HTMLElement}
+                channelType={channelType}
                />
             </Grid>
 
