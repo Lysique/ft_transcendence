@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { userInfo } from 'os';
 import { Server, Socket } from 'socket.io';
-//import { AuthService } from 'src/auth/auth.service';
-//import { UserDto } from 'src/models/users/dto/user.dto';
+import { AuthService } from 'src/auth/auth.service';
+import { UserDto } from 'src/models/users/dto/user.dto';
 
 type roomType = {
   roomName : string;
-  owner : string;
-  admin : Set<string>;
+  owner : string;//number id
+  admin : Set<string>;//number id
   password : string;
-  userSet : Set<string>;
-  mutedMap : Map<string,number>;
-  banMap : Map<string,number>;
+  userSet : Set<string>;//userdto
+  mutedMap : Map<string,number>;//number id datetype
+  banMap : Map<string,number>;//number id datetype
+  //listMsg : Array<string>;//message
 };
 
 
@@ -28,7 +29,7 @@ export class ChatService {
         */
         
       ) {this.listRoom = new Array();}
-
+//renvoi de larray avec la presence de l;utilisateur dans les room
       public listRoom: Array<roomType>;
       //principal
 
@@ -36,6 +37,12 @@ export class ChatService {
       }
 
       // UTILS    
+
+      roomUserPresence(client : Socket)
+      {
+        let temparray = this.listRoom.filter(elem => elem.userSet.has(client.id));
+        return temparray;//tableau vide si pas de presence
+      }
 
       roomExist(roomname : string)
       {

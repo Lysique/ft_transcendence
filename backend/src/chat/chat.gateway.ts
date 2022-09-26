@@ -133,7 +133,8 @@ export class ChatGateway implements OnGatewayConnection {
 
     socket.join('joinroomname');
 
-    this.chatService.getLaRoom('joinroomname').userSet.add(socket.id);
+    if (this.chatService.getLaRoom('joinroomname'))
+      this.chatService.getLaRoom('joinroomname').userSet.add(socket.id);
     console.log(socket.id + ' Connected');
 
     // old 
@@ -176,8 +177,10 @@ export class ChatGateway implements OnGatewayConnection {
     //   for (let key of this.maproom.keys()) {
     //     this.listRoom.lastIndexOf(key) === -1 ? this.listRoom.push(key) : null;
     // }
-    
-    let arr = Array.from(this.chatService.getLaRoom('joinroomname').userSet);
+    let arr
+    if (this.chatService.getLaRoom('joinroomname'))
+    {
+      arr = Array.from(this.chatService.getLaRoom('joinroomname').userSet);
 
       this.server.emit('connected',{
         listUser : arr,
@@ -185,6 +188,7 @@ export class ChatGateway implements OnGatewayConnection {
         roompassword : this.chatService.getLaRoom('joinroomname').password,
         roomowner : ''
       });
+    }
       // console.log(this.maproom);
       // console.log(this.roomowner);
       // console.log(this.roompassword);
