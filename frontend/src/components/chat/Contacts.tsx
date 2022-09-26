@@ -23,25 +23,13 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
-import DoNotDisturbOnTotalSilenceIcon from '@mui/icons-material/DoNotDisturbOnTotalSilence';
 import DangerousIcon from '@mui/icons-material/Dangerous';
 import LocalPoliceIcon from '@mui/icons-material/LocalPolice';
 
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormLabel from '@mui/material/FormLabel';
-import { flexbox } from '@mui/system';
-
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-import Stack from '@mui/material/Stack';
 
 
 // ------------- [ TEMPORARY - LINK BACKEND ] ---------------
@@ -88,18 +76,15 @@ export const Contacts = () => {
             // }
 
             // [ COMPLETE ]
-            console.log("profile");
           };
 
           const handleInvitation = () => {
             // [ COMPLETE ]
-            console.log("invitation");
           };
 
           
           const handleAdmin = () => {
             // [ COMPLETE ]
-            console.log("admin");
             // setInputList(inputList.concat(<Input key={inputList.length} />));
             //   <Alert severity="warning">
             //   <AlertTitle>Warning</AlertTitle>
@@ -122,7 +107,6 @@ export const Contacts = () => {
               };
             
             const [muteDuration, setMuteDuration] = React.useState('1 hour');
-            console.log("muteBar1 : ", muteDuration);
 
               const handleCloseMuteBar = () => {
                 setMuteDuration('1 hour');

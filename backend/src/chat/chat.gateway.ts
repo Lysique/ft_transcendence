@@ -12,6 +12,7 @@ import { ChatService } from './chat.service';
 import { Inject } from '@nestjs/common';
 import { stringify } from 'querystring';
 import { timingSafeEqual } from 'crypto';
+import { UserDto } from 'src/models/users/dto/user.dto';
 
 type UserPayload = {
   delvalue: string;
@@ -28,41 +29,39 @@ type UserPayload = {
 //new payload : socketid,room,pass
 
 
-let listRoom : Array<roomType> = [];
+// let listRoom : Array<roomType> = [];
 
-type roomType = {
-  roomName : string;
-  owner : string;
-  admin : Set<string>;
-  password : string;
-  userSet : Set<string>;
-  mutedMap : Map<string,number>;
-  banMap : Map<string,number>;//not number date
-};
+// type roomType = {
+//   roomName : string;
+//   owner : string;
+//   admin : Set<string>;
+//   password : string;
+//   userSet : Set<UserDto>;
+//   mutedMap : Map<string,number>;
+//   banMap : Map<string,number>;//not number date
+// };
 
-function addRoomToList(roomObject : roomType, listRoom : Array<roomType>) : void {
-  listRoom.push(roomObject);
-}
+// function addRoomToList(roomObject : roomType, listRoom : Array<roomType>) : void {
+//   listRoom.push(roomObject);
+// }
 
-addRoomToList(
-  {
-  roomName : 'joinroom', 
-  owner : '', 
-  admin : new Set<string>, 
-  password : '', 
-  userSet : new Set<string>().add('jeanvaljean'), 
-  mutedMap : new Map<string,number>().set('leconnard', 300), 
-  banMap : new Map<string,number>
-  },
-  listRoom
-  );
+// addRoomToList(
+//   {
+//   roomName : 'joinroom', 
+//   owner : '', 
+//   admin : new Set<string>, 
+//   password : '', 
+//   userSet : new Set<string>().add('jeanvaljean'), 
+//   mutedMap : new Map<string,number>().set('leconnard', 300), 
+//   banMap : new Map<string,number>
+//   },
+//   listRoom
+//   );
 
-function getLaRoom(name :string, mylist : Array<roomType>) : roomType
-{
-  return (mylist.find(room => (room.roomName === name)));
-}
-
-console.log(getLaRoom('joinroom', listRoom).userSet.size);
+// function getLaRoom(name :string, mylist : Array<roomType>) : roomType
+// {
+//   return (mylist.find(room => (room.roomName === name)));
+// }
 
 
 // function leaveRoomEraseSocket(room,roomowner,roomadmin,roompassword,maproom,socketid,socket,server,listRoom,listUserr){
@@ -122,72 +121,72 @@ export class ChatGateway implements OnGatewayConnection {
 
   handleConnection(@ConnectedSocket() socket: Socket) {
 
-    this.chatService.addRoomToList(
-      {roomName : 'joinroomname',
-    owner : '',
-    admin : new Set<string>,
-    password : '',
-    userSet : new Set<string>,
-    mutedMap : new Map<string,number>,
-    banMap : new Map<string,number>}, listRoom);
+    // this.chatService.addRoomToList(
+    //   {roomName : 'joinroomname',
+    // owner : '',
+    // admin : new Set<string>,
+    // password : '',
+    // userSet : new Set<string>,
+    // mutedMap : new Map<string,number>,
+    // banMap : new Map<string,number>}, listRoom);
 
-    socket.join('joinroomname');
+    // socket.join('joinroomname');
 
-    this.chatService.getLaRoom('joinroomname').userSet.add(socket.id);
-    console.log(socket.id + ' Connected');
+    // this.chatService.getLaRoom('joinroomname').userSet.add(socket.id);
+    // console.log(socket.id + ' Connected');
 
-    // old 
-    // this.roompassword.set('joinroomname','');
+    // // old 
+    // // this.roompassword.set('joinroomname','');
     
     
 
 
-                       /* INITALIZATION  */
+    //                    /* INITALIZATION  */
 
 
     
-    // this.maproom.set('joinroomname', new Set<string>);
-    // this.roomadmin.set('joinroomname', new Set<string>);
+    // // this.maproom.set('joinroomname', new Set<string>);
+    // // this.roomadmin.set('joinroomname', new Set<string>);
     
     
   
-    // socket.join('joinroomname');
+    // // socket.join('joinroomname');
 
-    // if (this.maproom.has('joinroomname'))
-    // {
-    //   if (this.maproom.get('joinroomname').has(socket.id) === false)
-    //   {
-    //     this.maproom.get('joinroomname').add(socket.id);
-    //   }
-    // }
-    // else
-    // {
-    //   this.maproom.set('joinroomname', new Set<string>);
-    //   this.maproom.get('joinroomname').add(socket.id);
-    //   this.roomadmin.set('joinroomname',new Set<string>);
-    // }
+    // // if (this.maproom.has('joinroomname'))
+    // // {
+    // //   if (this.maproom.get('joinroomname').has(socket.id) === false)
+    // //   {
+    // //     this.maproom.get('joinroomname').add(socket.id);
+    // //   }
+    // // }
+    // // else
+    // // {
+    // //   this.maproom.set('joinroomname', new Set<string>);
+    // //   this.maproom.get('joinroomname').add(socket.id);
+    // //   this.roomadmin.set('joinroomname',new Set<string>);
+    // // }
 
-    //   console.log(socket.id + ' Connected');
+    // //   console.log(socket.id + ' Connected');
       
-    //   this.listUserr.push(socket.id);
-    //   for (var i = 0; i < this.listRoom.length;i++) {
-    //     this.listRoom.pop
-    //   }
-    //   for (let key of this.maproom.keys()) {
-    //     this.listRoom.lastIndexOf(key) === -1 ? this.listRoom.push(key) : null;
-    // }
+    // //   this.listUserr.push(socket.id);
+    // //   for (var i = 0; i < this.listRoom.length;i++) {
+    // //     this.listRoom.pop
+    // //   }
+    // //   for (let key of this.maproom.keys()) {
+    // //     this.listRoom.lastIndexOf(key) === -1 ? this.listRoom.push(key) : null;
+    // // }
     
-    let arr = Array.from(this.chatService.getLaRoom('joinroomname').userSet);
+    // let arr = Array.from(this.chatService.getLaRoom('joinroomname').userSet);
 
-      this.server.emit('connected',{
-        listUser : arr,
-        roomlist : ['joinroomname'],
-        roompassword : this.chatService.getLaRoom('joinroomname').password,
-        roomowner : ''
-      });
-      // console.log(this.maproom);
-      // console.log(this.roomowner);
-      // console.log(this.roompassword);
+    //   this.server.emit('connected',{
+    //     listUser : arr,
+    //     roomlist : ['joinroomname'],
+    //     roompassword : this.chatService.getLaRoom('joinroomname').password,
+    //     roomowner : ''
+    //   });
+    //   // console.log(this.maproom);
+    //   // console.log(this.roomowner);
+    //   // console.log(this.roompassword);
     
   }
     
@@ -508,62 +507,62 @@ export class ChatGateway implements OnGatewayConnection {
   };
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
-    console.log('asfsdsfsf');
+  //   console.log('asfsdsfsf');
       
-    /*             
+  //   /*             
 
-                tout le clean dans cette fonction est inutile car chaque leave de channel est manuel selon l'ennonce
-    */
+  //               tout le clean dans cette fonction est inutile car chaque leave de channel est manuel selon l'ennonce
+  //   */
 
-    let result : string[] = this.listUserr.filter(user => user !== socket.id);
-    this.listUserr = result;
+  //   let result : string[] = this.listUserr.filter(user => user !== socket.id);
+  //   this.listUserr = result;
 
 
-    function leaveChannel(value, key, map) {
-      map.has(key) ?
-          (map.get(key).has(socket.id)) ?
-              (map.get(key).size == 1) ?  
-                  map.delete(key) : map.get(key).delete(socket.id)
-              :
-                  console.log('bug leave mais pas de socket id present')
-          :
-          console.log('bug na pas le leaveroom')
-    }
+  //   function leaveChannel(value, key, map) {
+  //     map.has(key) ?
+  //         (map.get(key).has(socket.id)) ?
+  //             (map.get(key).size == 1) ?  
+  //                 map.delete(key) : map.get(key).delete(socket.id)
+  //             :
+  //                 console.log('bug leave mais pas de socket id present')
+  //         :
+  //         console.log('bug na pas le leaveroom')
+  //   }
 
     
-    this.maproom.forEach(leaveChannel);
+  //   this.maproom.forEach(leaveChannel);
 
 
-    /* + 5 car sinon pop bug ... */
-    for (var i = 0; i < this.listRoom.length + 5;i++) {
-      this.listRoom.pop()
-    }
-    for (let key of this.maproom.keys()) {
-      this.listRoom.lastIndexOf(key) === -1 ? this.listRoom.push(key) : null;
-  }
+  //   /* + 5 car sinon pop bug ... */
+  //   for (var i = 0; i < this.listRoom.length + 5;i++) {
+  //     this.listRoom.pop()
+  //   }
+  //   for (let key of this.maproom.keys()) {
+  //     this.listRoom.lastIndexOf(key) === -1 ? this.listRoom.push(key) : null;
+  // }
 
-  function eraseadmin(value,key,map){
-    value === socket.id ? 
-    map.delete(key) 
-    : null
-  }
-  this.roomowner.forEach(eraseadmin);
+  // function eraseadmin(value,key,map){
+  //   value === socket.id ? 
+  //   map.delete(key) 
+  //   : null
+  // }
+  // this.roomowner.forEach(eraseadmin);
 
-  function eraseroompassword(value,key,map){
-    map.has(key) ? null : map.delete(key)
-  }
-  this.roompassword.forEach(eraseroompassword);
-
-
+  // function eraseroompassword(value,key,map){
+  //   map.has(key) ? null : map.delete(key)
+  // }
+  // this.roompassword.forEach(eraseroompassword);
 
 
 
-    this.server.emit('connected',{
-      listUser : this.listUserr,
-      roomlist : this.listRoom,
-      roompassword : this.roompassword,
-      roomowner : this.roomowner
-    });
+
+
+  //   this.server.emit('connected',{
+  //     listUser : this.listUserr,
+  //     roomlist : this.listRoom,
+  //     roompassword : this.roompassword,
+  //     roomowner : this.roomowner
+  //   });
  
-  };
+   };
 }
