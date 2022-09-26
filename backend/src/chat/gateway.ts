@@ -25,6 +25,8 @@ type UserPayload = {
   roompassword : Map<string,string>;
 };
 
+//new payload : socketid,room,pass
+
 
 let listRoom : Array<roomType> = [];
 
@@ -35,7 +37,7 @@ type roomType = {
   password : string;
   userSet : Set<string>;
   mutedMap : Map<string,number>;
-  banMap : Map<string,number>;
+  banMap : Map<string,number>;//not number date
 };
 
 function addRoomToList(roomObject : roomType, listRoom : Array<roomType>) : void {
@@ -63,38 +65,38 @@ function getLaRoom(name :string, mylist : Array<roomType>) : roomType
 console.log(getLaRoom('joinroom', listRoom).userSet.size);
 
 
-function leaveRoomEraseSocket(room,roomowner,roomadmin,roompassword,maproom,socketid,socket,server,listRoom,listUserr){
+// function leaveRoomEraseSocket(room,roomowner,roomadmin,roompassword,maproom,socketid,socket,server,listRoom,listUserr){
             
-            roomowner.get(room) === socketid ? roomowner.delete(room) : null
-            maproom.has(room) ? (maproom.get(room).forEach(elem => { if (elem === socketid) {maproom.get(room).delete(socketid);}})) : null;
-            maproom.has(room) ? (maproom.get(room).size > 0 ? null : (maproom.delete(room),roompassword.delete(room),roomadmin.delete(room))) : null;
-            for (var i = 0; i < listRoom.length + 5;i++) 
-            {
-              listRoom.pop()
-            }
+//             roomowner.get(room) === socketid ? roomowner.delete(room) : null
+//             maproom.has(room) ? (maproom.get(room).forEach(elem => { if (elem === socketid) {maproom.get(room).delete(socketid);}})) : null;
+//             maproom.has(room) ? (maproom.get(room).size > 0 ? null : (maproom.delete(room),roompassword.delete(room),roomadmin.delete(room))) : null;
+//             for (var i = 0; i < listRoom.length + 5;i++) 
+//             {
+//               listRoom.pop()
+//             }
 
-            for (let key of maproom.keys()) 
-            {
-              listRoom.lastIndexOf(key) === -1 ? listRoom.push(key) : null;
-            }
+//             for (let key of maproom.keys()) 
+//             {
+//               listRoom.lastIndexOf(key) === -1 ? listRoom.push(key) : null;
+//             }
 
-            server.to(socketid).emit('roomMove',{
-              listUser : listUserr,
-              roomlist : listRoom,
-              roompassworda : roompassword,
-              roomowner : roomowner,
-              oldroom : room,
-              mynewroom : 'joinroomname',
-            });
+//             server.to(socketid).emit('roomMove',{
+//               listUser : listUserr,
+//               roomlist : listRoom,
+//               roompassworda : roompassword,
+//               roomowner : roomowner,
+//               oldroom : room,
+//               mynewroom : 'joinroomname',
+//             });
 
-            server.emit('connected',{
-              listUser : listUserr,
-              roomlist : listRoom,
-              roompassword : roompassword,
-              roomowner : roomowner
-            });
+//             server.emit('connected',{
+//               listUser : listUserr,
+//               roomlist : listRoom,
+//               roompassword : roompassword,
+//               roomowner : roomowner
+//             });
 
-    }
+//     }
 
 @WebSocketGateway({
   cors: {
@@ -199,13 +201,21 @@ export class MyGateway implements OnGatewayConnection {
 
 
         let success = 0;
-        //refacto en joinroomdans chat service
+        //refacto en joinroomdans chat service + condition de ban + maj de l'array si bantime = 0;
 
-        if (this.chatService.getLaRoom(userinfo.room) !== undefined )
+
+        const room = this.chatService.getLaRoom(userinfo.room);
+        //    if (undefined) -> error
+        //  if (this.chatService.checkPwd(room, userinfo.inputpassword) == false)
+          //  -> error
+        // if this.chatService.isBanned(room, userId) -> error
+        // chatService.joinroom(server, ...)
+
+        if (room !== undefined )
         {
-          if (this.chatService.getLaRoom(userinfo.room).password === userinfo.inputpassword)
+          if (room.password === userinfo.inputpassword)
           {
-            this.chatService.getLaRoom(userinfo.room).userSet.add(socket.id);
+            room.userSet.add(socket.id);
             socket.join(userinfo.room);
             socket.leave(userinfo.oldroom);
             success = 1;
@@ -287,7 +297,8 @@ export class MyGateway implements OnGatewayConnection {
       async leaveCurrentRoom(@ConnectedSocket() socket: Socket, @MessageBody() body: any) {
       
             //this.chatService.leaveRoomEaseSocket((body.room,this.roomowner,this.roomadmin,this.roompassword,this.maproom,body.socketid,socket,this.server,this.listRoom,this.listUserr);
-            leaveRoomEraseSocket(body.room,this.roomowner,this.roomadmin,this.roompassword,this.maproom,body.socketid,socket,this.server,this.listRoom,this.listUserr);
+            //  chatService.leaveRoom(userId, room, Socket for now)
+          //  leaveRoomEraseSocket(body.room,this.roomowner,this.roomadmin,this.roompassword,this.maproom,body.socketid,socket,this.server,this.listRoom,this.listUserr);
             console.log(this.maproom);console.log(this.roomowner);console.log(this.roompassword);
             console.log('je leave la room ');
             socket.leave(body.room);
@@ -297,6 +308,8 @@ export class MyGateway implements OnGatewayConnection {
 
       @SubscribeMessage('kickevent')
       async kickEvent(@ConnectedSocket() socket: Socket, @MessageBody() body: any) {
+
+        //check si emiter admin/owner , cant kick owner
       
 
         let socketid = body.kicklist;
@@ -305,7 +318,7 @@ export class MyGateway implements OnGatewayConnection {
                 && ((this.roomowner.get(body.room) === body.socketid) || (this.roomadmin.get(body.room).has(body.socketid)) ))
         {      
           console.log('je kick ' + body.kicklist + 'de la room suivante ' + body.room);
-          leaveRoomEraseSocket(body.room,this.roomowner,this.roomadmin,this.roompassword,this.maproom,socketid,socket,this.server,this.listRoom,this.listUserr);
+         // leaveRoomEraseSocket(body.room,this.roomowner,this.roomadmin,this.roompassword,this.maproom,socketid,socket,this.server,this.listRoom,this.listUserr);
           console.log(this.maproom);console.log(this.roomowner);console.log(this.roompassword);
           this.server.to(body.kicklist).emit('forceleaveroom',body.room);
           //this.server.in(body.kicklist).emit('leavecurrentroom')
@@ -319,6 +332,8 @@ export class MyGateway implements OnGatewayConnection {
 
         @SubscribeMessage('banevent')
         async banEvent(@ConnectedSocket() socket: Socket,@MessageBody() body: any) {
+          //check si emiter admin/owner , cant kick owner
+
         
 
             let socketid = body.kicklist;
@@ -327,7 +342,7 @@ export class MyGateway implements OnGatewayConnection {
                       ( (this.roomowner.get(body.room) === body.socketid) || (this.roomadmin.get(body.room).has(body.socketid)) ))
             {      
 
-            leaveRoomEraseSocket(body.room,this.roomowner,this.roomadmin,this.roompassword,this.maproom,socketid,socket,this.server,this.listRoom,this.listUserr);
+           // leaveRoomEraseSocket(body.room,this.roomowner,this.roomadmin,this.roompassword,this.maproom,socketid,socket,this.server,this.listRoom,this.listUserr);
             console.log(this.maproom);console.log(this.roomowner);console.log(this.roompassword);
             this.server.to(body.kicklist).emit('forceleaveroom',body.room);
             this.server.in(body.kicklist).emit('leavecurrentroom')

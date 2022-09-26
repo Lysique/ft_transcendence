@@ -14,7 +14,6 @@ type roomType = {
   banMap : Map<string,number>;
 };
 
-let listRoom : Array<roomType> = [];
 
 @Injectable()
 export class ChatService {
@@ -28,9 +27,36 @@ export class ChatService {
         private dataSource: DataSource,
         */
         
-      ) {}
+      ) {this.listRoom = new Array();}
+
+      public listRoom: Array<roomType>;
+      //principal
+
+      joinRoom(userId : string, roomName : string, password : string, client : Socket) {
+      }
 
       // UTILS    
+
+      roomExist(roomname : string)
+      {
+        if (this.getLaRoom(roomname) !== undefined)
+          return true;
+      
+        else
+          return false;
+      }
+
+      //checkpass
+      //checkmute
+      //check ban
+      //
+
+
+      
+
+      
+
+
     addRoomToList(roomObject : roomType, listRoom : Array<roomType>)
     {
       listRoom.push(roomObject);
@@ -38,7 +64,7 @@ export class ChatService {
 
     getLaRoom(name :string)
     {
-      return (listRoom.find(room => (room.roomName === name)));
+      return (this.listRoom.find(room => (room.roomName === name)));
     }
 
     //LEAVEROOM CHECK 1 PERSON
@@ -113,7 +139,7 @@ createRoom(room,password,socketid){
       mutedMap : new Map<string,number>(), 
       banMap : new Map<string,number>()
       },
-      listRoom
+      this.listRoom
       );
   }
 }
