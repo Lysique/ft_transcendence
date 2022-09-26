@@ -8,7 +8,7 @@ import { GameModule } from './game/game.module';
 import { getEnvPath } from './common/helper/env.helper';
 import { TypeOrmConfigService } from './config/typeorm/typeorm.service';
 import { AuthModule } from './auth/auth.module';
-import { GatewayModule } from './chat/gateway.module';
+import { ChatModule } from './chat/chat.module';
 
 //  Get the environment file
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
@@ -22,7 +22,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     AuthModule,
     AvatarsModule,
     GameModule,
-    GatewayModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [],
