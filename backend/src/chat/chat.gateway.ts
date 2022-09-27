@@ -173,7 +173,7 @@ export class ChatGateway implements OnGatewayConnection {
 
         if (this.chatService.createRoom(body.roomName,body.password,userDto.id))
         {
-          allRoom = this.chatService.roomAll;
+          allRoom = this.chatService.getLaRoom(body.roomName);
           this.server.emit('createRoomSuccess',allRoom);
         }
       }
