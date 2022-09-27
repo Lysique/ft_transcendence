@@ -40,6 +40,8 @@ export class ChatService {
       const userDto: UserDto = await this.authService.getUserFromSocket(socket);
       return userDto;
     }
+                           /*********************** JOIN ROOM  ************************/
+
 
     async joinRoom(userId : number, roomName : string, password : string) {
       if (this.getLaRoom(roomName) === undefined)
@@ -82,6 +84,10 @@ export class ChatService {
         }
       }
 
+
+
+                                 /*********************** LEAVE ROOM  ************************/
+
     async leaveRoom(roomName : string, userId : number)
     {
       if (this.getLaRoom(roomName) === undefined)
@@ -101,7 +107,11 @@ export class ChatService {
       this.tryDeleteRoom(roomName);
       return true;
       }
-      
+
+
+
+
+                  /*********************** Set Admin  ************************/
 
     async setAdmin(roomName : string, userId : number, victim : number)
     {
@@ -121,6 +131,11 @@ export class ChatService {
       console.log('impossible de mettre admin lutilisateur');
       return false;
     }
+
+
+
+            /*********************** Create Room  ************************/
+
 
     createRoom(room,password,userId){
       if (this.getLaRoom(room) !== undefined)
@@ -146,6 +161,10 @@ export class ChatService {
     
       return true;
     }
+
+
+
+          /*********************** KICK  && BAN ************************/
 
     async kickFunction(userId : number, victim : number, roomArg : string)
     {
@@ -184,6 +203,10 @@ export class ChatService {
       return false;
     }
 
+     /*********************** CHANGE PW ************************/
+
+
+
     changePw(userId : number, roomName : string, password : string)
     {
       if (this.getLaRoom(roomName) === undefined)
@@ -201,6 +224,10 @@ export class ChatService {
       console.log('impossible de changer le password');
       return false;
     }
+
+
+    /********************** MUTE FUNCTION ************************/
+
 
     async muteFunction(userId : number, victim : number, roomArg : string, timeMute : number)
     {
@@ -224,6 +251,8 @@ export class ChatService {
       return false;
     }
 
+    /*********************** SEND MESSAGE ROOM && PRIVATE MESSAGE ************************/
+
     async sendMessage(userId : number, victim : number, roomName : string, timeBan : number, message : string)
     {
       if (this.getLaRoom(roomName) === undefined)
@@ -244,6 +273,11 @@ export class ChatService {
         return true;
       }
       return false;
+    }
+
+    async sendPrivateMessage(userId : number, victim : number, roomName : string, timeBan : number, message : string)
+    {
+      //not yet defined ...
     }
 
 
@@ -267,7 +301,7 @@ export class ChatService {
     {
       const userDto: UserDto = await this.userService.findOneById(userId);
       let temparray = [];
-      this.listRoom.forEach(element => temparray.push(element));
+      this.listRoom.forEach(element => temparray.push(element.roomName));
       return temparray;
     }
 
@@ -293,12 +327,10 @@ export class ChatService {
       return (this.listRoom.find(room => (room.roomName === name)));
     }
 
-    //LEAVEROOM CHECK 1 PERSON
-
+    /* check if room empty and delete it */
     async tryDeleteRoom(room : string){
             
       let listroomtemp;
-      //delete la room si ya personne
       if (this.getLaRoom(room).userSet.size === 0)
       {
         listroomtemp = this.listRoom.filter(elem => elem.roomName !== room);
