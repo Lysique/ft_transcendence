@@ -14,6 +14,8 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Feed } from './Feed';
 import { JoinCreateRoomBar } from './JoinCreateRoomBar';
+import { WebsocketContext } from 'contexts/WebsocketContext';
+import { ChatNotif } from './ChatNotif';
 
 
 function a11yProps(index: number) {
@@ -31,6 +33,10 @@ var roomsTemplate: any[] = [
 {
   roomName: 'Test2.55555jhfqiwefhqweifniqebfqefhbqefhbqhefhqofebqwefq',
   messages: ['212', '222']
+},
+{
+  roomName: 'Room1',
+  messages: ['It is room 1', 'How cool']
 },
 {
   roomName: 'Test2',
@@ -54,8 +60,8 @@ var privateMsgs: any[] = [
 export const Chat = () => {
 
     const [tabIndex, setTabIndex] = React.useState<number>(0);
-
     const [rooms, setRooms] = React.useState<any>(roomsTemplate);
+    const socket = React.useContext(WebsocketContext);
 
     React.useEffect(() => {
       // const fetchRooms = async () => {
@@ -68,6 +74,15 @@ export const Chat = () => {
       // fetchRooms();
     }, []);
 
+    React.useEffect(() => {
+      socket.on('roomSuccessfullyCreated', (room: any) => {
+        console.log(room.name + ' created!');
+      });
+      return () => {
+        socket.off('roomSuccessfullyCreated');
+      };
+    }, []);
+
     enum ChannelType {
       none = 0,
       privateMessage = 1,
@@ -78,12 +93,12 @@ export const Chat = () => {
 
     const [settings, setSettings] = React.useState<null | HTMLElement>(null);
   
-    const handleChangeDicussion = (event: React.SyntheticEvent, newValue: number) => {
+    const handleChangeDicussion = (event: React.SyntheticEvent | null, newValue: number) => {
       setTabIndex(newValue);
       setChannelType(ChannelType.privateMessage);
     };
 
-    const handleChangeChannel = (event: React.SyntheticEvent, newValue: number) => {
+    const handleChangeChannel = (event: React.SyntheticEvent | null, newValue: number) => {
       setTabIndex(newValue);
       setChannelType(ChannelType.publicChannel);
     };
@@ -104,7 +119,10 @@ export const Chat = () => {
 
             <Grid item xs={2.5} sm={2.5} md={2.5} lg={2.5}>
                 <Paper>
-                    <JoinCreateRoomBar />
+                    <JoinCreateRoomBar 
+                      currentRooms={rooms}
+                      handleChangeChannel={handleChangeChannel}
+                    />
 
 
                     <div>
@@ -223,6 +241,9 @@ export const Chat = () => {
             </Grid>
 
         </Grid>
+
+      <ChatNotif />
+
     </Box>
     );
 }

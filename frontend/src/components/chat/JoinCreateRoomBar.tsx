@@ -12,32 +12,49 @@ const SearchPersonn = styled('div')(({ theme }) => ({
     borderRadius: 1,
   }));
   
-export const JoinCreateRoomBar = () => {
+export const JoinCreateRoomBar = ({
+    currentRooms,
+    handleChangeChannel
+}: any) => {
 
     const roomNames = ['Room1', 'Room2'];
-    const [allRooms, setAllRooms] = React.useState<string[] | null>(null);
+    const [allRooms, setAllRooms] = React.useState<string[]>(roomNames);
 
-    React.useEffect(() => {
+    // React.useEffect(() => {
         
-        const fetchRoomNames = async() => {
-            //  Api.fetchRoomNames
-            setAllRooms(null);
+    //     const fetchRoomNames = async() => {
+    //         //  Api.fetchRoomNames
+
+    //         setAllRooms([]);
+    //     }
+
+    //     fetchRoomNames();
+
+    // }, []);
+
+    const [openJoinRoom, setOpenJoinRoom] = React.useState<boolean>(false);
+
+    const joinRoomHandler = (roomName: string) => {
+        const idx = currentRooms.findIndex((room: { roomName: string; }) => {
+            return room.roomName === roomName;
+        });
+        if (idx !== -1) {
+            handleChangeChannel(null, idx);
         }
-
-        fetchRoomNames();
-
-    }, []);
+        else {
+            //  Open join room request dialog
+        }
+    }
 
     const keyPress = (event: any): void => {
         if (event.keyCode === 13)
         {
-            console.log(event.target.value + ' searched!')
+            joinRoomHandler(event.target.value);
         }
     }
 
     const handleClick = (event: any, value: string, reason: any) => {
-        //  Todo: Join room dialog -> password after first dialog
-        console.log(value + ' clicked!')
+        joinRoomHandler(value);
     }
 
     const [openCreateRoom, setOpenCreateRoom] = React.useState<boolean>(false);
@@ -64,7 +81,7 @@ export const JoinCreateRoomBar = () => {
             disableClearable
             freeSolo
             onChange={handleClick}
-            options={roomNames}
+            options={allRooms}
             renderInput={(params) => (
                 <>
                 <WhiteBorderTextField
