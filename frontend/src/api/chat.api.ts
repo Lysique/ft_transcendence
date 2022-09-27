@@ -1,18 +1,19 @@
 import { UserDto } from "./dto/user.dto";
 
-export type messageSent = {
+export interface messageType {
   userId : number;
   userName : string;
   message : string;
   date : number;
 };
 
-export interface RoomType {
+
+export interface roomType {
   roomName : string;
   owner : number;
-  admin : Set<number>;
-  userSet : Set<UserDto>;
-  listMsg : Array<messageSent>;
+  admins : Set<number>;
+  users : Set<UserDto>;
+  messages : Array<messageType>;
 };
 
 export class ChatAPI {
