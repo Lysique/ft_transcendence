@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { UserDto } from 'src/models/users/dto/user.dto';
 import { UsersService } from 'src/models/users/users.service';
+import { Socket} from 'socket.io';
 
 type roomType = {
   roomName : string;
@@ -20,7 +21,8 @@ export class ChatService {
 
     constructor(      
       //private authService: AuthService,
-      private userService: UsersService
+      private userService: UsersService, 
+      private authService: AuthService
     ) {
       this.listRoom = new Array();
     }
@@ -33,6 +35,11 @@ export class ChatService {
     ** @Principal
     **
     */
+
+    async getUserFromSocket(socket: Socket) {
+      const userDto: UserDto = await this.authService.getUserFromSocket(socket);
+      return userDto;
+    }
 
     async joinRoom(userId : number, roomName : string, password : string) {
       if (this.getLaRoom(roomName) === undefined)
