@@ -1,6 +1,6 @@
 import { UserDto } from "./dto/user.dto";
 
-export interface messageType {
+export interface MessageType {
   userId : number;
   userName : string;
   message : string;
@@ -8,12 +8,12 @@ export interface messageType {
 };
 
 
-export interface roomType {
+export interface RoomType {
   roomName : string;
   owner : number;
   admins : Set<number>;
   users : Set<UserDto>;
-  messages : Array<messageType>;
+  messages : Array<MessageType>;
 };
 
 export class ChatAPI {

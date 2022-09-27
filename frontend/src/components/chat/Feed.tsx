@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField';
 import SendIcon from '@mui/icons-material/Send';
 import IconButton from '@mui/material/IconButton';
 import { ChatSettings } from './ChatSettings';
-import { messageSent, RoomType } from 'api/chat.api';
+import { MessageType, RoomType } from 'api/chat.api';
 
   
 const RecvMessage = styled('div')(({ theme }) => ({
