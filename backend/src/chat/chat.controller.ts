@@ -8,15 +8,20 @@ import { Request } from 'express';
 export class ChatController {
    constructor(private readonly chatService: ChatService) {}
 
-  @Get('room/:usrId')
+  @Get('userRooms')
   @UseGuards(JwtAuthGuard)
   public async getRoomsFromUser(
     @Req() req: Request,
   ) {
       const user: any = req.user;
-      const rooms = this.chatService.roomUserPresence(user.id);
-      const roomAll = this.chatService.roomAll(user.id);
-        // return array of room type (called rooms ) where user is ==> return { rooms : rooms }
-        return { rooms : rooms };
+      const rooms = this.chatService.getAllRoomsFromUser(user.id);
+      return { rooms : rooms };
+  }
+
+  @Get('roomNames')
+  @UseGuards(JwtAuthGuard)
+  public async GetAllRoomNames(
+    @Req() req: Request,
+  ) {
   }
 }

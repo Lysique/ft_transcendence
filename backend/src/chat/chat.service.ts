@@ -253,11 +253,12 @@ export class ChatService {
     **
     */   
 
-    async roomUserPresence(userId : number)
+    async getAllRoomsFromUser(userId : number)
     {
       const userDto: UserDto = await this.userService.findOneById(userId);
-      let temparray = this.listRoom.filter(elem => elem.userSet.has(userDto));
-      return temparray;//tableau vide si pas de presence
+      
+      const temparray = this.listRoom.filter(elem => elem.userSet.has(userDto));
+      return temparray;
     }
 
 
