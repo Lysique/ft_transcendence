@@ -259,7 +259,7 @@ export class ChatService {
     {
       const userDto: UserDto = await this.userService.findOneById(userId);
       let temparray = [];
-      this.listRoom.forEach(element => temparray.push(element));
+      this.listRoom.forEach(element => temparray.push(element.roomName));
       return temparray;
     }
 
