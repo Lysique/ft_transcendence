@@ -34,18 +34,17 @@ export const Chat = () => {
     const socket = React.useContext(WebsocketContext);
 
     React.useEffect(() => {
-      const fetchRooms = async () => {
-        const resp: {rooms: RoomType[]} = await ChatAPI.getRoomsFromUser();
-        setRooms(resp.rooms);
-      };
+      // const fetchRooms = async () => {
+      //   const resp: {rooms: RoomType[]} = await ChatAPI.getRoomsFromUser();
+      //   setRooms(resp.rooms);
+      // };
   
-      fetchRooms();
+      // fetchRooms();
     }, []);
 
     React.useEffect(() => {
-      socket.on('addRoom', (room: RoomType) => {
-        console.log(room.roomName + ' created!');
-        setRooms([...rooms, room]);
+      socket.on('addRoom', ({room}) => {
+        setRooms((rooms) => [...rooms, room]);
       });
       return () => {
         socket.off('addRoom');
@@ -174,7 +173,7 @@ export const Chat = () => {
             {/* ------------ FEED ------------ */}
             <Grid item xs={7} sm={7} md={7} lg={7}>
                <Feed 
-                messages={
+                rooms={
                   channelType === ChannelType.publicChannel ?
                   rooms
                   :

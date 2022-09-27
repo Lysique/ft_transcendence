@@ -52,41 +52,41 @@ export class ChatGateway implements OnGatewayConnection {
 
     /*  Beta Program , test connection on connect with 'joinroomname'*/
 
-    this.chatService.addRoomToList(
-      {roomName : 'joinroomname',
-    owner : 11,
-    admin : new Set<number>(),
-    password : '',
-    userSet : new Set<UserDto>(),
-    mutedMap : new Map<number,number>(),
-    banMap : new Map<number,number>(),
-    listMsg : new Array<messageSent>()
-  }, this.chatService.listRoom);
+  //   this.chatService.addRoomToList(
+  //     {roomName : 'joinroomname',
+  //   owner : 11,
+  //   admin : new Set<number>(),
+  //   password : '',
+  //   userSet : new Set<UserDto>(),
+  //   mutedMap : new Map<number,number>(),
+  //   banMap : new Map<number,number>(),
+  //   listMsg : new Array<messageSent>()
+  // }, this.chatService.listRoom);
 
     
 
-    if (this.chatService.joinRoom(996,'joinroomname',''))
-    {
-      socket.join('joinroomname');
-      console.log(996 + ' Connected');
-    }
+  //   if (this.chatService.joinRoom(996,'joinroomname',''))
+  //   {
+  //     socket.join('joinroomname');
+  //     console.log(996 + ' Connected');
+  //   }
 
 
 
 
-    // UPDATE CLIENT =>tamighi to fill
-    let arr
-    if (this.chatService.getLaRoom('joinroomname'))
-    {
-      arr = Array.from(this.chatService.getLaRoom('joinroomname').userSet);
+  //   // UPDATE CLIENT =>tamighi to fill
+  //   let arr
+  //   if (this.chatService.getLaRoom('joinroomname'))
+  //   {
+  //     arr = Array.from(this.chatService.getLaRoom('joinroomname').userSet);
 
-      this.server.emit('connected',{
-        listUser : arr,
-        roomlist : ['joinroomname'],
-        roompassword : this.chatService.getLaRoom('joinroomname').password,
-        roomowner : ''
-      });
-    }
+  //     this.server.emit('connected',{
+  //       listUser : arr,
+  //       roomlist : ['joinroomname'],
+  //       roompassword : this.chatService.getLaRoom('joinroomname').password,
+  //       roomowner : ''
+  //     });
+  //   }
 
   }
     
@@ -102,9 +102,9 @@ export class ChatGateway implements OnGatewayConnection {
 
         if (this.chatService.createRoom(body.roomName,body.password,userDto.id))
         {
-          let tempreturn = this.chatService.fillReturnRoom(body.roomName);
-          currentRoom = this.chatService.getLaRoom(body.roomName);
-          this.server.emit('createRoomSuccess',{currentRoom,tempreturn});
+          const tempreturn = await this.chatService.fillReturnRoom(body.roomName);
+          console.log(tempreturn);
+          this.server.to('user_' + userDto.id.toString()).emit('addRoom',{room: tempreturn});
         }
       }
 

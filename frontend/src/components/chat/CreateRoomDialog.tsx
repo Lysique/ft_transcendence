@@ -34,7 +34,7 @@ export const CreateRoomDialog = ({
             setError('Name too long (15 char max)')
         }
         else {
-            // socket.emit('createRoom', {roomName: roomName, password: ''});
+            socket.emit('createRoom', {roomName: roomName, password: ''});
             setRoomName('');
             closeAndResetError();
         }

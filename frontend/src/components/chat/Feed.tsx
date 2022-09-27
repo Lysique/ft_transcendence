@@ -10,6 +10,7 @@ import TextField from '@mui/material/TextField';
 import SendIcon from '@mui/icons-material/Send';
 import IconButton from '@mui/material/IconButton';
 import { ChatSettings } from './ChatSettings';
+import { messageSent, RoomType } from 'api/chat.api';
 
   
 const RecvMessage = styled('div')(({ theme }) => ({
@@ -64,7 +65,7 @@ publicChannel = 2
 }
 
 interface ChatSettingsProps {
-    messages: any
+    rooms: RoomType[]
     tabIndex: number
     handleOpenSettings: any
     handleCloseSettings: any
@@ -73,7 +74,7 @@ interface ChatSettingsProps {
   }
 
 export const Feed = ({
-    messages, 
+    rooms, 
     tabIndex, 
     handleOpenSettings, 
     handleCloseSettings, 
@@ -89,7 +90,7 @@ export const Feed = ({
                     <div className='chat' style={{height: '70vh'}}>
 
                     {
-                    messages.map((room: any, index: any) => {
+                    rooms.map((room: RoomType, index: number) => {
 
                       return (
                     
@@ -104,12 +105,12 @@ export const Feed = ({
                           settings={settings as HTMLElement}
                           />
 
-                          {room.messages.map((message: any, index: any) => {
+                          {room.listMsg.map((message: messageSent, index: number) => {
                             return (
                               <div key={index}>
                                 <RecvMessage>
                                   <Typography className="sender" style={{backgroundColor: "background.paper"}} >Loraine</Typography> 
-                                    {message}
+                                    {message.message}
                                   <Typography align="right" >date</Typography>
                                 </RecvMessage>
                                 <SendMessage>

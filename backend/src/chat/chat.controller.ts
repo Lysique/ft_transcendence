@@ -14,7 +14,7 @@ export class ChatController {
     @Req() req: Request,
   ) {
       const user: any = req.user;
-      const rooms = this.chatService.getAllRoomsFromUser(user.id);
+      const rooms = await this.chatService.getAllRoomsFromUser(user.id);
       return { rooms : rooms };
   }
 

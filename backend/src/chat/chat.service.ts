@@ -305,7 +305,7 @@ export class ChatService {
     **
     */   
 
-    async fillReturnRoom(roomName : string)
+    async fillReturnRoom(roomName : string): Promise<roomReturn>
     {
       let returnroom = {
         roomName : roomName,
@@ -314,7 +314,7 @@ export class ChatService {
         userSet : this.getLaRoom(roomName).userSet,
         listMsg : this.getLaRoom(roomName).listMsg
       }
-      console.log('la room que je return' + this.fillReturnRoom);
+      return returnroom;
     }
 
     async getAllRoomsFromUser(userId : number)
