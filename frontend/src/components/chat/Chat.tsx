@@ -2,12 +2,7 @@ import * as React from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
-import InputBase from '@mui/material/InputBase';
-import { Toolbar} from '@mui/material'
-import PersonSearch from '@mui/icons-material/PersonSearch';
 import { Contacts } from "components/chat/Contacts";
-
-import { styled, alpha } from '@mui/system';
 
 import { Grid, Paper } from '@mui/material'
 
@@ -18,18 +13,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Feed } from './Feed';
-  
-
-const SearchPersonn = styled('div')(({ theme }) => ({
-  color: 'primary',
-  backgroundColor: 'primary',
-  paddingLeft: 0,
-  '&:hover':{
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-    opacity:'0.5',
-  },
-  borderRadius: 1,
-}));
+import { JoinCreateRoomBar } from './JoinCreateRoomBar';
 
 
 function a11yProps(index: number) {
@@ -120,12 +104,7 @@ export const Chat = () => {
 
             <Grid item xs={2.5} sm={2.5} md={2.5} lg={2.5}>
                 <Paper>
-                    <SearchPersonn>
-                        <Toolbar>
-                            <PersonSearch/>
-                            <InputBase placeholder="...search" style={{paddingLeft:'10px'}}></InputBase>
-                        </Toolbar>
-                    </SearchPersonn>
+                    <JoinCreateRoomBar />
 
 
                     <div>
@@ -145,7 +124,7 @@ export const Chat = () => {
                             channelType === ChannelType.publicChannel ?
                             tabIndex
                             :
-                            0
+                            false
                           }
 
                           onChange={handleChangeChannel}
@@ -190,7 +169,7 @@ export const Chat = () => {
                             channelType === ChannelType.privateMessage ?
                             tabIndex
                             :
-                            0
+                            false
                           }
                           onChange={handleChangeDicussion}
                           aria-label="Vertical tabs example"
