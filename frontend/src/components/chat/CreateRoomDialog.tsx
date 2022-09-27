@@ -1,4 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material"
+import { WebsocketContext } from "contexts/WebsocketContext"
 import React from "react"
 
 interface CreateRoomDialogProps {
@@ -13,6 +14,8 @@ export const CreateRoomDialog = ({
 
     const [roomName, setRoomName] = React.useState<string>('');
     const [error, setError] = React.useState<string>('');
+    const socket = React.useContext(WebsocketContext);
+
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setRoomName(e.target.value);
@@ -31,7 +34,7 @@ export const CreateRoomDialog = ({
             setError('Name too long (15 char max)')
         }
         else {
-            //  Emit create room
+            // socket.emit('createRoom', {roomName: roomName, password: ''});
             setRoomName('');
             closeAndResetError();
         }

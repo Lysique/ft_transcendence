@@ -16,6 +16,7 @@ import { Feed } from './Feed';
 import { JoinCreateRoomBar } from './JoinCreateRoomBar';
 import { WebsocketContext } from 'contexts/WebsocketContext';
 import { ChatNotif } from './ChatNotif';
+import { ChatAPI, RoomType } from 'api/chat.api';
 
 
 function a11yProps(index: number) {
@@ -25,63 +26,31 @@ function a11yProps(index: number) {
   };
 }
 
-var roomsTemplate: any[] = [
-{
-  roomName: 'Test1',
-  messages: ['11', '12']
-}, 
-{
-  roomName: 'Test2.55555jhfqiwefhqweifniqebfqefhbqefhbqhefhqofebqwefq',
-  messages: ['212', '222']
-},
-{
-  roomName: 'Room1',
-  messages: ['It is room 1', 'How cool']
-},
-{
-  roomName: 'Test2',
-  messages: ['21', '22']
-}]
-
-var privateMsgs: any[] = [
-  {
-    userName: 'Paul',
-    messages: ['2aa', '12aa']
-  }, 
-  {
-    userName: 'Francois',
-    messages: ['212bb', '222bb']
-  },
-  {
-    userName: 'TMartin',
-    messages: ['21cc', '22cc']
-  }]
-
 export const Chat = () => {
 
     const [tabIndex, setTabIndex] = React.useState<number>(0);
-    const [rooms, setRooms] = React.useState<any>(roomsTemplate);
+    const [rooms, setRooms] = React.useState<RoomType[]>([]);
+    const [privateRooms, setPrivateRooms] = React.useState<RoomType[]>([]);
     const socket = React.useContext(WebsocketContext);
 
     React.useEffect(() => {
-      // const fetchRooms = async () => {
-      //   const resp: any = ChatAPI.getRoomsFromUser();
-      //   if (resp) {
-      //     setRooms(resp);
-      //   }
-      // };
+      const fetchRooms = async () => {
+        const resp: {rooms: RoomType[]} = await ChatAPI.getRoomsFromUser();
+        setRooms(resp.rooms);
+      };
   
-      // fetchRooms();
+      fetchRooms();
     }, []);
 
     React.useEffect(() => {
-      socket.on('roomSuccessfullyCreated', (room: any) => {
-        console.log(room.name + ' created!');
+      socket.on('addRoom', (room: RoomType) => {
+        console.log(room.roomName + ' created!');
+        setRooms([...rooms, room]);
       });
       return () => {
-        socket.off('roomSuccessfullyCreated');
+        socket.off('addRoom');
       };
-    }, []);
+    }, [socket]);
 
     enum ChannelType {
       none = 0,
@@ -152,12 +121,7 @@ export const Chat = () => {
 
                             {rooms.map((channel: any, index: any) => {
                               return (
-                                // <Tab label={channel} {...a11yProps(index)} icon={<Badge><CircleNotificationsIcon/></Badge>} iconPosition="end"></Tab>
-                                <Tab key={index} label={channel.roomName.length > 20 ? 
-                                  channel.roomName.substr(0,20) + '...'
-                                  : 
-                                  channel.roomName
-                                } {...a11yProps(index)}/> 
+                                <Tab key={index} label={channel.roomName} {...a11yProps(index)}/> 
                               );
                             })}
 
@@ -193,14 +157,9 @@ export const Chat = () => {
                           aria-label="Vertical tabs example"
                           sx={{ borderRight: 1, borderColor: 'divider', height: '28vh' }}
                           >
-                           {privateMsgs.map((channel, index) => {
+                           {privateRooms.map((channel, index) => {
                               return (
-                                // <Tab label={channel} {...a11yProps(index)} icon={<Badge><CircleNotificationsIcon/></Badge>} iconPosition="end"></Tab>
-                                <Tab key={index} label={channel.userName.length > 20 ? 
-                                  channel.userName.substr(0,20) + '...'
-                                  : 
-                                  channel.userName
-                                } {...a11yProps(index)}/> 
+                                <Tab key={index} label={channel.roomName} {...a11yProps(index)}/> 
                               );
                             })}
 
@@ -220,7 +179,7 @@ export const Chat = () => {
                   rooms
                   :
                   channelType === ChannelType.privateMessage ?
-                  privateMsgs
+                  privateRooms
                   :
                   []
                 }

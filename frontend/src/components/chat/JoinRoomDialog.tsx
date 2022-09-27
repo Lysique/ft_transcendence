@@ -1,4 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material"
+import { WebsocketContext } from "contexts/WebsocketContext";
 import React from "react"
 
 export const JoinRoomDialog = ({
@@ -7,7 +8,13 @@ export const JoinRoomDialog = ({
     setOpen
 }: any ) => {
 
+    const socket = React.useContext(WebsocketContext);
+    //  Add usestate password
 
+    const joinRoom = () => {
+        setOpen(false);
+        // socket.emit('joinRoom', {roomName: roomName, password: ''});
+    }
 
     return (
         <Dialog 
@@ -31,7 +38,7 @@ export const JoinRoomDialog = ({
         <DialogContent />
 
         <DialogActions>
-            <Button onClick={() => { setOpen(false)} } >
+            <Button onClick={joinRoom} >
                 Join
             </Button>
             <Button onClick={() => { setOpen(false)} }>

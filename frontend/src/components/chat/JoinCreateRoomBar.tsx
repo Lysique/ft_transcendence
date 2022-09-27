@@ -5,6 +5,7 @@ import React from "react";
 import { CreateRoomDialog } from "./CreateRoomDialog";
 import { WhiteBorderTextField } from "components/utils/WhiteBorderTextField";
 import { JoinRoomDialog } from "./JoinRoomDialog";
+import { ChatAPI } from "api/chat.api";
 
 const SearchPersonn = styled('div')(({ theme }) => ({
     color: 'primary',
@@ -21,17 +22,15 @@ export const JoinCreateRoomBar = ({
     const roomNames = ['Room1', 'Room2'];
     const [allRooms, setAllRooms] = React.useState<string[]>(roomNames);
 
-    // React.useEffect(() => {
+    React.useEffect(() => {
         
-    //     const fetchRoomNames = async() => {
-    //         //  Api.fetchRoomNames
+        const fetchRoomNames = async() => {
+            const resp: {rooms: string[]} = await ChatAPI.getAllRoomNames();
+            setAllRooms(resp.rooms);
+        }
 
-    //         setAllRooms([]);
-    //     }
-
-    //     fetchRoomNames();
-
-    // }, []);
+        fetchRoomNames();
+    }, []);
 
     const [openJoinRoom, setOpenJoinRoom] = React.useState<boolean>(false);
     const [roomToJoin, setRoomToJoin]= React.useState<string>('');
