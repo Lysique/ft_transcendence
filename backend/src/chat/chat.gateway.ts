@@ -93,7 +93,7 @@ export class ChatGateway implements OnGatewayConnection {
     
 
 
-                           /*********************** JOIN ROOM  ************************/
+                           /*********************** CREATE ROOM  ************************/
       
       @SubscribeMessage('createRoom')
       async createRoom(@ConnectedSocket() socket: Socket, @MessageBody() body : {roomName: string, password: string}) {
@@ -108,6 +108,8 @@ export class ChatGateway implements OnGatewayConnection {
         }
       }
 
+
+                         /*********************** JOIN ROOM  ************************/
 
       @SubscribeMessage('joinRoom')
       async joinRoom(@ConnectedSocket() socket: Socket, @MessageBody() userinfo: UserPayload) {
@@ -217,6 +219,7 @@ export class ChatGateway implements OnGatewayConnection {
   onPrivateMessage(@ConnectedSocket() client: Socket,
   @MessageBody() body: any,
   ) {
+    //if (chat.Service.sendPrivateMessage(userId : number, victim : number, roomName : string, timeBan : number, message : string))
 
   };
 

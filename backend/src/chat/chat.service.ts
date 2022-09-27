@@ -275,6 +275,11 @@ export class ChatService {
       return false;
     }
 
+    async sendPrivateMessage(userId : number, victim : number, roomName : string, timeBan : number, message : string)
+    {
+      //not yet defined ...
+    }
+
 
     /*
     **
