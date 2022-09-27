@@ -161,6 +161,7 @@ export class ChatGateway implements OnGatewayConnection {
 
         @SubscribeMessage('banevent')
         async banEvent(@ConnectedSocket() socket: Socket,@MessageBody() body: any) {
+          //if (this.chatService.banFunction(userId : number, victim : number, roomArg : string, timeBan : number))
           
       };
 
@@ -170,6 +171,7 @@ export class ChatGateway implements OnGatewayConnection {
 
         @SubscribeMessage('setadmin')
         async setAdmin(@ConnectedSocket() socket: Socket,@MessageBody() body: any) {
+          //if (this.chatService.changePw(userId : number, roomName : string, password : string))
               
         };
 
@@ -177,7 +179,8 @@ export class ChatGateway implements OnGatewayConnection {
                         /*********************** SET ADMIN MUTE EVENT  ************************/
 
         @SubscribeMessage('muteadminevent')
-        async muteAdminEvent(@ConnectedSocket() socket: Socket,@MessageBody() body: any) {  
+        async muteAdminEvent(@ConnectedSocket() socket: Socket,@MessageBody() body: any) {
+          //if (this.chatService.muteFunction(userId : number, victim : number, roomArg : string, timeMute : number))
           
           
           };
@@ -186,6 +189,7 @@ export class ChatGateway implements OnGatewayConnection {
                     
           @SubscribeMessage('changepw')
           async changePw(@ConnectedSocket() socket: Socket,@MessageBody() body: any) {
+            //if (this.chatSercie.changePw(userId : number, roomName : string, password : string))
             
           };
                        /*********************** DISCONNECT  ************************/
@@ -204,6 +208,7 @@ export class ChatGateway implements OnGatewayConnection {
   onNewMessage(@ConnectedSocket() client: Socket,
   @MessageBody() body: any,
   ) {
+    //if (this.chatService.sendMessage(userId : number, victim : number, roomName : string, timeBan : number, message : string))
    
   };
 

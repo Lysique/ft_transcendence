@@ -251,7 +251,7 @@ export class ChatService {
       return false;
     }
 
-    /*********************** SEND MESSAGE ************************/
+    /*********************** SEND MESSAGE ROOM && PRIVATE MESSAGE ************************/
 
     async sendMessage(userId : number, victim : number, roomName : string, timeBan : number, message : string)
     {
