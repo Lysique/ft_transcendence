@@ -1,7 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { userInfo } from 'os';
-import { VirtualAction } from 'rxjs';
-import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { UserDto } from 'src/models/users/dto/user.dto';
 import { UsersService } from 'src/models/users/users.service';
@@ -11,7 +8,7 @@ type roomType = {
   owner : number;
   admin : Set<number>;
   password : string;
-  userSet : Set<UserDto>;//userdto
+  userSet : Set<UserDto>;
   mutedMap : Map<number,number>;
   banMap : Map<number,number>;
   listMsg : Array<string>;

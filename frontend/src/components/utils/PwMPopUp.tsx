@@ -9,7 +9,7 @@ interface PopUpProps {
     open: boolean
     setOpen: Function
     setValidation: Function
-	setAnswered: Function
+	  setAnswered: Function
     title: string 
     message: string
 }

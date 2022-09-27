@@ -12,14 +12,29 @@ export const CreateRoomDialog = ({
 } : CreateRoomDialogProps) => {
 
     const [roomName, setRoomName] = React.useState<string>('');
+    const [error, setError] = React.useState<string>('');
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setRoomName(e.target.value);
     }
 
-    const onCreate = () => {
-        //  Emit create room
+    const closeAndResetError = () => {
+        setError('');
         onClose();
+    }
+
+    const onCreate = () => {
+        if (roomName === '') {
+            setError('Please enter a room name')
+        }
+        else if (roomName.length > 15) {
+            setError('Name too long (15 char max)')
+        }
+        else {
+            //  Emit create room
+            setRoomName('');
+            closeAndResetError();
+        }
     }
 
     return (
@@ -29,8 +44,10 @@ export const CreateRoomDialog = ({
         <DialogContent />
 
             <TextField
+            error={error === '' ? false : true}
             id="outlined-name"
-            label="Name"
+            label="Room name"
+            helperText={error}
             value={roomName}
             onChange={handleInput}
             />
@@ -41,7 +58,7 @@ export const CreateRoomDialog = ({
             <Button onClick={onCreate} >
                 Create
             </Button>
-            <Button onClick={onClose}>
+            <Button onClick={closeAndResetError}>
                 Cancel
             </Button>
         </DialogActions>
