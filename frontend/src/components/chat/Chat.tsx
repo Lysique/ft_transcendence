@@ -34,12 +34,12 @@ export const Chat = () => {
     const socket = React.useContext(WebsocketContext);
 
     React.useEffect(() => {
-      // const fetchRooms = async () => {
-      //   const resp: {rooms: RoomType[]} = await ChatAPI.getRoomsFromUser();
-      //   setRooms(resp.rooms);
-      // };
+      const fetchRooms = async () => {
+        const resp: {rooms: RoomType[]} = await ChatAPI.getRoomsFromUser();
+        setRooms(resp.rooms);
+      };
   
-      // fetchRooms();
+      fetchRooms();
     }, []);
 
     React.useEffect(() => {

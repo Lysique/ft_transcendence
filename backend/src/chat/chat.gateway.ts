@@ -96,14 +96,12 @@ export class ChatGateway implements OnGatewayConnection {
       
       @SubscribeMessage('createRoom')
       async createRoom(@ConnectedSocket() socket: Socket, @MessageBody() body : {roomName: string, password: string}) {
-        let currentRoom;
 
         const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
 
         if (this.chatService.createRoom(body.roomName,body.password,userDto.id))
         {
           const tempreturn = await this.chatService.fillReturnRoom(body.roomName);
-          console.log(tempreturn);
           this.server.to('user_' + userDto.id.toString()).emit('addRoom',{room: tempreturn});
         }
       }

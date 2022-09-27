@@ -4,31 +4,31 @@ import { UserDto } from 'src/models/users/dto/user.dto';
 import { UsersService } from 'src/models/users/users.service';
 import { Socket} from 'socket.io';
 
-export type messageSent = {
+export interface messageType {
   userId : number;
   userName : string;
   message : string;
   date : number;
 };
 
-export type roomType = {
+export interface roomType {
   roomName : string;
   owner : number;
-  admin : Set<number>;
+  admins : Array<number>;
   password : string;
-  userSet : Set<UserDto>;
+  users : Array<UserDto>;
   mutedMap : Map<number,number>;
   banMap : Map<number,number>;
-  listMsg : Array<messageSent>;
+  messages : Array<messageType>;
 };
 
 //fill le room return a chqaue fois
 type roomReturn = {
   roomName : string;
   owner : number;
-  admin : Set<number>;
-  userSet : Set<UserDto>;
-  listMsg : Array<messageSent>;
+  admins : Set<number>;
+  users : Set<UserDto>;
+  messages : Array<messageType>;
 };
 
 
@@ -79,7 +79,7 @@ export class ChatService {
             if (datenow - room.banMap.get(userId) <= 0)
             {
               room.banMap.delete(userId);
-              room.userSet.add(userDto);
+              room.users.push(userDto);
               return true;
             }
               else
@@ -90,7 +90,7 @@ export class ChatService {
           }
           else
           {
-            room.userSet.add(userDto);
+            room.users.push(userDto);
             return true;
           }
         }
@@ -115,12 +115,12 @@ export class ChatService {
       const room = this.getLaRoom(roomName);
       const userDto: UserDto = await this.userService.findOneById(userId);
       
-      if (!room.userSet.has(userDto))
+      if (!room.users.has(userDto))
       {
         console.log('cant leave because he is not in the room');
         return false;
       }
-      room.userSet.add(userDto);
+      room.users.add(userDto);
       this.tryDeleteRoom(roomName);
       return true;
       }
@@ -141,7 +141,7 @@ export class ChatService {
       if (userId === room.owner && victim !== room.owner)
       {
         const userDto: UserDto = await this.userService.findOneById(userId);
-        room.admin.add(userId);
+        room.admins.push(userId);
         console.log('on a bien setup ladmin pour notre ami ' + victim);
         return true;
       }
@@ -166,12 +166,12 @@ export class ChatService {
         {
         roomName : room, 
         owner : userId, 
-        admin : new Set<number>, 
+        admins : new Array<number>, 
         password : password, 
-        userSet : new Set<UserDto>().add(userId), 
+        users : new Array<UserDto>().push(userId), 
         mutedMap : new Map<number,number>(), 
         banMap : new Map<number,number>(),
-        listMsg : new Array<messageSent>(),
+        listMsg : new Array<messageType>(),
         },
         this.listRoom
         );
@@ -187,10 +187,10 @@ export class ChatService {
     {
       const room = this.getLaRoom(roomArg);
       const userDto: UserDto = await this.userService.findOneById(victim);
-      if (room.owner !== victim   &&    ( room.admin.has(userId) || room.owner === userId ))
+      if (room.owner !== victim   &&    ( room.admins.has(userId) || room.owner === userId ))
       {
         console.log('kick successfull , good bye ' + victim);
-        room.userSet.delete(userDto);
+        room.users.delete(userDto);
         this.tryDeleteRoom(roomArg);
         return true;
       }
@@ -321,7 +321,7 @@ export class ChatService {
     {
       const userDto: UserDto = await this.userService.findOneById(userId);
       
-      const temparray = this.listRoom.filter(elem => elem.userSet.has(userDto));
+      const temparray = this.listRoom.filter(elem => elem.userSet.has({id: userId}));
       return temparray;
     }
 
