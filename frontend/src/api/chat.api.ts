@@ -7,9 +7,9 @@ export type RoomType = {
     messages: Array<string>;
     password : string;
     userSet : Set<UserDto>;
-    mutedMap : Map<number,number>;
-    banMap : Map<number,number>;//not number date
-  };
+    mutedMap : Map<number,Date>;
+    banMap : Map<number,Date>;//not number date
+};
 
 export class ChatAPI {
   public static async getRoomsFromUser(): Promise<{ rooms: RoomType[] } | null> {

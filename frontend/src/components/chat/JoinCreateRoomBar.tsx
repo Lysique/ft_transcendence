@@ -4,6 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import React from "react";
 import { CreateRoomDialog } from "./CreateRoomDialog";
 import { WhiteBorderTextField } from "components/utils/WhiteBorderTextField";
+import { JoinRoomDialog } from "./JoinRoomDialog";
 
 const SearchPersonn = styled('div')(({ theme }) => ({
     color: 'primary',
@@ -33,6 +34,7 @@ export const JoinCreateRoomBar = ({
     // }, []);
 
     const [openJoinRoom, setOpenJoinRoom] = React.useState<boolean>(false);
+    const [roomToJoin, setRoomToJoin]= React.useState<string>('');
 
     const joinRoomHandler = (roomName: string) => {
         const idx = currentRooms.findIndex((room: { roomName: string; }) => {
@@ -42,7 +44,9 @@ export const JoinCreateRoomBar = ({
             handleChangeChannel(null, idx);
         }
         else {
-            //  Open join room request dialog
+            setOpenJoinRoom(true);
+            //  With optional password
+            setRoomToJoin(roomName);
         }
     }
 
@@ -107,6 +111,12 @@ export const JoinCreateRoomBar = ({
     <CreateRoomDialog
         open={openCreateRoom}
         onClose={handleCloseCreateRoom}
+    />
+
+    <JoinRoomDialog 
+        open={openJoinRoom}
+        roomName={roomToJoin}
+        setOpen={setOpenJoinRoom}
     />
 
     </>
