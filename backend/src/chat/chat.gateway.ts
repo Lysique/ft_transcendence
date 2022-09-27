@@ -96,14 +96,15 @@ export class ChatGateway implements OnGatewayConnection {
       
       @SubscribeMessage('createRoom')
       async createRoom(@ConnectedSocket() socket: Socket, @MessageBody() body : {roomName: string, password: string}) {
-        let allRoom;
+        let currentRoom;
 
         const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
 
         if (this.chatService.createRoom(body.roomName,body.password,userDto.id))
         {
-          allRoom = this.chatService.getLaRoom(body.roomName);
-          this.server.emit('createRoomSuccess',allRoom);
+          let tempreturn = this.chatService.fillReturnRoom(body.roomName);
+          currentRoom = this.chatService.getLaRoom(body.roomName);
+          this.server.emit('createRoomSuccess',{currentRoom,tempreturn});
         }
       }
 
@@ -116,6 +117,7 @@ export class ChatGateway implements OnGatewayConnection {
         //async joinRoom(userId : number, roomName : string, password : string)
         if (this.chatService.joinRoom(34,userinfo.room, '' ))
         {
+          //room return update
           // emit vers le client
         }
         

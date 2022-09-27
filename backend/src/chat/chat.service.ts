@@ -305,6 +305,18 @@ export class ChatService {
     **
     */   
 
+    async fillReturnRoom(roomName : string)
+    {
+      let returnroom = {
+        roomName : roomName,
+        owner : this.getLaRoom(roomName).owner,
+        admin : this.getLaRoom(roomName).admin,
+        userSet : this.getLaRoom(roomName).userSet,
+        listMsg : this.getLaRoom(roomName).listMsg
+      }
+      console.log('la room que je return' + this.fillReturnRoom);
+    }
+
     async getAllRoomsFromUser(userId : number)
     {
       const userDto: UserDto = await this.userService.findOneById(userId);
