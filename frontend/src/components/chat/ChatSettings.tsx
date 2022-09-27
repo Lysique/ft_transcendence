@@ -38,9 +38,8 @@ export const ChatSettings = ({handleOpenSettings, handleCloseSettings, settings}
             onClose={handleCloseSettings}
             >
                 <div>LEAVE THE CHANNEL</div>
-                {  true ?
+                {  true &&
                 <div>PASWORD SETTINGS</div>
-                : ''
                 }
             </Menu>
         </Box>

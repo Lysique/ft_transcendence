@@ -50,7 +50,7 @@ const RecvMessage = styled('div')(({ theme }) => ({
       >
         {value === index && (
           <Box sx={{ p: 3 }}>
-            <Typography>{children}</Typography>
+            <Typography component={'div'}>{children}</Typography>
           </Box>
         )}
       </div>
@@ -93,20 +93,20 @@ export const Feed = ({
 
                       return (
                     
-                        <TabPanel value={tabIndex} index={index}>
+                        <TabPanel value={tabIndex} index={index} key={index} >                       
+                                                 
+                           <Box
+                        sx={{ height: '60vh', overflow: "hidden", overflowY: "scroll"}}>
 
-
-                        <ChatSettings 
+                          <ChatSettings 
                           handleCloseSettings={handleCloseSettings}
                           handleOpenSettings={handleOpenSettings}
                           settings={settings as HTMLElement}
-                        />
-                        
-                           <Box
-                        sx={{ height: '60vh', overflow: "hidden", overflowY: "scroll"}}>
+                          />
+
                           {room.messages.map((message: any, index: any) => {
                             return (
-                              <div>
+                              <div key={index}>
                                 <RecvMessage>
                                   <Typography className="sender" style={{backgroundColor: "background.paper"}} >Loraine</Typography> 
                                     {message}
@@ -131,9 +131,7 @@ export const Feed = ({
 
                   
                 </div>
-                { channelType === ChannelType.none ?
-                ''
-                : 
+                { channelType !== ChannelType.none &&
                     <Box sx={{
                       display: 'flex',
                       justifyContent: 'flex-end',

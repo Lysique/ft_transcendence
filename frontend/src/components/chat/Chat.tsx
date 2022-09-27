@@ -145,7 +145,7 @@ export const Chat = () => {
                             channelType === ChannelType.publicChannel ?
                             tabIndex
                             :
-                            0
+                            false
                           }
 
                           onChange={handleChangeChannel}
@@ -190,7 +190,7 @@ export const Chat = () => {
                             channelType === ChannelType.privateMessage ?
                             tabIndex
                             :
-                            0
+                            false
                           }
                           onChange={handleChangeDicussion}
                           aria-label="Vertical tabs example"
