@@ -165,6 +165,17 @@ export class ChatGateway implements OnGatewayConnection {
 
                            /*********************** JOIN ROOM  ************************/
       
+      @SubscribeMessage('createRoom')
+      async createRoom(@ConnectedSocket() socket: Socket, @MessageBody() body : any) {
+        let allRoom;
+        if (this.chatService.createRoom(body.roomName,body.password,body.useId))
+        {
+          allRoom = this.chatService.roomAll;
+          this.server.emit('createRoomSuccess',allRoom);
+        }
+      }
+
+
       @SubscribeMessage('joinRoom')
       async joinRoom(@ConnectedSocket() socket: Socket, @MessageBody() userinfo: UserPayload) {
 

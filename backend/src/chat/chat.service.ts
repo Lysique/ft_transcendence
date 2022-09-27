@@ -256,6 +256,18 @@ export class ChatService {
       return temparray;//tableau vide si pas de presence
     }
 
+
+    /* all room list string room name */
+    async roomAll(userId : number)
+    {
+      const userDto: UserDto = await this.userService.findOneById(userId);
+      let temparray = [];
+      this.listRoom.forEach(element => temparray.push(element));
+      return temparray;
+    }
+
+    
+
     roomExist(roomname : string)
     {
       if (this.getLaRoom(roomname) !== undefined)
