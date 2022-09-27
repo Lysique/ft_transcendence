@@ -4,7 +4,14 @@ import { UserDto } from 'src/models/users/dto/user.dto';
 import { UsersService } from 'src/models/users/users.service';
 import { Socket} from 'socket.io';
 
-type roomType = {
+export type messageSent = {
+  userId : number;
+  userName : string;
+  message : string;
+  date : number;
+};
+
+export type roomType = {
   roomName : string;
   owner : number;
   admin : Set<number>;
@@ -12,8 +19,18 @@ type roomType = {
   userSet : Set<UserDto>;
   mutedMap : Map<number,number>;
   banMap : Map<number,number>;
-  listMsg : Array<string>;
+  listMsg : Array<messageSent>;
 };
+
+//fill le room return a chqaue fois
+type roomReturn = {
+  roomName : string;
+  owner : number;
+  admin : Set<number>;
+  userSet : Set<UserDto>;
+  listMsg : Array<messageSent>;
+};
+
 
 
 @Injectable()
@@ -154,7 +171,7 @@ export class ChatService {
         userSet : new Set<UserDto>().add(userId), 
         mutedMap : new Map<number,number>(), 
         banMap : new Map<number,number>(),
-        listMsg : new Array<string>(),
+        listMsg : new Array<messageSent>(),
         },
         this.listRoom
         );
@@ -261,6 +278,7 @@ export class ChatService {
           return false;
         }
 
+        const userDto: UserDto = await this.userService.findOneById(userId);
       const room = this.getLaRoom(roomName);
 
       //can send message ?
@@ -268,7 +286,7 @@ export class ChatService {
       let datenow = Date.now();
       if ( (!room.mutedMap.has(userId)) || (datenow - room.mutedMap.get(userId) <= 0))
       {
-        let coconcatname : string = userId + message;
+        let coconcatname = {userId : userId, userName : userDto.name, message : message, date : Date.now()};
         room.listMsg.push(coconcatname);
         return true;
       }
@@ -286,6 +304,18 @@ export class ChatService {
     ** @Utils
     **
     */   
+
+    async fillReturnRoom(roomName : string)
+    {
+      let returnroom = {
+        roomName : roomName,
+        owner : this.getLaRoom(roomName).owner,
+        admin : this.getLaRoom(roomName).admin,
+        userSet : this.getLaRoom(roomName).userSet,
+        listMsg : this.getLaRoom(roomName).listMsg
+      }
+      console.log('la room que je return' + this.fillReturnRoom);
+    }
 
     async getAllRoomsFromUser(userId : number)
     {

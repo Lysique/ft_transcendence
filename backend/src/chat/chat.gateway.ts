@@ -8,12 +8,11 @@ import {
   OnGatewayConnection,
 } from '@nestjs/websockets';
 import { Server, Socket} from 'socket.io';
-import { ChatService } from './chat.service';
+import { ChatService, messageSent , roomType} from './chat.service';
 import { Inject } from '@nestjs/common';
 import { stringify } from 'querystring';
 import { timingSafeEqual } from 'crypto';
 import { UserDto } from 'src/models/users/dto/user.dto';
-
 type UserPayload = {
   delvalue: string;
   socketid: string;
@@ -61,7 +60,7 @@ export class ChatGateway implements OnGatewayConnection {
     userSet : new Set<UserDto>(),
     mutedMap : new Map<number,number>(),
     banMap : new Map<number,number>(),
-    listMsg : new Array<string>()
+    listMsg : new Array<messageSent>()
   }, this.chatService.listRoom);
 
     
@@ -97,14 +96,15 @@ export class ChatGateway implements OnGatewayConnection {
       
       @SubscribeMessage('createRoom')
       async createRoom(@ConnectedSocket() socket: Socket, @MessageBody() body : {roomName: string, password: string}) {
-        let allRoom;
+        let currentRoom;
 
         const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
 
         if (this.chatService.createRoom(body.roomName,body.password,userDto.id))
         {
-          allRoom = this.chatService.getLaRoom(body.roomName);
-          this.server.emit('createRoomSuccess',allRoom);
+          let tempreturn = this.chatService.fillReturnRoom(body.roomName);
+          currentRoom = this.chatService.getLaRoom(body.roomName);
+          this.server.emit('createRoomSuccess',{currentRoom,tempreturn});
         }
       }
 
@@ -117,6 +117,7 @@ export class ChatGateway implements OnGatewayConnection {
         //async joinRoom(userId : number, roomName : string, password : string)
         if (this.chatService.joinRoom(34,userinfo.room, '' ))
         {
+          //room return update
           // emit vers le client
         }
         
