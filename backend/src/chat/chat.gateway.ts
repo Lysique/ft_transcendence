@@ -8,12 +8,11 @@ import {
   OnGatewayConnection,
 } from '@nestjs/websockets';
 import { Server, Socket} from 'socket.io';
-import { ChatService } from './chat.service';
+import { ChatService, messageSent , roomType} from './chat.service';
 import { Inject } from '@nestjs/common';
 import { stringify } from 'querystring';
 import { timingSafeEqual } from 'crypto';
 import { UserDto } from 'src/models/users/dto/user.dto';
-
 type UserPayload = {
   delvalue: string;
   socketid: string;
@@ -61,7 +60,7 @@ export class ChatGateway implements OnGatewayConnection {
     userSet : new Set<UserDto>(),
     mutedMap : new Map<number,number>(),
     banMap : new Map<number,number>(),
-    listMsg : new Array<string>()
+    listMsg : new Array<messageSent>()
   }, this.chatService.listRoom);
 
     
