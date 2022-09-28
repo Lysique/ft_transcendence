@@ -132,6 +132,28 @@ export class ChatGateway implements OnGatewayConnection {
 
   };
 
+
+    /*********************** CHANGE PASSWORD  ************************/
+
+    @SubscribeMessage('changePassword')
+    async changePassword(@ConnectedSocket() socket: Socket,@MessageBody() body : {roomName: string, password: string}) {
+      if (!this.chatService.roomExist(body.roomName)) {
+        this.server.to(socket.id).emit('chatNotif', {notif: 'This room no longer exists.'});
+        return ;
+      }
+
+      const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
+      const roomDto: RoomDto = this.chatService.getRoomFromName(body.roomName);
+
+      if (roomDto.owner !== userDto.id) {
+        this.server.to(socket.id).emit('chatNotif', {notif: `An error has occured.`});
+        return ;
+      }
+
+      this.chatService.changePassword(roomDto, body.password);
+      this.server.to(socket.id).emit('chatNotif', {notif: `Password changed successfully.`});
+    };
+
     // @SubscribeMessage('kickevent')
     // async kickEvent(@ConnectedSocket() socket: Socket, @MessageBody() body: any) {
 
@@ -178,11 +200,4 @@ export class ChatGateway implements OnGatewayConnection {
         
         };
 
-                      /*********************** CHANGE PASSWORD  ************************/
-                  
-        @SubscribeMessage('changepw')
-        async changePw(@ConnectedSocket() socket: Socket,@MessageBody() body: any) {
-          //if (this.chatSercie.changePw(userId : number, roomName : string, password : string))
-          
-        };
   };

@@ -120,6 +120,13 @@ export class ChatService {
    this.RoomList.delete(room.roomName.toUpperCase());
   }
 
+       /*********************** CHANGE PW ************************/
+
+  changePassword(roomDto: RoomDto, password: string) {
+    roomDto.password = password;
+    this.RoomList.set(roomDto.roomName.toUpperCase(), roomDto);
+  }
+
   /*
   **
   ** @Controller
@@ -241,27 +248,7 @@ export class ChatService {
     //   return false;
     // }
 
-     /*********************** CHANGE PW ************************/
 
-
-
-    changePw(userId : number, roomName : string, password : string)
-    {
-      if (this.getRoomFromName(roomName) === undefined)
-        {
-          console.log('cant change pw, room doesnt exist');
-          return false;
-        }
-        const room = this.getRoomFromName(roomName);
-      if (userId === room.owner)
-      {
-        room.password = password;
-        console.log('on a bien setup le nouveau password ' + password);
-        return true;
-      }
-      console.log('impossible de changer le password');
-      return false;
-    }
 
 
     /********************** MUTE FUNCTION ************************/

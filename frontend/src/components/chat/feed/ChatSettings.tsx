@@ -6,17 +6,22 @@ import Menu from '@mui/material/Menu';
 import Tooltip from "@mui/material/Tooltip";
 import { RoomDto } from 'api/chat.api';
 import { WebsocketContext } from 'contexts/WebsocketContext';
-import { Button } from '@mui/material';
+import { Button, MenuItem } from '@mui/material';
 import ValidationPopup from 'components/utils/ValidationPopup';
+import { UserContext } from 'App';
+import { UserDto } from 'api/dto/user.dto';
+import { ChangeRoomPwdDialog } from './ChangeRoomPwdDialog';
 
 export const ChatSettings = ({room}: {room: RoomDto}) => {
 
     const [settings, setSettings] = React.useState<null | HTMLElement>(null);
     const socket = React.useContext(WebsocketContext);
+    const user: UserDto | null = React.useContext(UserContext);
 
     const handleCloseSettings = () => {
       setSettings(null);
     };
+
     const handleOpenSettings = (event: React.MouseEvent<HTMLElement>) => {
       setSettings(event.currentTarget);
     };
@@ -33,6 +38,12 @@ export const ChatSettings = ({room}: {room: RoomDto}) => {
             socket.emit('leaveRoom', { roomName: room.roomName })
         }
       }, [validation, socket]);
+
+    const [openChangePwd, setOpenChangePwd] = React.useState<boolean>(false);
+
+    React.useEffect(() => {
+        setSettings(null);
+      }, [openChangePwd, openValidation]);
     
     return (
         <>
@@ -58,10 +69,14 @@ export const ChatSettings = ({room}: {room: RoomDto}) => {
             open={Boolean(settings)}
             onClose={handleCloseSettings}
             >
-                <Button onClick={onLeaveChannelClick}>Leave room</Button>
-
-                {true &&
-                <div>PASSWORD SETTINGS</div>
+                <MenuItem >
+                    <Button onClick={onLeaveChannelClick}>Leave room</Button>
+                </MenuItem>
+                {
+                    user?.id === room.owner &&
+                    <MenuItem >
+                        <Button onClick={() => setOpenChangePwd(true)}>Change password</Button>
+                    </MenuItem>
                 }
             </Menu>
         </Box>
@@ -73,6 +88,13 @@ export const ChatSettings = ({room}: {room: RoomDto}) => {
             title={`Leave room ${room.roomName} ?`}
             message={'The room will be left and destroyed if you are the owner.'}
         />
+
+        <ChangeRoomPwdDialog
+            roomName={room.roomName}
+            open={openChangePwd}
+            setOpen={setOpenChangePwd}
+        />
+            
         </>
     );
 }
