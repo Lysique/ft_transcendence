@@ -1,6 +1,6 @@
 import { UserDto } from "./dto/user.dto";
 
-export interface MessageType {
+export interface MessageDto {
   userId : number;
   userName : string;
   message : string;
@@ -8,17 +8,18 @@ export interface MessageType {
 };
 
 
-export interface RoomType {
+export interface RoomDto {
   roomName : string;
   owner : number;
-  admins : Set<number>;
-  users : Set<UserDto>;
-  messages : Array<MessageType>;
+  admins : Array<number>;
+  users : Array<UserDto>;
+  messages : Array<MessageDto>;
+  hasPwd: boolean;
 };
 
 export class ChatAPI {
 
-  public static async getRoomsFromUser(): Promise<{ rooms: RoomType[] }> {
+  public static async getRoomsFromUser(): Promise<{ rooms: RoomDto[] }> {
 
     const resp = await fetch(
       `http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/chat/userRooms`,

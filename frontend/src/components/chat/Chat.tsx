@@ -16,7 +16,7 @@ import { Feed } from './Feed';
 import { JoinCreateRoomBar } from './JoinCreateRoomBar';
 import { WebsocketContext } from 'contexts/WebsocketContext';
 import { ChatNotif } from './ChatNotif';
-import { ChatAPI, RoomType } from 'api/chat.api';
+import { ChatAPI, RoomDto } from 'api/chat.api';
 
 
 function a11yProps(index: number) {
@@ -29,13 +29,13 @@ function a11yProps(index: number) {
 export const Chat = () => {
 
     const [tabIndex, setTabIndex] = React.useState<number>(0);
-    const [rooms, setRooms] = React.useState<RoomType[]>([]);
-    const [privateRooms, setPrivateRooms] = React.useState<RoomType[]>([]);
+    const [rooms, setRooms] = React.useState<RoomDto[]>([]);
+    const [privateRooms, setPrivateRooms] = React.useState<RoomDto[]>([]);
     const socket = React.useContext(WebsocketContext);
 
     React.useEffect(() => {
       const fetchRooms = async () => {
-        const resp: {rooms: RoomType[]} = await ChatAPI.getRoomsFromUser();
+        const resp: {rooms: RoomDto[]} = await ChatAPI.getRoomsFromUser();
         setRooms(resp.rooms);
       };
   
