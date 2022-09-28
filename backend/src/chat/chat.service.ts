@@ -8,7 +8,6 @@ export class MessageDto {
   userId : number;
   userName : string;
   message : string;
-  date : number;
 };
 
 export class RoomDto {
@@ -86,11 +85,10 @@ export class ChatService {
 
     addNewRoomMessage(room: RoomDto, user: UserDto, message: string): MessageDto {
     const messageDto: MessageDto = new MessageDto();
-    messageDto.date = Date.now();
     messageDto.message = message;
     messageDto.userId = user.id;
     messageDto.userName = user.name;
-    
+
     room.messages.push(messageDto);
     this.RoomList.set(room.roomName.toUpperCase(), room);
     return messageDto;
@@ -136,8 +134,6 @@ export class ChatService {
     return (this.RoomList.has(roomName.toUpperCase()));
   }
 
-
-
   getReturnRoom(roomDto: RoomDto): RoomReturnDto {
     const roomReturnDto: RoomReturnDto = new RoomReturnDto();
 
@@ -150,9 +146,11 @@ export class ChatService {
     return roomReturnDto;
   }
 
+  async addSocketToRooms(socket: Socket) {
+    const userDto: UserDto = await this.authService.getUserFromSocket(socket);
 
-
-
+    this.RoomList.forEach((value) => { value.users.find( ({id}) => id === userDto.id ) && socket.join(value.roomName); });
+  }
 
 
                                  /*********************** LEAVE ROOM  ************************/

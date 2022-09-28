@@ -1,33 +1,15 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 
-import { Paper, styled } from '@mui/material'
+import { Paper } from '@mui/material'
 
 import Typography from '@mui/material/Typography';
 
 import { ChatSettings } from './ChatSettings';
-import { MessageDto, RoomDto } from 'api/chat.api';
+import { RoomDto } from 'api/chat.api';
 import { SendMsgBar } from './SendMsgsBar';
 import { WebsocketContext } from 'contexts/WebsocketContext';
-
-
-const RecvMessage = styled('div')(({ theme }) => ({
-  color: 'white',
-  backgroundColor: 'blue',
-  borderRadius: '10px',
-  padding: "5px 10px",
-  margin: '15px 200px 15px 20px',
-
-}));
-
-const SendMessage = styled('div')(({ theme }) => ({
-  backgroundColor: 'purple',
-  color: 'white',
-  borderRadius: '10px',
-  padding: "5px 10px",
-  margin: '15px 20px 15px 200px',
-
-}));
+import { ChatMessages } from './ChatMessages';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -102,6 +84,7 @@ export const Feed = ({
       setMessage('');
     }
 
+    // eslint-disable-next-line
   }, [send]);
 
   return (
@@ -124,22 +107,8 @@ export const Feed = ({
                     settings={settings as HTMLElement}
                   />
 
-                  {room.messages.map((message: MessageDto, index: number) => {
-                    return (
-                      <div key={index}>
-                        <RecvMessage>
-                          <Typography className="sender" style={{backgroundColor: "background.paper"}} >Loraine</Typography> 
-                            {message.message}
-                          <Typography align="right" >date</Typography>
-                        </RecvMessage>
-                        <SendMessage>
-                          <div className="sender">Moi</div>
-                            hey ca va ?
-                            <Typography align="right" >date</Typography>
-                        </SendMessage>
-                      </div>
-                    );
-                  })}
+                  <ChatMessages room={room}/>
+
                   </Box>
                   
                 </TabPanel>

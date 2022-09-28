@@ -51,20 +51,6 @@ export const Chat = () => {
       };
     }, [socket]);
 
-    // React.useEffect(() => {
-    //   socket.on('newRoomMessage', ({roomName, messageDto}) => {
-    //     for (let i = 0; i < rooms.length; ++i) {
-    //       if (rooms[i].roomName === roomName) {
-    //         rooms[i].messages.push(messageDto);
-    //         break ;
-    //       }
-    //     }
-    //     setRooms(rooms);
-    //   });
-    //   return () => {
-    //     socket.off('newRoomMessage');
-    //   };
-    // }, [socket]);
 
     enum ChannelType {
       none = 0,

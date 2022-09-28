@@ -4,6 +4,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
   ConnectedSocket,
+  OnGatewayConnection,
 } from '@nestjs/websockets';
 import { Server, Socket} from 'socket.io';
 import { ChatService, MessageDto, RoomDto, RoomReturnDto } from './chat.service';
@@ -17,12 +18,16 @@ import { UserDto } from 'src/models/users/dto/user.dto';
     credentials: true,
   },
 })
-export class ChatGateway  {
+export class ChatGateway implements OnGatewayConnection {
 
   @WebSocketServer()
   server: Server;
 
   constructor(@Inject(ChatService) private chatService: ChatService) {}
+
+  async handleConnection(@ConnectedSocket() client: Socket, ...args: any[]) {
+    this.chatService.addSocketToRooms(client);
+  }
 
                           /*********************** CREATE ROOM  ************************/
     

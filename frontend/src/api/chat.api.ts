@@ -4,7 +4,6 @@ export interface MessageDto {
   userId : number;
   userName : string;
   message : string;
-  date : number;
 };
 
 
