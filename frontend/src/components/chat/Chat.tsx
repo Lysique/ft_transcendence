@@ -51,6 +51,15 @@ export const Chat = () => {
       };
     }, [socket]);
 
+    React.useEffect(() => {
+      socket.on('deleteRoom', ({roomName}) => {
+        setRooms(rooms.filter(room => room.roomName !== roomName));
+      });
+      return () => {
+        socket.off('deleteRoom');
+      };
+    }, [socket]);
+
 
     enum ChannelType {
       none = 0,

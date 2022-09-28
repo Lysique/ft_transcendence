@@ -29,97 +29,108 @@ export class ChatGateway implements OnGatewayConnection {
     this.chatService.addSocketToRooms(client);
   }
 
-                          /*********************** CREATE ROOM  ************************/
-    
-    @SubscribeMessage('createRoom')
-    async createRoom(@ConnectedSocket() socket: Socket, @MessageBody() body : {roomName: string, password: string}) {
+                        /*********************** CREATE ROOM  ************************/
+  
+  @SubscribeMessage('createRoom')
+  async createRoom(@ConnectedSocket() socket: Socket, @MessageBody() body : {roomName: string, password: string}) {
 
-      if (this.chatService.roomExist(body.roomName)) {
-        this.server.to(socket.id).emit('chatNotif', {notif: 'Room name already taken'});
-        return ;
-      }
-
-      const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
-
-      const newRoom: RoomDto = this.chatService.createRoom(body.roomName, body.password, userDto);
-
-      const roomReturn: RoomReturnDto = this.chatService.getReturnRoom(newRoom);
-
-      this.server.to('user_' + userDto.id.toString()).emit('addRoom',{ room: roomReturn });
-      this.server.to(socket.id).emit('chatNotif', {notif: `Room ${body.roomName} created successfully!`});
-      this.server.emit('roomCreated', {roomName: body.roomName})
+    if (this.chatService.roomExist(body.roomName)) {
+      this.server.to(socket.id).emit('chatNotif', {notif: 'Room name already taken'});
+      return ;
     }
 
-                        /*********************** JOIN ROOM  ************************/
+    const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
 
-    @SubscribeMessage('joinRoom')
-    async joinRoom(@ConnectedSocket() socket: Socket, @MessageBody() body : {roomName: string, password: string}) {
-      if (!this.chatService.roomExist(body.roomName)) {
-        this.server.to(socket.id).emit('chatNotif', {notif: 'This room does not exist.'});
-        return ;
-      }
+    const newRoom: RoomDto = this.chatService.createRoom(body.roomName, body.password, userDto);
 
-      const room: RoomDto = this.chatService.getRoomFromName(body.roomName);
+    const roomReturn: RoomReturnDto = this.chatService.getReturnRoom(newRoom);
 
-      if (room.password !== '' && body.password === '') {
-        this.server.to(socket.id).emit('chatNotif', {notif: 'This room is locked by a password.'});
-        return ;
-      }
-      
-      if (room.password !== '' && room.password !== body.password) {
-        this.server.to(socket.id).emit('chatNotif', {notif: 'Wrong password.'});
-        return ;
-      }
+    this.server.to('user_' + userDto.id.toString()).emit('addRoom',{ room: roomReturn });
+    this.server.to(socket.id).emit('chatNotif', {notif: `Room ${body.roomName} created successfully!`});
+    this.server.emit('roomCreated', {roomName: body.roomName})
+  }
 
-      const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
+                      /*********************** JOIN ROOM  ************************/
 
-      //  TODO: check if banned
+  @SubscribeMessage('joinRoom')
+  async joinRoom(@ConnectedSocket() socket: Socket, @MessageBody() body : {roomName: string, password: string}) {
+    if (!this.chatService.roomExist(body.roomName)) {
+      this.server.to(socket.id).emit('chatNotif', {notif: 'This room does not exist.'});
+      return ;
+    }
 
-      this.chatService.addToRoom(userDto, room);
+    const room: RoomDto = this.chatService.getRoomFromName(body.roomName);
 
-      const roomReturn: RoomReturnDto = this.chatService.getReturnRoom(room);
-      this.server.to('user_' + userDto.id.toString()).emit('addRoom',{ room: roomReturn });
-      this.server.to(socket.id).emit('chatNotif', {notif: 'Room joined successfully!'});
+    if (room.password !== '' && body.password === '') {
+      this.server.to(socket.id).emit('chatNotif', {notif: 'This room is locked by a password.'});
+      return ;
+    }
+    
+    if (room.password !== '' && room.password !== body.password) {
+      this.server.to(socket.id).emit('chatNotif', {notif: 'Wrong password.'});
+      return ;
+    }
 
-      //  TODO: implement frontend
-      // this.server.to(room.roomName).emit('roomJoined', {roomName: room.roomName, user: userDto});
-    };
+    const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
 
-                          /*********************** ROOM MESSAGES ************************/
+    //  TODO: check if banned
 
-    @SubscribeMessage('roomMessage')
-    async roomMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: {roomName: string, message: string}) {
-      if (!this.chatService.roomExist(body.roomName)) {
-        this.server.to(socket.id).emit('chatNotif', {notif: 'This room no longer exists.'});
-        return ;
-      }
+    this.chatService.addToRoom(userDto, room);
 
-      const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
-      const roomDto: RoomDto = this.chatService.getRoomFromName(body.roomName);
+    const roomReturn: RoomReturnDto = this.chatService.getReturnRoom(room);
+    this.server.to('user_' + userDto.id.toString()).emit('addRoom',{ room: roomReturn });
+    this.server.to(socket.id).emit('chatNotif', {notif: 'Room joined successfully!'});
 
-      //  TODO: Check if muted + check for blocked users
-
-      const messageDto: MessageDto = this.chatService.addNewRoomMessage(roomDto, userDto, body.message);
-      this.server.to(body.roomName).emit('newRoomMessage', {roomName: body.roomName, messageDto: messageDto });
+    //  TODO: implement frontend
+    // this.server.to(room.roomName).emit('roomJoined', {roomName: room.roomName, user: userDto});
   };
 
+                        /*********************** ROOM MESSAGES ************************/
 
-                      /*********************** KICK EVENT && LEAVE EVENT ************************/
+  @SubscribeMessage('roomMessage')
+  async roomMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: {roomName: string, message: string}) {
+    if (!this.chatService.roomExist(body.roomName)) {
+      this.server.to(socket.id).emit('chatNotif', {notif: 'This room no longer exists.'});
+      return ;
+    }
 
-    // @SubscribeMessage('leavecurrentroom')
-    // async leaveCurrentRoom(@ConnectedSocket() socket: Socket, @MessageBody() body: any) {
-    
+    const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
+    const roomDto: RoomDto = this.chatService.getRoomFromName(body.roomName);
 
-    //   await this.chatService.leaveRoom(body.room, 13);
-    //     console.log('jai bien leave la room');
-      
-    //   if (this.chatService.tryDeleteRoom(body.room))
-    //       console.log('room est delete car elle est vice');
-    //   else
-    //       console.log('client leave mais room pas delete car pas vide');
+    //  TODO: Check if muted + check for blocked users
 
-    //   //update client server emit
-    // };
+    const messageDto: MessageDto = this.chatService.addNewRoomMessage(roomDto, userDto, body.message);
+    this.server.to(body.roomName).emit('newRoomMessage', {roomName: body.roomName, messageDto: messageDto });
+};
+
+
+                    /*********************** KICK EVENT && LEAVE EVENT ************************/
+
+  @SubscribeMessage('leaveRoom')
+  async leaveCurrentRoom(@ConnectedSocket() socket: Socket, @MessageBody() body: { roomName: string }) {
+    if (!this.chatService.roomExist(body.roomName)) {
+      this.server.to(socket.id).emit('chatNotif', {notif: 'This room no longer exists.'});
+      return ;
+    }
+    const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
+    const roomDto: RoomDto = this.chatService.getRoomFromName(body.roomName);
+
+    if (roomDto.owner === userDto.id) {
+      this.chatService.destroyRoom(roomDto);
+      this.server.to(body.roomName).emit('deleteRoom',{ roomName: body.roomName });
+      this.server.to(body.roomName).emit('chatNotif',{ notif: `Room ${body.roomName} has been deleted by the owner.`});
+      this.server.socketsLeave(body.roomName);
+      return ;
+    }
+
+    this.chatService.leaveRoom(userDto, roomDto);
+    this.server.to('user_' + userDto.id.toString()).emit('deleteRoom',{ roomName: body.roomName });
+    this.server.to(socket.id).emit('chatNotif', {notif: `You left ${body.roomName}!`});
+
+    //  TODO: implement frontend
+    // this.server.to(room.roomName).emit('roomLeft', {roomName: room.roomName, user: userDto});
+
+  };
 
     // @SubscribeMessage('kickevent')
     // async kickEvent(@ConnectedSocket() socket: Socket, @MessageBody() body: any) {

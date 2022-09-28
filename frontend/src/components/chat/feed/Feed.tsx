@@ -16,8 +16,7 @@ interface TabPanelProps {
   index: number;
   value: number;
 }
-  
-  
+
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
@@ -44,7 +43,7 @@ privateMessage = 1,
 publicChannel = 2
 }
 
-interface ChatSettingsProps {
+interface FeedProps {
     rooms: RoomDto[]
     privateMsgs: RoomDto[]
     tabIndex: number
@@ -57,16 +56,7 @@ export const Feed = ({
     tabIndex,
     channelType
 
-}: ChatSettingsProps) => {
-  
-  const [settings, setSettings] = React.useState<null | HTMLElement>(null);
-
-  const handleCloseSettings = () => {
-    setSettings(null);
-  };
-  const handleOpenSettings = (event: React.MouseEvent<HTMLElement>) => {
-    setSettings(event.currentTarget);
-  };
+}: FeedProps) => {
 
   const [message, setMessage] = React.useState<string>('');
   const [send, setSend] = React.useState<boolean>(false);
@@ -90,6 +80,7 @@ export const Feed = ({
   return (
     <Paper>
       <div className="conversation" style={{height: '90vh'}}>
+
         <div className='chat' style={{height: '70vh'}}>
 
           {channelType === ChannelType.publicChannel && rooms.map((room: RoomDto, index: number) => {
@@ -98,14 +89,9 @@ export const Feed = ({
             
                 <TabPanel value={tabIndex} index={index} key={index} >                       
                                           
-                    <Box
-                sx={{ height: '60vh', overflow: "hidden", overflowY: "scroll"}}>
+                  <Box sx={{ height: '60vh', overflow: "hidden", overflowY: "scroll"}}>
 
-                  <ChatSettings 
-                    handleCloseSettings={handleCloseSettings}
-                    handleOpenSettings={handleOpenSettings}
-                    settings={settings as HTMLElement}
-                  />
+                  <ChatSettings room={room}/>
 
                   <ChatMessages room={room}/>
 
@@ -120,11 +106,11 @@ export const Feed = ({
         </div>
 
         { channelType !== ChannelType.none &&
-            <SendMsgBar 
+          <SendMsgBar 
             setSend={setSend}
             setMessage={setMessage}
             message={message}
-            />
+          />
         }
 
       </div>  

@@ -46,7 +46,7 @@ export class ChatService {
     ** @Gateway
     **
     */
-               /*********************** Create Room  ************************/
+               /*********************** CREATE ROOM  ************************/
 
 
   createRoom(roomName: string, password: string, userDto: UserDto): RoomDto {
@@ -83,7 +83,7 @@ export class ChatService {
 
       /*********************** SEND MESSAGE ROOM && PRIVATE MESSAGE ************************/
 
-    addNewRoomMessage(room: RoomDto, user: UserDto, message: string): MessageDto {
+  addNewRoomMessage(room: RoomDto, user: UserDto, message: string): MessageDto {
     const messageDto: MessageDto = new MessageDto();
     messageDto.message = message;
     messageDto.userId = user.id;
@@ -92,6 +92,32 @@ export class ChatService {
     room.messages.push(messageDto);
     this.RoomList.set(room.roomName.toUpperCase(), room);
     return messageDto;
+  }
+
+       /*********************** LEAVE ROOM  ************************/
+
+
+  leaveRoom(userDto: UserDto, room: RoomDto) {
+    const userIndex = room.users.findIndex(({id}) => id === userDto.id);
+
+    if (userIndex > -1) {
+      room.users.splice(userIndex, 1);
+    }
+
+    const adminIndex = room.admins.indexOf(userDto.id);
+
+    if (adminIndex > -1) {
+      room.admins.splice(adminIndex, 1);
+    }
+
+    this.RoomList.set(room.roomName.toUpperCase(), room);
+
+    const sockets: Socket[] = this.authService.getSocketsFromUser(userDto.id);
+    sockets.forEach((socket) => { socket.leave(room.roomName) });
+  }
+
+  destroyRoom(room: RoomDto) {
+   this.RoomList.delete(room.roomName.toUpperCase());
   }
 
   /*
@@ -152,28 +178,6 @@ export class ChatService {
     this.RoomList.forEach((value) => { value.users.find( ({id}) => id === userDto.id ) && socket.join(value.roomName); });
   }
 
-
-                                 /*********************** LEAVE ROOM  ************************/
-
-    // async leaveRoom(roomName : string, userId : number)
-    // {
-    //   if (this.getRoomFromName(roomName) === undefined)
-    //     {
-    //       console.log('cant leave, room doesnt exist');
-    //       return false;
-    //     }
-    //   const room = this.getRoomFromName(roomName);
-    //   const userDto: UserDto = await this.userService.findOneById(userId);
-      
-    //   if (!room.users.has(userDto))
-    //   {
-    //     console.log('cant leave because he is not in the room');
-    //     return false;
-    //   }
-    //   room.users.add(userDto);
-    //   this.tryDeleteRoom(roomName);
-    //   return true;
-    //   }
     
 
                   /*********************** Set Admin  ************************/
