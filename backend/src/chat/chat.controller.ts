@@ -1,6 +1,6 @@
 import { Controller, Get, UseGuards, Param, Req } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { ChatService } from './chat.service';
+import { ChatService, RoomDto } from './chat.service';
 import { Request } from 'express';
 
 
@@ -15,7 +15,7 @@ export class ChatController {
   ) {
       const user: any = req.user;
 
-      const rooms = await this.chatService.getAllRoomsFromUser(user.id);
+      const rooms: RoomDto[] = this.chatService.getAllRoomsFromUser(user.id);
 
       return { rooms : rooms };
   }

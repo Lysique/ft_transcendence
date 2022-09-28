@@ -4,34 +4,32 @@ import { UserDto } from 'src/models/users/dto/user.dto';
 import { UsersService } from 'src/models/users/users.service';
 import { Socket} from 'socket.io';
 
-export interface messageType {
+export class MessageDto {
   userId : number;
   userName : string;
   message : string;
   date : number;
 };
 
-export interface roomType {
+export class RoomDto {
   roomName : string;
   owner : number;
   admins : Array<number>;
-  password : string;
   users : Array<UserDto>;
+  messages : Array<MessageDto>;
+  password : string;
   mutedMap : Map<number,number>;
   banMap : Map<number,number>;
-  messages : Array<messageType>;
 };
 
-//fill le room return a chqaue fois
-type roomReturn = {
+export class RoomReturnDto {
   roomName : string;
   owner : number;
-  admins : Set<number>;
-  users : Set<UserDto>;
-  messages : Array<messageType>;
+  admins : Array<number>;
+  users : Array<UserDto>;
+  messages : Array<MessageDto>;
+  hasPwd: boolean;
 };
-
-
 
 @Injectable()
 export class ChatService {
@@ -41,33 +39,95 @@ export class ChatService {
       private userService: UsersService, 
       private authService: AuthService
     ) {
-      this.listRoom = new Array();
+      this.RoomList = new Map();
     }
 
     /* list all room */
-    public listRoom: Array<roomType>;
+    public RoomList: Map<string, RoomDto>;
 
     /*
     **
-    ** @Principal
+    ** @Gateway
     **
     */
+               /*********************** Create Room  ************************/
 
-    async getUserFromSocket(socket: Socket) {
-      const userDto: UserDto = await this.authService.getUserFromSocket(socket);
-      return userDto;
-    }
+
+  createRoom(roomName: string, password: string, userDto: UserDto): RoomDto {
+    const roomDto = new RoomDto();
+
+    roomDto.roomName = roomName;
+    roomDto.owner = userDto.id;
+    roomDto.admins = [userDto.id];
+    roomDto.users = [userDto];
+    roomDto.messages = [];
+    roomDto.password = password;
+    roomDto.mutedMap = new Map();
+    roomDto.banMap = new Map();
+
+    this.RoomList.set(roomName, roomDto);
+    return roomDto;
+  }
+
+  /*
+  **
+  ** @Controller
+  **
+  */
+
+  getAllRoomsFromUser(userId : number): RoomDto[] {
+    const userRooms = new Array<RoomDto>;
+
+    this.RoomList.forEach((value) => { value.users.find( ({id}) => id === userId ) && userRooms.push(value); })
+
+    return userRooms;
+  }
+
+
+  /*
+  **
+  ** @Utils
+  **
+  */
+
+  async getUserFromSocket(socket: Socket) {
+    const userDto: UserDto = await this.authService.getUserFromSocket(socket);
+    return userDto;
+  }
+
+  getRoomFromName(name: string): RoomDto {
+    return (this.RoomList.get(name));
+  }
+
+  roomAlreadyExist(roomName: string): boolean {
+    return (this.RoomList.has(roomName));
+  }
+
+  getReturnRoom(roomDto: RoomDto): RoomReturnDto {
+    const roomReturnDto: RoomReturnDto = new RoomReturnDto();
+
+    roomReturnDto.roomName = roomDto.roomName;
+    roomReturnDto.owner = roomDto.owner;
+    roomReturnDto.admins = roomDto.admins;
+    roomReturnDto.users = roomDto.users;
+    roomReturnDto.messages = roomDto.messages;
+    roomReturnDto.hasPwd = roomDto.password === '' ? false : true;
+
+    return roomReturnDto;
+  }
+
+
                            /*********************** JOIN ROOM  ************************/
 
 
     async joinRoom(userId : number, roomName : string, password : string) {
-      if (this.getLaRoom(roomName) === undefined)
+      if (this.getRoomFromName(roomName) === undefined)
         {
           console.log('cant join, room doesnt exist');
           return false;
         }
 
-      const room = this.getLaRoom(roomName);
+      const room = this.getRoomFromName(roomName);
       const userDto: UserDto = await this.userService.findOneById(userId);
    
       //update et check le banmap en utils pour rendre ca plus lisible
@@ -105,39 +165,37 @@ export class ChatService {
 
                                  /*********************** LEAVE ROOM  ************************/
 
-    async leaveRoom(roomName : string, userId : number)
-    {
-      if (this.getLaRoom(roomName) === undefined)
-        {
-          console.log('cant leave, room doesnt exist');
-          return false;
-        }
-      const room = this.getLaRoom(roomName);
-      const userDto: UserDto = await this.userService.findOneById(userId);
+    // async leaveRoom(roomName : string, userId : number)
+    // {
+    //   if (this.getRoomFromName(roomName) === undefined)
+    //     {
+    //       console.log('cant leave, room doesnt exist');
+    //       return false;
+    //     }
+    //   const room = this.getRoomFromName(roomName);
+    //   const userDto: UserDto = await this.userService.findOneById(userId);
       
-      if (!room.users.has(userDto))
-      {
-        console.log('cant leave because he is not in the room');
-        return false;
-      }
-      room.users.add(userDto);
-      this.tryDeleteRoom(roomName);
-      return true;
-      }
-
-
-
+    //   if (!room.users.has(userDto))
+    //   {
+    //     console.log('cant leave because he is not in the room');
+    //     return false;
+    //   }
+    //   room.users.add(userDto);
+    //   this.tryDeleteRoom(roomName);
+    //   return true;
+    //   }
+    
 
                   /*********************** Set Admin  ************************/
 
     async setAdmin(roomName : string, userId : number, victim : number)
     {
-      if (this.getLaRoom(roomName) === undefined)
+      if (this.getRoomFromName(roomName) === undefined)
         {
           console.log('cant leave, room doesnt exist');
           return false;
         }
-        const room = this.getLaRoom(roomName);
+        const room = this.getRoomFromName(roomName);
       if (userId === room.owner && victim !== room.owner)
       {
         const userDto: UserDto = await this.userService.findOneById(userId);
@@ -150,75 +208,44 @@ export class ChatService {
     }
 
 
-
-            /*********************** Create Room  ************************/
-
-
-    createRoom(room,password,userId){
-      if (this.getLaRoom(room) !== undefined)
-      {
-        console.log('cant create room , duplicate room name');
-        return false;
-      }
-
-      console.log('im creating the room : ' + room);
-      this.addRoomToList(
-        {
-        roomName : room, 
-        owner : userId, 
-        admins : new Array<number>, 
-        password : password, 
-        users : new Array<UserDto>().push(userId), 
-        mutedMap : new Map<number,number>(), 
-        banMap : new Map<number,number>(),
-        listMsg : new Array<messageType>(),
-        },
-        this.listRoom
-        );
-    
-      return true;
-    }
-
-
-
           /*********************** KICK  && BAN ************************/
 
-    async kickFunction(userId : number, victim : number, roomArg : string)
-    {
-      const room = this.getLaRoom(roomArg);
-      const userDto: UserDto = await this.userService.findOneById(victim);
-      if (room.owner !== victim   &&    ( room.admins.has(userId) || room.owner === userId ))
-      {
-        console.log('kick successfull , good bye ' + victim);
-        room.users.delete(userDto);
-        this.tryDeleteRoom(roomArg);
-        return true;
-      }
-      else
-      {
-        console.log('you cant kick the user ' + victim);
-      }
-      return false;
-    }
+    // async kickFunction(userId : number, victim : number, roomArg : string)
+    // {
+    //   const room = this.getRoomFromName(roomArg);
+    //   const userDto: UserDto = await this.userService.findOneById(victim);
+    //   if (room.owner !== victim   &&    ( room.admins.has(userId) || room.owner === userId ))
+    //   {
+    //     console.log('kick successfull , good bye ' + victim);
+    //     room.users.delete(userDto);
+    //     this.tryDeleteRoom(roomArg);
+    //     return true;
+    //   }
+    //   else
+    //   {
+    //     console.log('you cant kick the user ' + victim);
+    //   }
+    //   return false;
+    // }
 
-    async banFunction(userId : number, victim : number, roomArg : string, timeBan : number)
-    {
-      const room = this.getLaRoom(roomArg);
-      const userDto: UserDto = await this.userService.findOneById(victim);
-      if (room.owner !== victim   &&    ( room.admin.has(userId) || room.owner === userId ))
-      {
-        console.log('user ' + victim + ' is ban from the channel');
-        room.userSet.delete(userDto);
-        room.banMap.set(victim,timeBan);
-        this.tryDeleteRoom(roomArg);
-        return true;
-      }
-      else
-      {
-        console.log(userId + ' you cant ban the user : ' + victim);
-      }
-      return false;
-    }
+    // async banFunction(userId : number, victim : number, roomArg : string, timeBan : number)
+    // {
+    //   const room = this.getRoomFromName(roomArg);
+    //   const userDto: UserDto = await this.userService.findOneById(victim);
+    //   if (room.owner !== victim   &&    ( room.admin.has(userId) || room.owner === userId ))
+    //   {
+    //     console.log('user ' + victim + ' is ban from the channel');
+    //     room.userSet.delete(userDto);
+    //     room.banMap.set(victim,timeBan);
+    //     this.tryDeleteRoom(roomArg);
+    //     return true;
+    //   }
+    //   else
+    //   {
+    //     console.log(userId + ' you cant ban the user : ' + victim);
+    //   }
+    //   return false;
+    // }
 
      /*********************** CHANGE PW ************************/
 
@@ -226,12 +253,12 @@ export class ChatService {
 
     changePw(userId : number, roomName : string, password : string)
     {
-      if (this.getLaRoom(roomName) === undefined)
+      if (this.getRoomFromName(roomName) === undefined)
         {
           console.log('cant change pw, room doesnt exist');
           return false;
         }
-        const room = this.getLaRoom(roomName);
+        const room = this.getRoomFromName(roomName);
       if (userId === room.owner)
       {
         room.password = password;
@@ -245,53 +272,52 @@ export class ChatService {
 
     /********************** MUTE FUNCTION ************************/
 
-
-    async muteFunction(userId : number, victim : number, roomArg : string, timeMute : number)
-    {
-      if (this.getLaRoom(roomArg) === undefined)
-        {
-          console.log('cant mute this guy , room doesnt exist');
-          return false;
-        }
-      const room = this.getLaRoom(roomArg);
-      const userDto: UserDto = await this.userService.findOneById(victim);
-      if (room.owner !== victim   &&    ( room.admin.has(userId) || room.owner === userId ))
-      {
-        console.log('user ' + victim + ' is mute from the channel');
-        room.mutedMap.set(victim,timeMute);
-        return true;
-      }
-      else
-      {
-        console.log(userId + ' you cant mute the user : ' + victim);
-      }
-      return false;
-    }
+    // async muteFunction(userId : number, victim : number, roomArg : string, timeMute : number)
+    // {
+    //   if (this.getRoomFromName(roomArg) === undefined)
+    //     {
+    //       console.log('cant mute this guy , room doesnt exist');
+    //       return false;
+    //     }
+    //   const room = this.getRoomFromName(roomArg);
+    //   const userDto: UserDto = await this.userService.findOneById(victim);
+    //   if (room.owner !== victim   &&    ( room.admin.has(userId) || room.owner === userId ))
+    //   {
+    //     console.log('user ' + victim + ' is mute from the channel');
+    //     room.mutedMap.set(victim,timeMute);
+    //     return true;
+    //   }
+    //   else
+    //   {
+    //     console.log(userId + ' you cant mute the user : ' + victim);
+    //   }
+    //   return false;
+    // }
 
     /*********************** SEND MESSAGE ROOM && PRIVATE MESSAGE ************************/
 
-    async sendMessage(userId : number, victim : number, roomName : string, timeBan : number, message : string)
-    {
-      if (this.getLaRoom(roomName) === undefined)
-        {
-          console.log('cant send a message to this room , room doesnt exist');
-          return false;
-        }
+    // async sendMessage(userId : number, victim : number, roomName : string, timeBan : number, message : string)
+    // {
+    //   if (this.getRoomFromName(roomName) === undefined)
+    //     {
+    //       console.log('cant send a message to this room , room doesnt exist');
+    //       return false;
+    //     }
 
-        const userDto: UserDto = await this.userService.findOneById(userId);
-      const room = this.getLaRoom(roomName);
+    //     const userDto: UserDto = await this.userService.findOneById(userId);
+    //   const room = this.getRoomFromName(roomName);
 
-      //can send message ?
+    //   //can send message ?
 
-      let datenow = Date.now();
-      if ( (!room.mutedMap.has(userId)) || (datenow - room.mutedMap.get(userId) <= 0))
-      {
-        let coconcatname = {userId : userId, userName : userDto.name, message : message, date : Date.now()};
-        room.listMsg.push(coconcatname);
-        return true;
-      }
-      return false;
-    }
+    //   let datenow = Date.now();
+    //   if ( (!room.mutedMap.has(userId)) || (datenow - room.mutedMap.get(userId) <= 0))
+    //   {
+    //     let coconcatname = {userId : userId, userName : userDto.name, message : message, date : Date.now()};
+    //     room.listMsg.push(coconcatname);
+    //     return true;
+    //   }
+    //   return false;
+    // }
 
     async sendPrivateMessage(userId : number, victim : number, roomName : string, timeBan : number, message : string)
     {
@@ -305,25 +331,7 @@ export class ChatService {
     **
     */   
 
-    async fillReturnRoom(roomName : string): Promise<roomReturn>
-    {
-      let returnroom = {
-        roomName : roomName,
-        owner : this.getLaRoom(roomName).owner,
-        admin : this.getLaRoom(roomName).admin,
-        userSet : this.getLaRoom(roomName).userSet,
-        listMsg : this.getLaRoom(roomName).listMsg
-      }
-      return returnroom;
-    }
 
-    async getAllRoomsFromUser(userId : number)
-    {
-      const userDto: UserDto = await this.userService.findOneById(userId);
-      
-      const temparray = this.listRoom.filter(elem => elem.userSet.has({id: userId}));
-      return temparray;
-    }
 
 
     /* all room list string room name */
@@ -331,45 +339,31 @@ export class ChatService {
     {
       const userDto: UserDto = await this.userService.findOneById(userId);
       let temparray = [];
-      this.listRoom.forEach(element => temparray.push(element.roomName));
+      this.RoomList.forEach(element => temparray.push(element.roomName));
       return temparray;
     }
 
-    
 
-    roomExist(roomname : string)
-    {
-      if (this.getLaRoom(roomname) !== undefined)
-        return true;
-    
-      else
-        return false;
-    }
 
-    addRoomToList(roomObject : roomType, listRoom : Array<roomType>)
+    addRoomToList(roomObject : RoomDto, RoomList : Array<RoomDto>)
     {
       console.log('add de la room' + roomObject.roomName);
-      listRoom.push(roomObject);
+      RoomList.push(roomObject);
     }
 
-    getLaRoom(name :string)
-    {
-      return (this.listRoom.find(room => (room.roomName === name)));
-    }
-
-    /* check if room empty and delete it */
-    async tryDeleteRoom(room : string){
+  //   /* check if room empty and delete it */
+  //   async tryDeleteRoom(room : string){
             
-      let listroomtemp;
-      if (this.getLaRoom(room).userSet.size === 0)
-      {
-        listroomtemp = this.listRoom.filter(elem => elem.roomName !== room);
-        this.listRoom = listroomtemp;
-        return true;
-       }
-       else
-        return false
+  //     let TmpList;
+  //     if (this.getRoomFromName(room).userSet.size === 0)
+  //     {
+  //       TmpList = this.RoomList.filter(elem => elem.roomName !== room);
+  //       this.RoomList = TmpList;
+  //       return true;
+  //      }
+  //      else
+  //       return false
 
-}
+  // }
 
 }
