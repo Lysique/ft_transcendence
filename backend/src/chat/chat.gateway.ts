@@ -97,7 +97,7 @@ export class ChatGateway implements OnGatewayConnection {
       const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
       const roomDto: RoomDto = this.chatService.getRoomFromName(body.roomName);
 
-      //  TODO: Check if muted
+      //  TODO: Check if muted + check for blocked users
 
       const messageDto: MessageDto = this.chatService.addNewRoomMessage(roomDto, userDto, body.message);
       this.server.to(body.roomName).emit('newRoomMessage', {roomName: body.roomName, messageDto: messageDto });

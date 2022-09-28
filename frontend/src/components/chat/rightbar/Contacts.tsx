@@ -43,10 +43,6 @@ export const Contacts = () => {
     // ----------------------------------------------------------
     const isAdmin = admin && admin === true;
 
-
-
-    // const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
     const [openContact, setOpenContact] = React.useState<null | HTMLElement>(null);
    
     const handleOpenContact = (event: React.MouseEvent<HTMLElement>) => {
@@ -93,7 +89,7 @@ export const Contacts = () => {
             // );
           };
 
-              const [ban, setBan] = React.useState<null | HTMLElement>(null);
+            const [ban, setBan] = React.useState<null | HTMLElement>(null);
    
             const handleBan = (event: React.MouseEvent<HTMLElement>) => {
                 setBan(event.currentTarget);
@@ -274,32 +270,6 @@ export const Contacts = () => {
                       </FormControl>
                   </FormGroup>
                   : ''}
-
-                
-
-
-
-
-                         {/* <Menu
-                        id="contact-appbar"
-                        anchorEl={block}
-                        anchorOrigin={{
-                          vertical: 'top',
-                          horizontal: 'right',
-                        }}
-                        keepMounted
-                        transformOrigin={{
-                          vertical: 'top',
-                          horizontal: 'right',
-                        }}
-                        open={Boolean(block)}
-                        onClose={handleCloseBlock}
-                        >
-                        <MenuItem onClick={handleCloseBlock}><PersonIcon/><p>hey</p></MenuItem>
-                        </Menu> */}
-                      {/* </MenuItem> */}
-                    {/* </FormControl>
-                  </FormGroup> */}
               </Menu>
               </div>
               ))}
