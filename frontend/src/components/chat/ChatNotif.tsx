@@ -10,8 +10,9 @@ export const ChatNotif = () => {
 
 
     React.useEffect(() => {
-      socket.on('chatNotif', (notif: string) => {
+      socket.on('chatNotif', ({notif}) => {
         setMessage(notif);
+        setOpen(true);
       });
       return () => {
         socket.off('chatNotif');

@@ -8,12 +8,17 @@ export const JoinRoomDialog = ({
     setOpen
 }: any ) => {
 
+    const [pwd, setPwd] = React.useState<string>('');
     const socket = React.useContext(WebsocketContext);
     //  Add usestate password
 
     const joinRoom = () => {
         setOpen(false);
-        // socket.emit('joinRoom', {roomName: roomName, password: ''});
+        socket.emit('joinRoom', {roomName: roomName, password: pwd});
+    }
+
+    const handlePwdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setPwd(event.target.value);
     }
 
     return (
@@ -25,13 +30,14 @@ export const JoinRoomDialog = ({
         <DialogTitle id="alert-dialog-title">Create Room</DialogTitle>
         <DialogContent />
         <DialogContentText id="alert-dialog-description" sx={{ml:3, mr:3, mb:3}}>
-        Would you like to join {roomName} ?
+            Would you like to join {roomName} ? (Password is optional)
         </DialogContentText>
 
         <TextField
           id="outlined-password-input"
           label="Password"
           type="password"
+          onChange={handlePwdChange}
           sx={{ml:3, mr:3}}
         />
 

@@ -33,7 +33,6 @@ export class ChatAPI {
   }
 
   public static async getAllRoomNames(): Promise<{ rooms: string[] }> {
-    return {rooms : []};
 
     const resp = await fetch(
       `http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/chat/roomNames`,

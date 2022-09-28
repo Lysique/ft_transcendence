@@ -1,6 +1,6 @@
-import { Controller, Get, UseGuards, Param, Req } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { ChatService, RoomDto } from './chat.service';
+import { ChatService, RoomDto, RoomReturnDto } from './chat.service';
 import { Request } from 'express';
 
 
@@ -17,13 +17,18 @@ export class ChatController {
 
       const rooms: RoomDto[] = this.chatService.getAllRoomsFromUser(user.id);
 
-      return { rooms : rooms };
+      const roomReturns = new Array<RoomReturnDto>;
+      rooms.forEach((room) => roomReturns.push(this.chatService.getReturnRoom(room)));
+
+      return { rooms : roomReturns };
+
   }
 
   @Get('roomNames')
   @UseGuards(JwtAuthGuard)
-  public async GetAllRoomNames(
-    @Req() req: Request,
-  ) {
+  public async GetAllRoomNames() {
+    const roomNames: string[] = this.chatService.getAllRoomNames();
+
+    return { rooms: roomNames }
   }
 }

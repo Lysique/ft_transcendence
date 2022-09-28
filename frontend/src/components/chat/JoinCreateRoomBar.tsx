@@ -1,11 +1,13 @@
 import { PersonSearch } from "@mui/icons-material";
-import { Autocomplete, IconButton, styled, Toolbar } from "@mui/material"
+import { Autocomplete, Box, Grid, IconButton, styled, Toolbar } from "@mui/material"
 import AddIcon from '@mui/icons-material/Add';
 import React from "react";
 import { CreateRoomDialog } from "./CreateRoomDialog";
 import { WhiteBorderTextField } from "components/utils/WhiteBorderTextField";
 import { JoinRoomDialog } from "./JoinRoomDialog";
 import { ChatAPI } from "api/chat.api";
+import LockIcon from '@mui/icons-material/Lock';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const SearchPersonn = styled('div')(({ theme }) => ({
     color: 'primary',
@@ -19,11 +21,9 @@ export const JoinCreateRoomBar = ({
     handleChangeChannel
 }: any) => {
 
-    const roomNames = ['Room1', 'Room2'];
-    const [allRooms, setAllRooms] = React.useState<string[]>(roomNames);
+    const [allRooms, setAllRooms] = React.useState<string[]>([]);
 
-    React.useEffect(() => {
-        
+    React.useEffect(() => {  
         const fetchRoomNames = async() => {
             const resp: {rooms: string[]} = await ChatAPI.getAllRoomNames();
             setAllRooms(resp.rooms);
@@ -31,6 +31,8 @@ export const JoinCreateRoomBar = ({
 
         fetchRoomNames();
     }, []);
+
+    //  Socket on new room created
 
     const [openJoinRoom, setOpenJoinRoom] = React.useState<boolean>(false);
     const [roomToJoin, setRoomToJoin]= React.useState<string>('');
@@ -85,8 +87,26 @@ export const JoinCreateRoomBar = ({
             freeSolo
             onChange={handleClick}
             options={allRooms}
+            renderOption={(props, option) => (
+                <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+                    <Grid container >
+                        <Grid>
+                            {option}
+                        </Grid>
+                        <Grid sx={{marginLeft:'auto'}}>
+                            {
+                            currentRooms.find( ({roomName }: {roomName: string}) => roomName === option ) ?
+                            <ArrowForwardIosIcon />
+                            :
+                            <LockIcon />
+                            }
+                        </Grid>
+                    </Grid>
+                </Box>
+            )}
             renderInput={(params) => (
                 <>
+
                 <WhiteBorderTextField
                     {...params}
                     onKeyDown={keyPress}
@@ -95,6 +115,7 @@ export const JoinCreateRoomBar = ({
                         ...params.InputProps,
                     }}
                 />
+
                 </>
             )}
         />

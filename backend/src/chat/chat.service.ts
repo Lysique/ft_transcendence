@@ -65,7 +65,7 @@ export class ChatService {
     roomDto.mutedMap = new Map();
     roomDto.banMap = new Map();
 
-    this.RoomList.set(roomName, roomDto);
+    this.RoomList.set(roomName.toUpperCase(), roomDto);
     return roomDto;
   }
 
@@ -84,6 +84,14 @@ export class ChatService {
   }
 
 
+
+    /* all room list string room name */
+    getAllRoomNames(): string[] {
+      const roomNames = new Array<string>;
+      this.RoomList.forEach(element => roomNames.push(element.roomName));
+      return roomNames;
+    }
+
   /*
   **
   ** @Utils
@@ -100,7 +108,7 @@ export class ChatService {
   }
 
   roomAlreadyExist(roomName: string): boolean {
-    return (this.RoomList.has(roomName));
+    return (this.RoomList.has(roomName.toUpperCase()));
   }
 
   getReturnRoom(roomDto: RoomDto): RoomReturnDto {
@@ -333,23 +341,6 @@ export class ChatService {
 
 
 
-
-    /* all room list string room name */
-    async roomAll(userId : number)
-    {
-      const userDto: UserDto = await this.userService.findOneById(userId);
-      let temparray = [];
-      this.RoomList.forEach(element => temparray.push(element.roomName));
-      return temparray;
-    }
-
-
-
-    addRoomToList(roomObject : RoomDto, RoomList : Array<RoomDto>)
-    {
-      console.log('add de la room' + roomObject.roomName);
-      RoomList.push(roomObject);
-    }
 
   //   /* check if room empty and delete it */
   //   async tryDeleteRoom(room : string){

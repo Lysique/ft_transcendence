@@ -118,7 +118,7 @@ export const Chat = () => {
                           sx={{ borderRight: 1, borderColor: 'divider', height: '28vh' }}
                           >
 
-                            {rooms.map((channel: any, index: any) => {
+                            {rooms.map((channel: RoomDto, index: number) => {
                               return (
                                 <Tab key={index} label={channel.roomName} {...a11yProps(index)}/> 
                               );

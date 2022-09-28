@@ -30,7 +30,7 @@ export class ChatGateway  {
     async createRoom(@ConnectedSocket() socket: Socket, @MessageBody() body : {roomName: string, password: string}) {
 
       if (this.chatService.roomAlreadyExist(body.roomName)) {
-        this.server.to(socket.id).emit('roomAlreadyExist');
+        this.server.to(socket.id).emit('chatNotif', {notif: 'Room name already taken'});
         return ;
       }
 
@@ -41,7 +41,7 @@ export class ChatGateway  {
       const roomReturn: RoomReturnDto = this.chatService.getReturnRoom(newRoom);
 
       this.server.to('user_' + userDto.id.toString()).emit('addRoom',{ room: roomReturn });
-      this.server.to(socket.id).emit('roomCreated');
+      this.server.to(socket.id).emit('chatNotif', {notif: `Room ${body.roomName} created successfully!`});
     }
 
                         /*********************** JOIN ROOM  ************************/
