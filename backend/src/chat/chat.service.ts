@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { UserDto } from 'src/models/users/dto/user.dto';
 import { UsersService } from 'src/models/users/users.service';
-import { Socket} from 'socket.io';
+import { Socket, Server } from 'socket.io';
 
 export class MessageDto {
   userId : number;
@@ -28,21 +28,18 @@ export class RoomReturnDto {
   admins : Array<number>;
   users : Array<UserDto>;
   messages : Array<MessageDto>;
-  hasPwd: boolean;
 };
 
 @Injectable()
 export class ChatService {
 
-    constructor(      
-      //private authService: AuthService,
+    constructor(
       private userService: UsersService, 
       private authService: AuthService
     ) {
       this.RoomList = new Map();
     }
 
-    /* list all room */
     public RoomList: Map<string, RoomDto>;
 
     /*
@@ -59,14 +56,44 @@ export class ChatService {
     roomDto.roomName = roomName;
     roomDto.owner = userDto.id;
     roomDto.admins = [userDto.id];
-    roomDto.users = [userDto];
+    roomDto.users = [];
     roomDto.messages = [];
     roomDto.password = password;
     roomDto.mutedMap = new Map();
     roomDto.banMap = new Map();
 
     this.RoomList.set(roomName.toUpperCase(), roomDto);
+    this.addToRoom(userDto, roomDto);
     return roomDto;
+  }
+
+                   /*********************** JOIN ROOM  ************************/
+
+
+  addToRoom(userDto: UserDto, room: RoomDto) {
+    if (room.users.find(({id}) => id === userDto.id )) {
+      return ;
+    }
+
+    room.users.push(userDto);
+    this.RoomList.set(room.roomName.toUpperCase(), room);
+
+    const sockets: Socket[] = this.authService.getSocketsFromUser(userDto.id);
+    sockets.forEach(socket => socket.join(room.roomName));
+  }
+
+      /*********************** SEND MESSAGE ROOM && PRIVATE MESSAGE ************************/
+
+    addNewRoomMessage(room: RoomDto, user: UserDto, message: string): MessageDto {
+    const messageDto: MessageDto = new MessageDto();
+    messageDto.date = Date.now();
+    messageDto.message = message;
+    messageDto.userId = user.id;
+    messageDto.userName = user.name;
+    
+    room.messages.push(messageDto);
+    this.RoomList.set(room.roomName.toUpperCase(), room);
+    return messageDto;
   }
 
   /*
@@ -77,20 +104,18 @@ export class ChatService {
 
   getAllRoomsFromUser(userId : number): RoomDto[] {
     const userRooms = new Array<RoomDto>;
-
     this.RoomList.forEach((value) => { value.users.find( ({id}) => id === userId ) && userRooms.push(value); })
-
     return userRooms;
   }
 
 
 
-    /* all room list string room name */
-    getAllRoomNames(): string[] {
-      const roomNames = new Array<string>;
-      this.RoomList.forEach(element => roomNames.push(element.roomName));
-      return roomNames;
-    }
+  /* all room list string room name */
+  getAllRoomNames(): string[] {
+    const roomNames = new Array<string>;
+    this.RoomList.forEach(element => roomNames.push(element.roomName));
+    return roomNames;
+  }
 
   /*
   **
@@ -98,18 +123,20 @@ export class ChatService {
   **
   */
 
-  async getUserFromSocket(socket: Socket) {
+  async getUserFromSocket(socket: Socket): Promise<UserDto> {
     const userDto: UserDto = await this.authService.getUserFromSocket(socket);
     return userDto;
   }
 
   getRoomFromName(name: string): RoomDto {
-    return (this.RoomList.get(name));
+    return (this.RoomList.get(name.toUpperCase()));
   }
 
-  roomAlreadyExist(roomName: string): boolean {
+  roomExist(roomName: string): boolean {
     return (this.RoomList.has(roomName.toUpperCase()));
   }
+
+
 
   getReturnRoom(roomDto: RoomDto): RoomReturnDto {
     const roomReturnDto: RoomReturnDto = new RoomReturnDto();
@@ -119,55 +146,12 @@ export class ChatService {
     roomReturnDto.admins = roomDto.admins;
     roomReturnDto.users = roomDto.users;
     roomReturnDto.messages = roomDto.messages;
-    roomReturnDto.hasPwd = roomDto.password === '' ? false : true;
 
     return roomReturnDto;
   }
 
 
-                           /*********************** JOIN ROOM  ************************/
 
-
-    async joinRoom(userId : number, roomName : string, password : string) {
-      if (this.getRoomFromName(roomName) === undefined)
-        {
-          console.log('cant join, room doesnt exist');
-          return false;
-        }
-
-      const room = this.getRoomFromName(roomName);
-      const userDto: UserDto = await this.userService.findOneById(userId);
-   
-      //update et check le banmap en utils pour rendre ca plus lisible
-      if (room.password === password)
-        {
-          if (room.banMap.has(userId))
-          {
-            let datenow = Date.now();
-            if (datenow - room.banMap.get(userId) <= 0)
-            {
-              room.banMap.delete(userId);
-              room.users.push(userDto);
-              return true;
-            }
-              else
-              {
-                console.log('cant join because user is ban for ' + (datenow - room.banMap.get(userId)));
-                return false;
-              }
-          }
-          else
-          {
-            room.users.push(userDto);
-            return true;
-          }
-        }
-        else
-        {
-          console.log('mauvais password');
-          return false;
-        }
-      }
 
 
 
@@ -302,30 +286,7 @@ export class ChatService {
     //   return false;
     // }
 
-    /*********************** SEND MESSAGE ROOM && PRIVATE MESSAGE ************************/
 
-    // async sendMessage(userId : number, victim : number, roomName : string, timeBan : number, message : string)
-    // {
-    //   if (this.getRoomFromName(roomName) === undefined)
-    //     {
-    //       console.log('cant send a message to this room , room doesnt exist');
-    //       return false;
-    //     }
-
-    //     const userDto: UserDto = await this.userService.findOneById(userId);
-    //   const room = this.getRoomFromName(roomName);
-
-    //   //can send message ?
-
-    //   let datenow = Date.now();
-    //   if ( (!room.mutedMap.has(userId)) || (datenow - room.mutedMap.get(userId) <= 0))
-    //   {
-    //     let coconcatname = {userId : userId, userName : userDto.name, message : message, date : Date.now()};
-    //     room.listMsg.push(coconcatname);
-    //     return true;
-    //   }
-    //   return false;
-    // }
 
     async sendPrivateMessage(userId : number, victim : number, roomName : string, timeBan : number, message : string)
     {

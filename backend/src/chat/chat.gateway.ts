@@ -6,7 +6,7 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket} from 'socket.io';
-import { ChatService, RoomDto, RoomReturnDto } from './chat.service';
+import { ChatService, MessageDto, RoomDto, RoomReturnDto } from './chat.service';
 import { Inject } from '@nestjs/common';
 import { UserDto } from 'src/models/users/dto/user.dto';
 
@@ -29,7 +29,7 @@ export class ChatGateway  {
     @SubscribeMessage('createRoom')
     async createRoom(@ConnectedSocket() socket: Socket, @MessageBody() body : {roomName: string, password: string}) {
 
-      if (this.chatService.roomAlreadyExist(body.roomName)) {
+      if (this.chatService.roomExist(body.roomName)) {
         this.server.to(socket.id).emit('chatNotif', {notif: 'Room name already taken'});
         return ;
       }
@@ -42,22 +42,61 @@ export class ChatGateway  {
 
       this.server.to('user_' + userDto.id.toString()).emit('addRoom',{ room: roomReturn });
       this.server.to(socket.id).emit('chatNotif', {notif: `Room ${body.roomName} created successfully!`});
+      this.server.emit('roomCreated', {roomName: body.roomName})
     }
 
                         /*********************** JOIN ROOM  ************************/
 
-    // @SubscribeMessage('joinRoom')
-    // async joinRoom(@ConnectedSocket() socket: Socket, @MessageBody() userinfo: UserPayload) {
+    @SubscribeMessage('joinRoom')
+    async joinRoom(@ConnectedSocket() socket: Socket, @MessageBody() body : {roomName: string, password: string}) {
+      if (!this.chatService.roomExist(body.roomName)) {
+        this.server.to(socket.id).emit('chatNotif', {notif: 'This room does not exist.'});
+        return ;
+      }
 
-    //   //async joinRoom(userId : number, roomName : string, password : string)
-    //   if (this.chatService.joinRoom(34,userinfo.room, '' ))
-    //   {
-    //     //room return update
-    //     // emit vers le client
-    //   }
+      const room: RoomDto = this.chatService.getRoomFromName(body.roomName);
+
+      if (room.password !== '' && body.password === '') {
+        this.server.to(socket.id).emit('chatNotif', {notif: 'This room is locked by a password.'});
+        return ;
+      }
       
-      
-    // };
+      if (room.password !== '' && room.password !== body.password) {
+        this.server.to(socket.id).emit('chatNotif', {notif: 'Wrong password.'});
+        return ;
+      }
+
+      const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
+
+      //  TODO: check if banned
+
+      this.chatService.addToRoom(userDto, room);
+
+      const roomReturn: RoomReturnDto = this.chatService.getReturnRoom(room);
+      this.server.to('user_' + userDto.id.toString()).emit('addRoom',{ room: roomReturn });
+      this.server.to(socket.id).emit('chatNotif', {notif: 'Room joined successfully!'});
+
+      //  TODO: implement frontend
+      // this.server.to(room.roomName).emit('roomJoined', {roomName: room.roomName, user: userDto});
+    };
+
+                          /*********************** ROOM MESSAGES ************************/
+
+    @SubscribeMessage('roomMessage')
+    async roomMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: {roomName: string, message: string}) {
+      if (!this.chatService.roomExist(body.roomName)) {
+        this.server.to(socket.id).emit('chatNotif', {notif: 'This room no longer exists.'});
+        return ;
+      }
+
+      const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
+      const roomDto: RoomDto = this.chatService.getRoomFromName(body.roomName);
+
+      //  TODO: Check if muted
+
+      const messageDto: MessageDto = this.chatService.addNewRoomMessage(roomDto, userDto, body.message);
+      this.server.to(body.roomName).emit('newRoomMessage', {roomName: body.roomName, messageDto: messageDto });
+  };
 
 
                       /*********************** KICK EVENT && LEAVE EVENT ************************/

@@ -14,7 +14,6 @@ export interface RoomDto {
   admins : Array<number>;
   users : Array<UserDto>;
   messages : Array<MessageDto>;
-  hasPwd: boolean;
 };
 
 export class ChatAPI {

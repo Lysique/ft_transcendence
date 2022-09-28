@@ -10,7 +10,6 @@ export const JoinRoomDialog = ({
 
     const [pwd, setPwd] = React.useState<string>('');
     const socket = React.useContext(WebsocketContext);
-    //  Add usestate password
 
     const joinRoom = () => {
         setOpen(false);

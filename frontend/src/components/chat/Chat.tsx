@@ -12,8 +12,8 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Feed } from './Feed';
-import { JoinCreateRoomBar } from './JoinCreateRoomBar';
+import { Feed } from './feed/Feed';
+import { JoinCreateRoomBar } from './leftbar/JoinCreateRoomBar';
 import { WebsocketContext } from 'contexts/WebsocketContext';
 import { ChatNotif } from './ChatNotif';
 import { ChatAPI, RoomDto } from 'api/chat.api';
@@ -30,7 +30,7 @@ export const Chat = () => {
 
     const [tabIndex, setTabIndex] = React.useState<number>(0);
     const [rooms, setRooms] = React.useState<RoomDto[]>([]);
-    const [privateRooms, setPrivateRooms] = React.useState<RoomDto[]>([]);
+    const [privateMsgs, setPrivateMsgs] = React.useState<RoomDto[]>([]);
     const socket = React.useContext(WebsocketContext);
 
     React.useEffect(() => {
@@ -51,6 +51,21 @@ export const Chat = () => {
       };
     }, [socket]);
 
+    // React.useEffect(() => {
+    //   socket.on('newRoomMessage', ({roomName, messageDto}) => {
+    //     for (let i = 0; i < rooms.length; ++i) {
+    //       if (rooms[i].roomName === roomName) {
+    //         rooms[i].messages.push(messageDto);
+    //         break ;
+    //       }
+    //     }
+    //     setRooms(rooms);
+    //   });
+    //   return () => {
+    //     socket.off('newRoomMessage');
+    //   };
+    // }, [socket]);
+
     enum ChannelType {
       none = 0,
       privateMessage = 1,
@@ -58,8 +73,6 @@ export const Chat = () => {
     }
 
     const [channelType, setChannelType] = React.useState<ChannelType>(ChannelType.none);
-
-    const [settings, setSettings] = React.useState<null | HTMLElement>(null);
   
     const handleChangeDicussion = (event: React.SyntheticEvent | null, newValue: number) => {
       setTabIndex(newValue);
@@ -70,13 +83,6 @@ export const Chat = () => {
       setTabIndex(newValue);
       setChannelType(ChannelType.publicChannel);
     };
-
-    const handleCloseSettings = () => {
-        setSettings(null);
-      };
-      const handleOpenSettings = (event: React.MouseEvent<HTMLElement>) => {
-        setSettings(event.currentTarget);
-      };
   
     return (
       <Box style={{height: "90vh"}}
@@ -130,9 +136,6 @@ export const Chat = () => {
                       </Accordion>
                     </div>
 
-
-
-
                     <div>
                       <Accordion>
                         <AccordionSummary
@@ -156,7 +159,7 @@ export const Chat = () => {
                           aria-label="Vertical tabs example"
                           sx={{ borderRight: 1, borderColor: 'divider', height: '28vh' }}
                           >
-                           {privateRooms.map((channel, index) => {
+                           {privateMsgs.map((channel, index) => {
                               return (
                                 <Tab key={index} label={channel.roomName} {...a11yProps(index)}/> 
                               );
@@ -173,19 +176,9 @@ export const Chat = () => {
             {/* ------------ FEED ------------ */}
             <Grid item xs={7} sm={7} md={7} lg={7}>
                <Feed 
-                rooms={
-                  channelType === ChannelType.publicChannel ?
-                  rooms
-                  :
-                  channelType === ChannelType.privateMessage ?
-                  privateRooms
-                  :
-                  []
-                }
+                rooms={rooms}
+                privateMsgs={privateMsgs}
                 tabIndex={tabIndex}
-                handleOpenSettings={handleOpenSettings}
-                handleCloseSettings={handleCloseSettings}
-                settings={settings as HTMLElement}
                 channelType={channelType}
                />
             </Grid>

@@ -8,6 +8,7 @@ import { JoinRoomDialog } from "./JoinRoomDialog";
 import { ChatAPI } from "api/chat.api";
 import LockIcon from '@mui/icons-material/Lock';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { WebsocketContext } from "contexts/WebsocketContext";
 
 const SearchPersonn = styled('div')(({ theme }) => ({
     color: 'primary',
@@ -22,6 +23,7 @@ export const JoinCreateRoomBar = ({
 }: any) => {
 
     const [allRooms, setAllRooms] = React.useState<string[]>([]);
+    const socket = React.useContext(WebsocketContext);
 
     React.useEffect(() => {  
         const fetchRoomNames = async() => {
@@ -32,28 +34,33 @@ export const JoinCreateRoomBar = ({
         fetchRoomNames();
     }, []);
 
-    //  Socket on new room created
+    React.useEffect(() => {
+        socket.on('roomCreated', ({roomName}) => {
+            setAllRooms((allRooms) => [...allRooms, roomName])
+        });
+        return () => {
+          socket.off('roomCreated');
+        };
+      }, [socket]);
 
     const [openJoinRoom, setOpenJoinRoom] = React.useState<boolean>(false);
     const [roomToJoin, setRoomToJoin]= React.useState<string>('');
 
     const joinRoomHandler = (roomName: string) => {
         const idx = currentRooms.findIndex((room: { roomName: string; }) => {
-            return room.roomName === roomName;
+            return room.roomName.toUpperCase() === roomName.toUpperCase();
         });
         if (idx !== -1) {
             handleChangeChannel(null, idx);
         }
         else {
             setOpenJoinRoom(true);
-            //  With optional password
             setRoomToJoin(roomName);
         }
     }
 
     const keyPress = (event: any): void => {
-        if (event.keyCode === 13)
-        {
+        if (event.keyCode === 13) {
             joinRoomHandler(event.target.value);
         }
     }

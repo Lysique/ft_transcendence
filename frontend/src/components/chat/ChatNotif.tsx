@@ -17,7 +17,7 @@ export const ChatNotif = () => {
       return () => {
         socket.off('chatNotif');
       };
-    }, []);
+    }, [socket]);
 
     return (
     <Dialog
