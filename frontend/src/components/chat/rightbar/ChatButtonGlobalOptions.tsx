@@ -6,15 +6,18 @@ import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import { UserContext } from 'App';
 import * as React from 'react';
 import { UserDto } from "api/dto/user.dto";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 
 export const ChatButtonGlobalOption = ({chosenUser} : {chosenUser: UserDto}) => {
 
     const user: UserDto | null = React.useContext(UserContext);
+    const navigate: NavigateFunction = useNavigate();
 
     const handleBlock = (event: React.MouseEvent<HTMLElement>) => {
     };
   
     const handleProfile = () => {
+        navigate(`/profile/${chosenUser.id}`, { replace: true });
     };
   
     const handleInvitation = () => {
