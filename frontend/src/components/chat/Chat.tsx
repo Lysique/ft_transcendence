@@ -19,122 +19,154 @@ enum ChannelType {
 
 export const Chat = () => {
 
-    const [tabIndex, setTabIndex] = React.useState<number>(0);
-    const [rooms, setRooms] = React.useState<RoomDto[]>([]);
-    const [privateMsgs, setPrivateMsgs] = React.useState<RoomDto[]>([]);
-    const [channelType, setChannelType] = React.useState<ChannelType>(ChannelType.none);
-    const socket = React.useContext(WebsocketContext);
+  const [tabIndex, setTabIndex] = React.useState<number>(0);
+  const [rooms, setRooms] = React.useState<RoomDto[]>([]);
+  const [privateMsgs, setPrivateMsgs] = React.useState<RoomDto[]>([]);
+  const [channelType, setChannelType] = React.useState<ChannelType>(ChannelType.none);
+  const socket = React.useContext(WebsocketContext);
 
-    React.useEffect(() => {
-      const fetchRooms = async () => {
-        const resp: {rooms: RoomDto[]} = await ChatAPI.getRoomsFromUser();
-        setRooms(resp.rooms);
-      };
+  React.useEffect(() => {
+    const fetchRooms = async () => {
+      const resp: {rooms: RoomDto[]} = await ChatAPI.getRoomsFromUser();
+      setRooms(resp.rooms);
+    };
+
+    fetchRooms();
+  }, []);
+
+  //  Usefull only if rooms in database..
+
+  // React.useEffect(() => {
+  //   socket.on("onUserChange", () => {
+  //     const fetchRooms = async () => {
+  //       const resp: {rooms: RoomDto[]} = await ChatAPI.getRoomsFromUser();
+  //       setRooms(resp.rooms);
+  //     };
   
-      fetchRooms();
-    }, []);
+  //     fetchRooms();
+  //   });
+  //   return () => {
+  //     socket.off("onUserChange");
+  //   };
+  // }, [socket]);
 
-    React.useEffect(() => {
-      socket.on('addRoom', ({room}) => {
-        setRooms((rooms) => [...rooms, room]);
-      });
-      return () => {
-        socket.off('addRoom');
-      };
-    }, [socket]);
+  React.useEffect(() => {
+    socket.on('addRoom', ({room}) => {
+      setRooms((rooms) => [...rooms, room]);
+    });
+    return () => {
+      socket.off('addRoom');
+    };
+  }, [socket]);
 
-    React.useEffect(() => {
-      socket.on('deleteRoom', ({roomName}) => {
-        const roomIndex: number = rooms.findIndex((room) => room.roomName === roomName);
-        if (tabIndex === roomIndex) {
-          setChannelType(ChannelType.none);
-        }
-        else if (tabIndex < roomIndex) {
-          setTabIndex(tabIndex - 1);
-        }
-        setRooms(rooms.filter(room => room.roomName !== roomName));
-      });
-      return () => {
-        socket.off('deleteRoom');
-      };
+  React.useEffect(() => {
+    socket.on('deleteRoom', ({roomName}) => {
+      const roomIndex: number = rooms.findIndex((room) => room.roomName === roomName);
+      if (tabIndex === roomIndex) {
+        setChannelType(ChannelType.none);
+      }
+      else if (tabIndex < roomIndex) {
+        setTabIndex(tabIndex - 1);
+      }
+      setRooms(rooms.filter(room => room.roomName !== roomName));
+    });
+    return () => {
+      socket.off('deleteRoom');
+    };
     }, [socket, rooms, tabIndex]);
   
-    const handleChangeDicussion = (event: React.SyntheticEvent | null, newValue: number) => {
-      setTabIndex(newValue);
-      setChannelType(ChannelType.privateMessage);
-    };
+  const handleChangeDicussion = (event: React.SyntheticEvent | null, newValue: number) => {
+    setTabIndex(newValue);
+    setChannelType(ChannelType.privateMessage);
+  };
 
-    const handleChangeChannel = (event: React.SyntheticEvent | null, newValue: number) => {
-      setTabIndex(newValue);
-      setChannelType(ChannelType.publicChannel);
-    };
-  
-    return (
-      <Box style={{height: "90vh"}}
-      >
-        <Grid container spacing={4}>
+  const handleChangeChannel = (event: React.SyntheticEvent | null, newValue: number) => {
+    setTabIndex(newValue);
+    setChannelType(ChannelType.publicChannel);
+  };
 
-            {/* ------------ LEFT BAR ------------ */}
+  return (
+    <Box style={{height: "90vh"}}
+    >
+      <Grid container spacing={4}>
 
-            <Grid item xs={2.5} sm={2.5} md={2.5} lg={2.5}>
-                <Paper>
-                    <JoinCreateRoomBar 
-                      currentRooms={rooms}
+          {/* ------------ LEFT BAR ------------ */}
+
+          <Grid item xs={2.5} sm={2.5} md={2.5} lg={2.5}>
+              <Paper>
+                  <JoinCreateRoomBar 
+                    currentRooms={rooms}
+                    handleChangeChannel={handleChangeChannel}
+                  />
+
+
+                  <div>
+                    <RoomTabs
+                      value={
+                        channelType === ChannelType.publicChannel ?
+                        tabIndex
+                        :
+                        false
+                      }
+                      rooms={rooms}
                       handleChangeChannel={handleChangeChannel}
                     />
+                  </div>
 
+                  <div>
+                    <DiscussionTabs
+                      value={
+                        channelType === ChannelType.privateMessage ?
+                        tabIndex
+                        :
+                        false
+                      }
+                      rooms={privateMsgs}
+                      handleChangeChannel={handleChangeDicussion}
+                    />
+                  </div>
+                
+              </Paper>
+          </Grid>
 
-                    <div>
-                      <RoomTabs
-                        value={
-                          channelType === ChannelType.publicChannel ?
-                          tabIndex
-                          :
-                          false
-                        }
-                        rooms={rooms}
-                        handleChangeChannel={handleChangeChannel}
-                      />
-                    </div>
+          {/* ------------ FEED ------------ */}
+          <Grid item xs={7} sm={7} md={7} lg={7}>
+              <Feed 
+              rooms={rooms}
+              privateMsgs={privateMsgs}
+              tabIndex={tabIndex}
+              channelType={channelType}
+              />
+          </Grid>
 
-                    <div>
-                      <DiscussionTabs
-                        value={
-                          channelType === ChannelType.privateMessage ?
-                          tabIndex
-                          :
-                          false
-                        }
-                        rooms={privateMsgs}
-                        handleChangeChannel={handleChangeDicussion}
-                      />
-                    </div>
-                  
-                </Paper>
-            </Grid>
+          {/* ------------ RIGHT BAR ------------ */}
 
-            {/* ------------ FEED ------------ */}
-            <Grid item xs={7} sm={7} md={7} lg={7}>
-               <Feed 
-                rooms={rooms}
-                privateMsgs={privateMsgs}
-                tabIndex={tabIndex}
-                channelType={channelType}
-               />
-            </Grid>
+          <Grid item xs={2.5} sm={2.5} md={2.5} lg={2.5}>
+              <Paper>
+                  <Contacts
+                    users={
+                      channelType === ChannelType.publicChannel ?
+                      rooms.at(tabIndex)?.users || null
+                      :
+                      channelType === ChannelType.privateMessage ?
+                      privateMsgs.at(tabIndex)?.users || null
+                      :
+                      null
+                    }
+                    room={
+                      channelType === ChannelType.publicChannel ?
+                      rooms.at(tabIndex) || null
+                      :
+                      null
+                    }
+                  />
+              </Paper>
+          </Grid>
 
-            {/* ------------ RIGHT BAR ------------ */}
+      </Grid>
 
-            <Grid item xs={2.5} sm={2.5} md={2.5} lg={2.5}>
-                <Paper>
-                    <Contacts/>
-                </Paper>
-            </Grid>
+    <ChatNotif />
 
-        </Grid>
-
-      <ChatNotif />
-
-    </Box>
-    );
+  </Box>
+  );
 }
