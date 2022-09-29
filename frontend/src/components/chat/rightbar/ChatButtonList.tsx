@@ -2,19 +2,20 @@ import Menu from '@mui/material/Menu';
 import { ChatButtonGlobalOption } from './ChatButtonGlobalOptions';
 import { ChatButtonAdminOption } from './ChatButtonAdminOptions';
 import { UserDto } from 'api/dto/user.dto';
+import { RoomDto } from 'api/chat.api';
 
 interface ChatButtonListProps {
     displayedUser: UserDto
+    room: RoomDto | null
     open: null | HTMLElement
     handleClose: () => void
-    adminRights: boolean
 }
 
 export const ChatButtonList = ({
     displayedUser,
+    room,
     open,
     handleClose,
-    adminRights
 
 }: ChatButtonListProps ) => {
 
@@ -40,13 +41,12 @@ export const ChatButtonList = ({
         handleClose={handleClose}
       />
 
-      { 
-        adminRights &&
-        <ChatButtonAdminOption 
+      <ChatButtonAdminOption 
           chosenUser={displayedUser}
           handleClose={handleClose}
-        />
-      }
+          room={room}
+      />
+      
       </Menu>
     )
 }

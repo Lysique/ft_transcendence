@@ -25,9 +25,7 @@ export const Contacts = ({
     if (user && user.friends) {
       setFriends(user.friends);
     }
-    if (users) {
-      setOtherUsers(users);
-    }
+    setOtherUsers(users? users : [])
   }, [user, users, room]);
 
   const [openContact, setOpenContact] = React.useState<null | HTMLElement>(null);
@@ -78,7 +76,7 @@ export const Contacts = ({
               open={openFriend}
               handleClose={handleCloseFriend}
               displayedUser={displayedUser}
-              adminRights={false}
+              room={null}
             />
 
             </div>
@@ -107,7 +105,7 @@ export const Contacts = ({
               open={openContact}
               handleClose={handleCloseContact}
               displayedUser={displayedUser}
-              adminRights={user && room && room?.admins.find((value) => value === user.id)? true : false}
+              room={room}
             />
 
             </div>

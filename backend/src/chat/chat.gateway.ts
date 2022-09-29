@@ -123,7 +123,7 @@ export class ChatGateway implements OnGatewayConnection {
       return ;
     }
 
-    this.chatService.leaveRoom(userDto, roomDto);
+    this.chatService.leaveRoom(userDto.id, roomDto);
     this.server.to('user_' + userDto.id.toString()).emit('deleteRoom',{ roomName: body.roomName });
     this.server.to(socket.id).emit('chatNotif', {notif: `You left ${body.roomName}!`});
 
@@ -154,22 +154,31 @@ export class ChatGateway implements OnGatewayConnection {
       this.server.to(socket.id).emit('chatNotif', {notif: `Password changed successfully.`});
     };
 
-    // @SubscribeMessage('kickevent')
-    // async kickEvent(@ConnectedSocket() socket: Socket, @MessageBody() body: any) {
+    @SubscribeMessage('kickUser')
+    async kickUser(@ConnectedSocket() socket: Socket, @MessageBody() body: {roomName: string, userId: number}) {
+      if (!this.chatService.roomExist(body.roomName)) {
+        this.server.to(socket.id).emit('chatNotif', {notif: 'This room no longer exists.'});
+        return ;
+      }
 
-      
-    //   if (this.chatService.kickFunction(15, body.value, body.room))
-    //   {
-    //     console.log('le kick est reussit');
-    //     //update client
-    //   }
-    //   else
-    //   {
-    //     console.log('le kick n est pas possible');
-    //   }
+      const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
+      const roomDto: RoomDto = this.chatService.getRoomFromName(body.roomName);
 
-    //   //update client server emit
-    // };
+      if (!this.chatService.isAdminFromRoom(userDto, roomDto)) {
+        this.server.to(socket.id).emit('chatNotif', {notif: 'An error has occured.'});
+        return ;
+      }
+
+      if (!roomDto.users.find(({id}) => id === userDto.id)) {
+        this.server.to(socket.id).emit('chatNotif', {notif: 'This user is no longer in the room.'});
+        return ;
+      }
+
+      this.chatService.leaveRoom(body.userId, roomDto);
+      this.server.to('user_' + body.userId.toString()).emit('deleteRoom',{ roomName: body.roomName });
+      this.server.to('user_' + body.userId.toString()).emit('globalChatNotif',{ 
+        notif: `You got kicked from ${body.roomName}. Watch your manners! Or begin a revolution against abuse of power!`});
+    };
 
                         /*********************** BAN EVENT  ************************/
 

@@ -1,4 +1,4 @@
-import { UserContext, SetUserContext } from 'App';
+import { UserContext } from 'App';
 import * as React from 'react';
 import { UserDto } from "api/dto/user.dto";
 import { WebsocketContext } from "contexts/WebsocketContext";
@@ -11,15 +11,18 @@ import DangerousIcon from '@mui/icons-material/Dangerous';
 import LocalPoliceIcon from '@mui/icons-material/LocalPolice';
 import Switch from '@mui/material/Switch';
 import { Box, Button, FormLabel, Menu, Radio, RadioGroup } from '@mui/material';
+import { RoomDto } from 'api/chat.api';
 
 interface ChatButtonAdminOptionProps {
     chosenUser: UserDto, 
+    room: RoomDto | null
     handleClose: () => void
 }
 
 export const ChatButtonAdminOption = ({
     chosenUser,
-    handleClose
+    handleClose,
+    room
     
 }: ChatButtonAdminOptionProps) => {
 
@@ -27,6 +30,13 @@ export const ChatButtonAdminOption = ({
     const socket = React.useContext(WebsocketContext);
 
     const handleAdmin = () => {
+    };
+
+    const handleKick = () => {
+      if (room) {
+        socket.emit('kickUser', { roomName: room.roomName, userId: chosenUser.id})
+      }
+      handleClose();
     };
   
     const [ban, setBan] = React.useState<null | HTMLElement>(null);
@@ -52,9 +62,16 @@ export const ChatButtonAdminOption = ({
       setMuteDuration(event.target.value);
       };
 
-    return (           
+    return (
+      <>
+      {user && room && room?.admins.find((value) => value === user.id) &&
+      
         <FormGroup>
         <FormControl>
+
+          {/* ************** KICK *************** */}
+
+          <MenuItem onClick={handleKick}><LocalPoliceIcon/><p style={{ marginLeft: "15px" }} >Kick user</p></MenuItem>
 
           {/* ************** NEW ADMIN *************** */}
 
@@ -110,7 +127,6 @@ export const ChatButtonAdminOption = ({
           open={Boolean(mute)}
           onClose={handleCloseMuteBar}
           >
-          {/* <MenuItem onClick={handleCloseMuteBar}> */}
           <MenuItem>
           <FormControl>
             <FormLabel id='muteDuration'>Mute for :</FormLabel>
@@ -132,5 +148,7 @@ export const ChatButtonAdminOption = ({
           </Menu>
           </FormControl>
       </FormGroup>
+      }
+      </>
     )
 }

@@ -97,14 +97,14 @@ export class ChatService {
        /*********************** LEAVE ROOM  ************************/
 
 
-  leaveRoom(userDto: UserDto, room: RoomDto) {
-    const userIndex = room.users.findIndex(({id}) => id === userDto.id);
+  leaveRoom(userId: number, room: RoomDto) {
+    const userIndex = room.users.findIndex(({id}) => id === userId);
 
     if (userIndex > -1) {
       room.users.splice(userIndex, 1);
     }
 
-    const adminIndex = room.admins.indexOf(userDto.id);
+    const adminIndex = room.admins.indexOf(userId);
 
     if (adminIndex > -1) {
       room.admins.splice(adminIndex, 1);
@@ -112,7 +112,7 @@ export class ChatService {
 
     this.RoomList.set(room.roomName.toUpperCase(), room);
 
-    const sockets: Socket[] = this.authService.getSocketsFromUser(userDto.id);
+    const sockets: Socket[] = this.authService.getSocketsFromUser(userId);
     sockets.forEach((socket) => { socket.leave(room.roomName) });
   }
 
@@ -179,10 +179,18 @@ export class ChatService {
     return roomReturnDto;
   }
 
+  async getUserFromId(id: number): Promise<UserDto> {
+    return await this.userService.findOneById(id);
+  }
+
   async addSocketToRooms(socket: Socket) {
     const userDto: UserDto = await this.authService.getUserFromSocket(socket);
 
     this.RoomList.forEach((value) => { value.users.find( ({id}) => id === userDto.id ) && socket.join(value.roomName); });
+  }
+
+  isAdminFromRoom(userDto: UserDto, roomDto: RoomDto): boolean {
+    return (roomDto.admins.find(id => id === userDto.id)? true : false);
   }
 
     
