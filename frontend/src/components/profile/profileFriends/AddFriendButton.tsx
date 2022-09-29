@@ -71,10 +71,9 @@ export const AddFriendButton = ({visited}: AddFriendButtonProps) => {
 
             if (user && user.friends && visited) {
             
-                for (var i = user.friends.length - 1; i >= 0; i-- ) {
-                    if ( user.friends[i].id === visited.id) { 
+                if (user && user.friends && visited) {
+                    if (user.friends.find(({id}) => id === visited.id )) {
                         friend = true;
-                        break ;
                     }
                 }
             }

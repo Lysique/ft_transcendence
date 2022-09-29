@@ -43,7 +43,7 @@ export const BlockButton = ({visited}: BlockButtonProps) => {
     }
 
     React.useEffect(() => {
-        const addToFriend = async () => {
+        const addToBlock = async () => {
             if (visited) {
 
                 let resp: UserDto | null;
@@ -59,32 +59,23 @@ export const BlockButton = ({visited}: BlockButtonProps) => {
         }
 
         if (validation === true) {
-            addToFriend();
+            addToBlock();
         }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [validation]);
 
     React.useEffect(() => {
-        const initIsFriend = async () => {
+        const initIsBlocked = async () => {
             let blocked = false;
 
             if (user && user.blocked && visited) {
-            
-                for (var i = user.blocked.length - 1; i >= 0; i-- ) {
-                    if ( user.blocked[i].id === visited.id) { 
-                        blocked = true;
-                        break ;
-                    }
+                if (user.blocked.find(({id}) => id === visited.id )) {
+                    blocked = true;
                 }
             }
             setButton(blocked? 'Unblock': 'Block');
             setIsBlocked(blocked);
         }
-    
-        initIsFriend();
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        initIsBlocked();
     }, [user, visited]);
     
     return (
