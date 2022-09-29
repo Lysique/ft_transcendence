@@ -10,9 +10,12 @@ import { BlockButton } from "components/profile/profileFriends/BlockButton";
 import { UserStatus } from "api/dto/user.dto";
 import { HistoryBar } from "components/profile/profileHistory/HistoryBar";
 import { StatBar } from "components/profile/profileStats/StatBar";
+import { WebsocketContext } from "contexts/WebsocketContext";
+
 
 export const VisitorProfile = () => {
   const [visited, setVisited] = React.useState<UserDto | null>(null);
+  const socket = React.useContext(WebsocketContext);
   const { id } = useParams<"id">();
   const navigate = useNavigate();
 
@@ -25,8 +28,23 @@ export const VisitorProfile = () => {
       setVisited(resp);
     };
     fetchProfile();
-    // eslint-disable-next-line
   }, [id]);
+
+  React.useEffect(() => {
+    socket.on('onUserChange', () => {
+      const fetchProfile = async () => {
+        const resp = await UserAPI.getOneUserById(id ? id : "");
+        if (!resp || Object.keys(resp).length === 0) {
+          navigate("/");
+        }
+        setVisited(resp);
+      };
+    fetchProfile();
+    });
+    return () => {
+      socket.off("onUserChange");
+    };
+  }, [socket]);
 
   return (
     <>

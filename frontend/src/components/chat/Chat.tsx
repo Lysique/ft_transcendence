@@ -1,17 +1,8 @@
 import * as React from 'react';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import { Contacts } from "components/chat/rightbar/Contacts";
 
 import { Grid, Paper } from '@mui/material'
-
-import Typography from '@mui/material/Typography';
-
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Feed } from './feed/Feed';
 import { JoinCreateRoomBar } from './leftbar/JoinCreateRoomBar';
 import { WebsocketContext } from 'contexts/WebsocketContext';
@@ -19,14 +10,6 @@ import { ChatNotif } from './ChatNotif';
 import { ChatAPI, RoomDto } from 'api/chat.api';
 import { RoomTabs } from './leftbar/RoomTabs';
 import { DiscussionTabs } from './leftbar/DiscussionTabs';
-
-
-function a11yProps(index: number) {
-  return {
-    id: `vertical-tab-${index}`,
-    'aria-controls': `vertical-tabpanel-${index}`,
-  };
-}
 
 enum ChannelType {
   none = 0,

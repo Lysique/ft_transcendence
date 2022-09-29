@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
 
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
@@ -30,88 +29,74 @@ import LocalPoliceIcon from '@mui/icons-material/LocalPolice';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormLabel from '@mui/material/FormLabel';
+import { UserDto } from 'api/dto/user.dto';
+import { RoomDto } from 'api/chat.api';
 
 
 // ------------- [ TEMPORARY - LINK BACKEND ] ---------------
 var contacts_arr:(number | string)[] = ["Pierre Pizzo", "Loraine Duhamel", "name 1","name 2","name 3", "name 4", "name 5","name 6","name 7", "name 8", "name 9", "name 10", "name 11"];
 // ----------------------------------------------------------
 
+interface ContactsProps {
+  users: UserDto[] | UserDto | null
+  room: RoomDto | null
+}
+
 export const Contacts = () => {
 
-    // ------------- [ TEMPORARY - LINK BACKEND ] ---------------
-    const admin = true;   // administrator => can ban, mute other users, add new admin (set to "true/false" to preview frontend)
-    // ----------------------------------------------------------
-    const isAdmin = admin && admin === true;
 
-    const [openContact, setOpenContact] = React.useState<null | HTMLElement>(null);
-   
-    const handleOpenContact = (event: React.MouseEvent<HTMLElement>) => {
-        setOpenContact(event.currentTarget);
-      };
-      
-      const handleCloseContact = () => {
-        setOpenContact(null);
-      };
+  const [openContact, setOpenContact] = React.useState<null | HTMLElement>(null);
 
-      const [block, setBlock] = React.useState<null | HTMLElement>(null);
-   
-      const handleBlock = (event: React.MouseEvent<HTMLElement>) => {
-          setBlock(event.currentTarget);
-        };
-
-          const handleProfile = () => {
-            // return {
-            //   <Route
-            //   path="/profile/:id"
-            //   element={
-            //     <RouteProtect>
-            //       <VisitorProfile />
-            //     </RouteProtect>
-            //   }
-            // />
-            // }
-
-            // [ COMPLETE ]
-          };
-
-          const handleInvitation = () => {
-            // [ COMPLETE ]
-          };
-
-          
-          const handleAdmin = () => {
-            // [ COMPLETE ]
-            // setInputList(inputList.concat(<Input key={inputList.length} />));
-            //   <Alert severity="warning">
-            //   <AlertTitle>Warning</AlertTitle>
-            //   This member already is an admin
-            // </Alert>
-            // );
-          };
-
-            const [ban, setBan] = React.useState<null | HTMLElement>(null);
-   
-            const handleBan = (event: React.MouseEvent<HTMLElement>) => {
-                setBan(event.currentTarget);
-              };
-
+  const handleOpenContact = (event: React.MouseEvent<HTMLElement>) => {
+      setOpenContact(event.currentTarget);
+    };
     
-            const [mute, setMute] = React.useState<null | HTMLElement>(null);
-       
-            const handleMute = (event: React.MouseEvent<HTMLElement>) => {
-                setMute(event.currentTarget);
-              };
-            
-            const [muteDuration, setMuteDuration] = React.useState('1 hour');
+    const handleCloseContact = () => {
+      setOpenContact(null);
+    };
 
-              const handleCloseMuteBar = () => {
-                setMuteDuration('1 hour');
-              };
-            
-            const handleMuteDuration = (event: React.ChangeEvent<HTMLInputElement>) => {
-              setMuteDuration(event.target.value);
-              };
+  const [block, setBlock] = React.useState<null | HTMLElement>(null);
+
+  const handleBlock = (event: React.MouseEvent<HTMLElement>) => {
+      setBlock(event.currentTarget);
+    };
+
+  const handleProfile = () => {
+
+  };
+
+  const handleInvitation = () => {
+
+  };
+
+  
+  const handleAdmin = () => {
+
+  };
+
+    const [ban, setBan] = React.useState<null | HTMLElement>(null);
+
+    const handleBan = (event: React.MouseEvent<HTMLElement>) => {
+        setBan(event.currentTarget);
+      };
+
+
+    const [mute, setMute] = React.useState<null | HTMLElement>(null);
+
+    const handleMute = (event: React.MouseEvent<HTMLElement>) => {
+        setMute(event.currentTarget);
+      };
     
+    const [muteDuration, setMuteDuration] = React.useState('1 hour');
+
+      const handleCloseMuteBar = () => {
+        setMuteDuration('1 hour');
+      };
+    
+    const handleMuteDuration = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setMuteDuration(event.target.value);
+      };
+
 
     return (
       <List key='contact-list'
@@ -126,15 +111,25 @@ export const Contacts = () => {
           <li key={`members`}>
             <ul >
               <ListSubheader style={{textAlign:'center'}}>{`Members`}</ListSubheader>
+
               {contacts_arr.map((contact) => (
                 <div key={contact}>
+
+              <Button
+                id="basic-button"
+                aria-controls={openContact ? "basic-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={openContact ? "true" : undefined}
+                sx={{ textTransform: 'none' }}
+                onClick={handleOpenContact}
+              >
                 
                 <ListItem key={contact}>
                     <ListItemAvatar>
                         <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
                     </ListItemAvatar>
                     <ListItemText primary={contact} />
-                    <IconButton
+                    {/* <IconButton
                         size="large"
                         aria-label="account of current user"
                         aria-controls="contact-appbar"
@@ -142,8 +137,12 @@ export const Contacts = () => {
                         onClick={handleOpenContact}
                         color="inherit">
                         <MoreVertIcon/>
-                    </IconButton>
+                    </IconButton> */}
                 </ListItem>
+
+                </Button>
+
+
                 <Menu
                 id="contact-appbar"
                 anchorEl={openContact}
@@ -159,6 +158,8 @@ export const Contacts = () => {
                 open={Boolean(openContact)}
                 onClose={handleCloseContact}
                 >
+
+
                   <FormGroup>
                     <FormControl>
 
@@ -190,7 +191,7 @@ export const Contacts = () => {
                       </FormControl>
                   </FormGroup>
 
-                  { isAdmin ?   // admin can ban, mute and add new admin
+                  { true ?   // admin can ban, mute and add new admin
                     <FormGroup>
                     <FormControl>
 
@@ -262,6 +263,7 @@ export const Contacts = () => {
                           <FormControlLabel value="8 hours" control={<Radio />} label="8 hours" />
                           <FormControlLabel value="12 hours" control={<Radio />} label="12 hours" />
                           <FormControlLabel value="24 hours" control={<Radio />} label="24 hours" />
+
                         </RadioGroup>
                       </FormControl>
                       </MenuItem>
@@ -273,6 +275,8 @@ export const Contacts = () => {
               </Menu>
               </div>
               ))}
+
+              
             </ul>
           </li>
       </List>
