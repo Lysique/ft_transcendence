@@ -166,7 +166,7 @@ export class ChatGateway implements OnGatewayConnection {
       }
 
       if (roomDto.owner === body.userId) {
-        this.server.to(socket.id).emit('chatNotif', {notif: 'The owner will be notified of your rebellion.'});
+        this.server.to(socket.id).emit('chatNotif', {notif: 'An error has occured.'});
         return ;
       }
 
