@@ -117,7 +117,7 @@ export class ChatGateway implements OnGatewayConnection {
 
     if (roomDto.owner === userDto.id) {
       this.chatService.destroyRoom(roomDto);
-      this.server.to(body.roomName).emit('deleteRoom',{ roomName: body.roomName });
+      this.server.emit('deleteRoom',{ roomName: body.roomName });
       this.server.to(body.roomName).emit('globalChatNotif',{ notif: `Room ${body.roomName} has been deleted by the owner.`});
       this.server.socketsLeave(body.roomName);
       return ;

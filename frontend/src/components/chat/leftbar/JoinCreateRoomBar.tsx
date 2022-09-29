@@ -43,6 +43,15 @@ export const JoinCreateRoomBar = ({
         };
       }, [socket]);
 
+      React.useEffect(() => {
+        socket.on('deleteRoom', ({roomName}) => {
+          setAllRooms(allRooms.filter(room => room !== roomName));
+        });
+        return () => {
+          socket.off('deleteRoom');
+        };
+      }, [socket, allRooms]);
+
     const [openJoinRoom, setOpenJoinRoom] = React.useState<boolean>(false);
     const [roomToJoin, setRoomToJoin]= React.useState<string>('');
 

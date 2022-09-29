@@ -35,7 +35,6 @@ export const Chat = () => {
   }, []);
 
   //  Usefull only if rooms in database..
-
   // React.useEffect(() => {
   //   socket.on("onUserChange", () => {
   //     const fetchRooms = async () => {
@@ -62,7 +61,10 @@ export const Chat = () => {
   React.useEffect(() => {
     socket.on('deleteRoom', ({roomName}) => {
       const roomIndex: number = rooms.findIndex((room) => room.roomName === roomName);
-      if (tabIndex === roomIndex) {
+      if (roomIndex === -1) {
+        return ;
+      }
+      else if (tabIndex === roomIndex) {
         setChannelType(ChannelType.none);
       }
       else if (tabIndex < roomIndex) {
@@ -73,7 +75,7 @@ export const Chat = () => {
     return () => {
       socket.off('deleteRoom');
     };
-    }, [socket, rooms, tabIndex]);
+  }, [socket, rooms, tabIndex]);
   
   const handleChangeDicussion = (event: React.SyntheticEvent | null, newValue: number) => {
     setTabIndex(newValue);
