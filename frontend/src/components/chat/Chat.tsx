@@ -59,10 +59,14 @@ export const Chat = () => {
   }, [socket]);
 
   React.useEffect(() => {
-    socket.on('roomChanged', ({newRoom}) => {
-      const roomIndex = rooms.findIndex(oldRoom => oldRoom.roomName === newRoom.roomName);
-      rooms[roomIndex] = newRoom;
-      setRooms(rooms);
+    socket.on('roomChanged', ({newRoom}: {newRoom : RoomDto}) => {
+      const updateRooms: RoomDto[] = rooms.map(room => {
+        if (room.roomName === newRoom.roomName) {
+          return newRoom;
+        }
+        return room;
+      })
+      setRooms(updateRooms);
     });
     return () => {
       socket.off('roomChanged');
