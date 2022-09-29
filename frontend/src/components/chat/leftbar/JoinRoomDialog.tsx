@@ -2,11 +2,17 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { WebsocketContext } from "contexts/WebsocketContext";
 import React from "react"
 
+interface JoinRoomDialogProps {
+    roomName: string
+    open: boolean
+    setOpen: Function
+}
+
 export const JoinRoomDialog = ({
     open,
     roomName,
     setOpen
-}: any ) => {
+}: JoinRoomDialogProps ) => {
 
     const [pwd, setPwd] = React.useState<string>('');
     const socket = React.useContext(WebsocketContext);

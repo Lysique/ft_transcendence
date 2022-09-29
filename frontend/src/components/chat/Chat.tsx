@@ -17,6 +17,8 @@ import { JoinCreateRoomBar } from './leftbar/JoinCreateRoomBar';
 import { WebsocketContext } from 'contexts/WebsocketContext';
 import { ChatNotif } from './ChatNotif';
 import { ChatAPI, RoomDto } from 'api/chat.api';
+import { RoomTabs } from './leftbar/RoomTabs';
+import { DiscussionTabs } from './leftbar/DiscussionTabs';
 
 
 function a11yProps(index: number) {
@@ -100,74 +102,29 @@ export const Chat = () => {
 
 
                     <div>
-                      <Accordion>
-                        <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel1a-content"
-                        id="panel1a-header"
-                        >
-                          <Typography style={{paddingLeft:'8px'}}>Channels</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <Tabs 
-                          orientation="vertical"
-
-                          value={
-                            channelType === ChannelType.publicChannel ?
-                            tabIndex
-                            :
-                            false
-                          }
-
-                          onChange={handleChangeChannel}
-                          aria-label="Vertical tabs example"
-                          sx={{ borderRight: 1, borderColor: 'divider', height: '28vh' }}
-                          >
-
-                            {rooms.map((channel: RoomDto, index: number) => {
-                              return (
-                                <Tab key={index} label={channel.roomName} {...a11yProps(index)}/> 
-                              );
-                            })}
-
-
-                          </Tabs>
-                        </AccordionDetails>
-                      </Accordion>
+                      <RoomTabs
+                        value={
+                          channelType === ChannelType.publicChannel ?
+                          tabIndex
+                          :
+                          false
+                        }
+                        rooms={rooms}
+                        handleChangeChannel={handleChangeChannel}
+                      />
                     </div>
 
                     <div>
-                      <Accordion>
-                        <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel1a-content"
-                        id="panel1a-header"
-                        >
-                          <Typography style={{paddingLeft:'8px'}}>Discussions</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <Tabs 
-                          orientation="vertical"
-                          variant="scrollable"
-                          value={
-                            channelType === ChannelType.privateMessage ?
-                            tabIndex
-                            :
-                            false
-                          }
-                          onChange={handleChangeDicussion}
-                          aria-label="Vertical tabs example"
-                          sx={{ borderRight: 1, borderColor: 'divider', height: '28vh' }}
-                          >
-                           {privateMsgs.map((channel, index) => {
-                              return (
-                                <Tab key={index} label={channel.roomName} {...a11yProps(index)}/> 
-                              );
-                            })}
-
-                          </Tabs>
-                        </AccordionDetails>
-                      </Accordion>
+                      <DiscussionTabs
+                        value={
+                          channelType === ChannelType.privateMessage ?
+                          tabIndex
+                          :
+                          false
+                        }
+                        rooms={privateMsgs}
+                        handleChangeChannel={handleChangeDicussion}
+                      />
                     </div>
                   
                 </Paper>
