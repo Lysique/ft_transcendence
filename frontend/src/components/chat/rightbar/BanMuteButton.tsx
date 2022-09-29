@@ -4,6 +4,8 @@ import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import React from "react";
 import { UserDto } from "api/dto/user.dto";
 import { ChooseSentenceTimePopup } from "./ChooseSentenceTimePopup";
+import { WebsocketContext } from "contexts/WebsocketContext";
+import { RoomDto } from "api/chat.api";
 
 enum Sentence {
     none = -1,
@@ -11,23 +13,42 @@ enum Sentence {
     mute = 1
 }
 
-export const BanMuteButton = ({user}: {user: UserDto}) => {
+interface BanMuteButtonProps {
+    user: UserDto,
+    room: RoomDto,
+    handleClose: any
+}
+
+export const BanMuteButton = ({
+    user,
+    room,
+    handleClose
+}: BanMuteButtonProps) => {
 
     const [open, setOpen] = React.useState<boolean>(false);
     const [sentence, setSentence] = React.useState<Sentence>(Sentence.none);
     const [time, setTime] = React.useState<number>(-1);
+    const socket = React.useContext(WebsocketContext);
 
     const handleBan = () => {
         setSentence(Sentence.ban);
         setOpen(true);
+        handleClose();
     };
 
     const handleMute = () => {
         setSentence(Sentence.mute);
         setOpen(true);
+        handleClose();
     };
 
     const handleSentence = () => {
+        if (sentence === Sentence.ban && time !== -1) {
+            socket.emit('banUser', {roomName: room.roomName, userId: user.id, time: time})
+        }
+        if (sentence === Sentence.mute && time !== -1) {
+            socket.emit('muteUser', {roomName: room.roomName, userId: user.id, time: time})
+        }
         setOpen(false);
         setSentence(Sentence.none);
         setTime(-1);

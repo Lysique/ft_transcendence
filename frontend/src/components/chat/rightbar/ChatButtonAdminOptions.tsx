@@ -77,6 +77,8 @@ export const ChatButtonAdminOption = ({
 
         <BanMuteButton
           user={chosenUser}
+          room={room}
+          handleClose={handleClose}
         />
        
       </FormControl>

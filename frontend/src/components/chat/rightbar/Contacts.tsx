@@ -13,7 +13,7 @@ interface ContactsProps {
 }
 
 export const Contacts = ({
-  users, 
+  users,
   room
 }: ContactsProps ) => {
 

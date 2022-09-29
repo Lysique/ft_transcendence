@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { UserDto } from 'src/models/users/dto/user.dto';
 import { UsersService } from 'src/models/users/users.service';
-import { Socket, Server } from 'socket.io';
+import { Socket } from 'socket.io';
 
 export class MessageDto {
   userId : number;
@@ -130,23 +130,43 @@ export class ChatService {
 
     /*********************** Set Admin  ************************/
 
-    async setAdmin(roomDto: RoomDto, userId: number) {
-      if (!this.isAdminFromRoom(userId, roomDto)) {
-        roomDto.admins.push(userId);
-        this.RoomList.set(roomDto.roomName.toUpperCase(), roomDto);
-      }
-    }
-
-    async unsetAdmin(roomDto: RoomDto, userId: number) {
-      const adminIndex = roomDto.admins.indexOf(userId);
-
-      if (adminIndex > -1) {
-        roomDto.admins.splice(adminIndex, 1);
-      }
-
+  setAdmin(roomDto: RoomDto, userId: number) {
+    if (!this.isAdminFromRoom(userId, roomDto)) {
+      roomDto.admins.push(userId);
       this.RoomList.set(roomDto.roomName.toUpperCase(), roomDto);
-
     }
+  }
+
+  unsetAdmin(roomDto: RoomDto, userId: number) {
+    const adminIndex = roomDto.admins.indexOf(userId);
+
+    if (adminIndex > -1) {
+      roomDto.admins.splice(adminIndex, 1);
+    }
+
+    this.RoomList.set(roomDto.roomName.toUpperCase(), roomDto);
+
+  }
+
+  setBanTime(roomDto: RoomDto, userId: number, time: number) {
+    if (time <= 0) {
+      roomDto.banMap.delete(userId);
+    }
+    else {
+      roomDto.banMap.set(userId, time * 60 * 1000 + Date.now());
+    }
+    this.RoomList.set(roomDto.roomName.toUpperCase(), roomDto);
+  }
+
+  setMuteTime(roomDto: RoomDto, userId: number, time: number) {
+    if (time === 0) {
+      roomDto.mutedMap.delete(userId);
+    }
+    else {
+      roomDto.mutedMap.set(userId, time * 60 * 1000 + Date.now());
+    }
+    this.RoomList.set(roomDto.roomName.toUpperCase(), roomDto);
+  }
 
   /*
   **
@@ -184,6 +204,32 @@ export class ChatService {
     return (this.RoomList.get(name.toUpperCase()));
   }
 
+  isBanned(roomDto: RoomDto, userId: number): boolean {
+    const time: number = roomDto.banMap.get(userId);
+    if (!time) {
+      return false;
+    }
+    if (time <= Date.now()) {
+      roomDto.banMap.delete(userId);
+      this.RoomList.set(roomDto.roomName.toUpperCase(), roomDto);
+      return false;
+    }
+    return true;
+  }
+
+  isMuted(roomDto: RoomDto, userId: number): boolean {
+    const time: number = roomDto.mutedMap.get(userId);
+    if (!time) {
+      return false;
+    }
+    if (time <= Date.now()) {
+      roomDto.mutedMap.delete(userId);
+      this.RoomList.set(roomDto.roomName.toUpperCase(), roomDto);
+      return false;
+    }
+    return true;
+  }
+
   roomExist(roomName: string): boolean {
     return (this.RoomList.has(roomName.toUpperCase()));
   }
@@ -213,55 +259,4 @@ export class ChatService {
   isAdminFromRoom(userId: number, roomDto: RoomDto): boolean {
     return (roomDto.admins.find(id => id === userId)? true : false);
   }
-
-    
-
-
-
-    // async banFunction(userId : number, victim : number, roomArg : string, timeBan : number)
-    // {
-    //   const room = this.getRoomFromName(roomArg);
-    //   const userDto: UserDto = await this.userService.findOneById(victim);
-    //   if (room.owner !== victim   &&    ( room.admin.has(userId) || room.owner === userId ))
-    //   {
-    //     console.log('user ' + victim + ' is ban from the channel');
-    //     room.userSet.delete(userDto);
-    //     room.banMap.set(victim,timeBan);
-    //     this.tryDeleteRoom(roomArg);
-    //     return true;
-    //   }
-    //   else
-    //   {
-    //     console.log(userId + ' you cant ban the user : ' + victim);
-    //   }
-    //   return false;
-    // }
-
-
-
-
-    /********************** MUTE FUNCTION ************************/
-
-    // async muteFunction(userId : number, victim : number, roomArg : string, timeMute : number)
-    // {
-    //   if (this.getRoomFromName(roomArg) === undefined)
-    //     {
-    //       console.log('cant mute this guy , room doesnt exist');
-    //       return false;
-    //     }
-    //   const room = this.getRoomFromName(roomArg);
-    //   const userDto: UserDto = await this.userService.findOneById(victim);
-    //   if (room.owner !== victim   &&    ( room.admin.has(userId) || room.owner === userId ))
-    //   {
-    //     console.log('user ' + victim + ' is mute from the channel');
-    //     room.mutedMap.set(victim,timeMute);
-    //     return true;
-    //   }
-    //   else
-    //   {
-    //     console.log(userId + ' you cant mute the user : ' + victim);
-    //   }
-    //   return false;
-    // }
-
 }
