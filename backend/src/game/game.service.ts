@@ -369,7 +369,7 @@ export class GameService {
     }
 
     for (let i = 0; i < data.length; ++i) {
-      if (data[i].userSocket.id == socketID) {
+      if (data[i].userSocket.id === socketID) {
         return data[i].userSocket;
       }
     }

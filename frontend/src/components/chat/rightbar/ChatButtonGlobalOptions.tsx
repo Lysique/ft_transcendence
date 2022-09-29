@@ -18,6 +18,7 @@ interface ChatButtonGlobalOptionProps {
 export const ChatButtonGlobalOption = ({
     chosenUser,
     handleClose
+
 }: ChatButtonGlobalOptionProps) => {
 
     const user: UserDto | null = React.useContext(UserContext);

@@ -28,7 +28,7 @@ export const VisitorProfile = () => {
       setVisited(resp);
     };
     fetchProfile();
-  }, [id]);
+  }, [id, navigate]);
 
   React.useEffect(() => {
     socket.on('onUserChange', () => {
@@ -44,7 +44,7 @@ export const VisitorProfile = () => {
     return () => {
       socket.off("onUserChange");
     };
-  }, [socket]);
+  }, [socket, navigate, id]);
 
   return (
     <>

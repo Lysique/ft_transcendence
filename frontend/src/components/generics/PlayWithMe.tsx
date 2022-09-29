@@ -48,7 +48,7 @@ function PlayWithMe() {
 
   useEffect(() => {
     if (answered === true) {
-      console.log(socketId);
+      console.log(inviterId, socketId)
       socket.emit("answerToInvite", {
         answer: validation,
         inviterId: inviterId,

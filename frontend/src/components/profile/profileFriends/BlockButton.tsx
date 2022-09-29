@@ -61,7 +61,8 @@ export const BlockButton = ({visited}: BlockButtonProps) => {
         if (validation === true) {
             addToBlock();
         }
-    }, [validation]);
+    // eslint-disable-next-line
+    }, [validation, setUser, visited, isBlocked]);
 
     React.useEffect(() => {
         const initIsBlocked = async () => {

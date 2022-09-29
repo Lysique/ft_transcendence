@@ -115,9 +115,8 @@ export class GameGateway implements OnGatewayDisconnect {
     this.server.to('user_' + inviteeUser.id.toString()).emit('closeInvite');
 
     const inviterSocket = this.gameService.getSocketFromId(body.inviterId, body.inviterSocketId)
-
     if (!inviterSocket) {
-      this.server.to(inviteeSocket.id).emit('errorGameInvite', { errorMsg: 'An error has occured, please try again!' });
+      this.server.to(inviteeSocket.id).emit('errorGameInvite', { errorMsg: 'An error has occured.' });
       return;
     }
 
