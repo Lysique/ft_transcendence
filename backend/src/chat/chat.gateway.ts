@@ -59,7 +59,7 @@ export class ChatGateway implements OnGatewayConnection {
       return ;
     }
 
-    const room: RoomDto = this.chatService.getRoomFromName(body.roomName);
+    let room: RoomDto = this.chatService.getRoomFromName(body.roomName);
 
     if (room.password !== '' && body.password === '') {
       this.server.to(socket.id).emit('chatNotif', {notif: 'This room is locked by a password.'});
@@ -80,9 +80,7 @@ export class ChatGateway implements OnGatewayConnection {
     const roomReturn: RoomReturnDto = this.chatService.getReturnRoom(room);
     this.server.to('user_' + userDto.id.toString()).emit('addRoom',{ room: roomReturn });
     this.server.to(socket.id).emit('chatNotif', {notif: 'Room joined successfully!'});
-
-    //  TODO: implement frontend
-    // this.server.to(room.roomName).emit('roomJoined', {roomName: room.roomName, user: userDto});
+    this.server.to(room.roomName).except('user_'+ userDto.id.toString()).emit('roomChanged', { newRoom: roomReturn });
   };
 
                         /*********************** ROOM MESSAGES ************************/
@@ -126,10 +124,8 @@ export class ChatGateway implements OnGatewayConnection {
     this.chatService.leaveRoom(userDto.id, roomDto);
     this.server.to('user_' + userDto.id.toString()).emit('deleteRoom',{ roomName: body.roomName });
     this.server.to(socket.id).emit('chatNotif', {notif: `You left ${body.roomName}!`});
-
-    //  TODO: implement frontend
-    // this.server.to(room.roomName).emit('roomLeft', {roomName: room.roomName, user: userDto});
-
+    const roomReturn: RoomReturnDto = this.chatService.getReturnRoom(roomDto);
+    this.server.to(roomDto.roomName).emit('roomChanged', { newRoom: roomReturn });
   };
 
 
@@ -178,6 +174,9 @@ export class ChatGateway implements OnGatewayConnection {
       this.server.to('user_' + body.userId.toString()).emit('deleteRoom',{ roomName: body.roomName });
       this.server.to('user_' + body.userId.toString()).emit('globalChatNotif',{ 
         notif: `You got kicked from ${body.roomName}. Watch your manners! Or begin a revolution against abuse of power!`});
+        
+      const roomReturn: RoomReturnDto = this.chatService.getReturnRoom(roomDto);
+      this.server.to(roomDto.roomName).emit('roomChanged', { newRoom: roomReturn });
     };
 
                         /*********************** BAN EVENT  ************************/

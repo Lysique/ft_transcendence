@@ -59,6 +59,17 @@ export const Chat = () => {
   }, [socket]);
 
   React.useEffect(() => {
+    socket.on('roomChanged', ({newRoom}) => {
+      const roomIndex = rooms.findIndex(oldRoom => oldRoom.roomName === newRoom.roomName);
+      rooms[roomIndex] = newRoom;
+      setRooms(rooms);
+    });
+    return () => {
+      socket.off('roomChanged');
+    };
+  }, [socket, rooms]);
+
+  React.useEffect(() => {
     socket.on('deleteRoom', ({roomName}) => {
       const roomIndex: number = rooms.findIndex((room) => room.roomName === roomName);
       if (roomIndex === -1) {

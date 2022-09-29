@@ -60,12 +60,14 @@ export const ChatMessages = ({
                 {message.message}
             </SendMessage>
 
-            :
+            : !user?.blocked?.find(({id}) => message.userId === id) ?
             
             <RecvMessage>
-                <Typography className="sender" style={{backgroundColor: "background.paper"}} >{message.userName}</Typography> 
+            <Typography className="sender" style={{backgroundColor: "background.paper"}} >{message.userName}</Typography> 
                 {message.message}
             </RecvMessage>
+            : 
+            null
             }
             </div>
         );

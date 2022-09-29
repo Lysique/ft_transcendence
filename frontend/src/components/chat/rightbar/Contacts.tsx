@@ -26,7 +26,7 @@ export const Contacts = ({
       setFriends(user.friends);
     }
     setOtherUsers(users? users : [])
-  }, [user, users, room]);
+  }, [user, users]);
 
   const [openContact, setOpenContact] = React.useState<null | HTMLElement>(null);
 

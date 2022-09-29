@@ -12,6 +12,7 @@ import LocalPoliceIcon from '@mui/icons-material/LocalPolice';
 import Switch from '@mui/material/Switch';
 import { Box, Button, FormLabel, Menu, Radio, RadioGroup } from '@mui/material';
 import { RoomDto } from 'api/chat.api';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 interface ChatButtonAdminOptionProps {
     chosenUser: UserDto, 
@@ -64,18 +65,19 @@ export const ChatButtonAdminOption = ({
 
     return (
       <>
-      {user && room && room?.admins.find((value) => value === user.id) &&
+                {/* ************** NEW ADMIN *************** */}
+      {user && room && room.owner === user.id &&
+      <MenuItem onClick={handleAdmin}><LocalPoliceIcon/><p style={{ marginLeft: "15px" }} >Set as admin</p></MenuItem>
+      }
+
+      {user && room && room.admins.find((value) => value === user.id) &&
       
         <FormGroup>
         <FormControl>
 
           {/* ************** KICK *************** */}
 
-          <MenuItem onClick={handleKick}><LocalPoliceIcon/><p style={{ marginLeft: "15px" }} >Kick user</p></MenuItem>
-
-          {/* ************** NEW ADMIN *************** */}
-
-          <MenuItem onClick={handleAdmin}><LocalPoliceIcon/><p style={{ marginLeft: "15px" }} >Set as admin</p></MenuItem>
+          <MenuItem onClick={handleKick}><LogoutIcon/><p style={{ marginLeft: "15px" }} >Kick user</p></MenuItem>
           
           {/* ************** BAN *************** */}
 
