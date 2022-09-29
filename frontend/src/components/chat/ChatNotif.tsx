@@ -2,10 +2,17 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { WebsocketContext } from "contexts/WebsocketContext";
 import React from "react"
 
+enum NotifType {
+  NoNotif = 0,
+  GlobalNotif = 1,
+  LocalNotif = 2
+}
+
 export const ChatNotif = () => {
 
     const [open, setOpen] = React.useState<boolean>(false);
     const [message, setMessage] = React.useState<string>('');
+    const [notifType, setNotifType] = React.useState<NotifType>(NotifType.NoNotif);
     const socket = React.useContext(WebsocketContext);
 
 
@@ -13,11 +20,40 @@ export const ChatNotif = () => {
       socket.on('chatNotif', ({notif}) => {
         setMessage(notif);
         setOpen(true);
+        setNotifType(NotifType.LocalNotif);
       });
       return () => {
         socket.off('chatNotif');
       };
     }, [socket]);
+
+    React.useEffect(() => {
+      socket.on('globalChatNotif', ({notif}) => {
+        setMessage(notif);
+        setOpen(true);
+        setNotifType(NotifType.GlobalNotif);
+      });
+      return () => {
+        socket.off('globalChatNotif');
+      };
+    }, [socket]);
+
+    React.useEffect(() => {
+      socket.on('closeUserChatNotif', () => {
+        setOpen(false);
+      });
+      return () => {
+        socket.off('closeUserChatNotif');
+      };
+    }, [socket]);
+
+    const handleClose = () => {
+      setOpen(false);
+      if (notifType === NotifType.GlobalNotif) {
+        socket.emit('closeGlobalChatNotif');
+      }
+      setNotifType(NotifType.NoNotif);
+    }
 
     return (
     <Dialog
@@ -34,7 +70,7 @@ export const ChatNotif = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-            <Button onClick={() => setOpen(false)} autoFocus>
+            <Button onClick={handleClose} autoFocus>
                 ok 
             </Button>
         </DialogActions>

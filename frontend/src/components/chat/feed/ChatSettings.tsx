@@ -37,7 +37,7 @@ export const ChatSettings = ({room}: {room: RoomDto}) => {
         if (validation) {
             socket.emit('leaveRoom', { roomName: room.roomName })
         }
-      }, [validation, socket]);
+      }, [validation, socket, room.roomName]);
 
     const [openChangePwd, setOpenChangePwd] = React.useState<boolean>(false);
 
@@ -86,7 +86,12 @@ export const ChatSettings = ({room}: {room: RoomDto}) => {
             setOpen={setOpenValidation}
             setValidation={setValidation}
             title={`Leave room ${room.roomName} ?`}
-            message={'The room will be left and destroyed if you are the owner.'}
+            message={
+                user?.id === room.owner ?
+                'The room will be destroyed because you are the owner.'
+                :
+                'You will no longer be in this room.'
+            }
         />
 
         <ChangeRoomPwdDialog

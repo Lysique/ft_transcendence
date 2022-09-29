@@ -26,11 +26,18 @@ function a11yProps(index: number) {
   };
 }
 
+enum ChannelType {
+  none = 0,
+  privateMessage = 1,
+  publicChannel = 2
+}
+
 export const Chat = () => {
 
     const [tabIndex, setTabIndex] = React.useState<number>(0);
     const [rooms, setRooms] = React.useState<RoomDto[]>([]);
     const [privateMsgs, setPrivateMsgs] = React.useState<RoomDto[]>([]);
+    const [channelType, setChannelType] = React.useState<ChannelType>(ChannelType.none);
     const socket = React.useContext(WebsocketContext);
 
     React.useEffect(() => {
@@ -53,21 +60,19 @@ export const Chat = () => {
 
     React.useEffect(() => {
       socket.on('deleteRoom', ({roomName}) => {
+        const roomIndex: number = rooms.findIndex((room) => room.roomName === roomName);
+        if (tabIndex === roomIndex) {
+          setChannelType(ChannelType.none);
+        }
+        else if (tabIndex < roomIndex) {
+          setTabIndex(tabIndex - 1);
+        }
         setRooms(rooms.filter(room => room.roomName !== roomName));
       });
       return () => {
         socket.off('deleteRoom');
       };
-    }, [socket]);
-
-
-    enum ChannelType {
-      none = 0,
-      privateMessage = 1,
-      publicChannel = 2
-    }
-
-    const [channelType, setChannelType] = React.useState<ChannelType>(ChannelType.none);
+    }, [socket, rooms, tabIndex]);
   
     const handleChangeDicussion = (event: React.SyntheticEvent | null, newValue: number) => {
       setTabIndex(newValue);

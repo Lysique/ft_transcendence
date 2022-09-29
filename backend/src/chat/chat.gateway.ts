@@ -118,7 +118,7 @@ export class ChatGateway implements OnGatewayConnection {
     if (roomDto.owner === userDto.id) {
       this.chatService.destroyRoom(roomDto);
       this.server.to(body.roomName).emit('deleteRoom',{ roomName: body.roomName });
-      this.server.to(body.roomName).emit('chatNotif',{ notif: `Room ${body.roomName} has been deleted by the owner.`});
+      this.server.to(body.roomName).emit('globalChatNotif',{ notif: `Room ${body.roomName} has been deleted by the owner.`});
       this.server.socketsLeave(body.roomName);
       return ;
     }
@@ -199,5 +199,11 @@ export class ChatGateway implements OnGatewayConnection {
         
         
         };
+
+    @SubscribeMessage('closeGlobalChatNotif')
+    async closeGlobalNotif(@ConnectedSocket() socket: Socket) {
+      const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
+      this.server.to('user_' + userDto.id.toString()).emit('closeUserChatNotif');
+    };
 
   };

@@ -35,7 +35,6 @@ export const JoinRoomDialog = ({
         <TextField
           id="outlined-password-input"
           label="Password"
-          type="password"
           onChange={handlePwdChange}
           sx={{ml:3, mr:3}}
         />
