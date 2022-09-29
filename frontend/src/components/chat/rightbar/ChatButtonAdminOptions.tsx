@@ -29,13 +29,29 @@ export const ChatButtonAdminOption = ({
 
     const user: UserDto | null = React.useContext(UserContext);
     const socket = React.useContext(WebsocketContext);
+    const [isChosenUserAdmin, setIsChosenUserAdmin] = React.useState<boolean>(false);
+
+    React.useEffect(() => {
+      if (room) {
+        setIsChosenUserAdmin(room.admins.find((admin) => admin === chosenUser.id) ? true : false);
+      }
+    }, [room]);
 
     const handleAdmin = () => {
+      if (room) {
+        if (!isChosenUserAdmin) {
+          socket.emit('setAdmin', { roomName: room.roomName, userId: chosenUser.id });
+        }
+        else {
+          socket.emit('unsetAdmin', { roomName: room.roomName, userId: chosenUser.id });
+        }
+      }
+      handleClose();
     };
 
     const handleKick = () => {
       if (room) {
-        socket.emit('kickUser', { roomName: room.roomName, userId: chosenUser.id})
+        socket.emit('kickUser', { roomName: room.roomName, userId: chosenUser.id })
       }
       handleClose();
     };
@@ -67,7 +83,12 @@ export const ChatButtonAdminOption = ({
       <>
                 {/* ************** NEW ADMIN *************** */}
       {user && room && room.owner === user.id &&
-      <MenuItem onClick={handleAdmin}><LocalPoliceIcon/><p style={{ marginLeft: "15px" }} >Set as admin</p></MenuItem>
+        <MenuItem onClick={handleAdmin}><LocalPoliceIcon/><p style={{ marginLeft: "15px" }} >{
+          !isChosenUserAdmin?
+          'Set as admin'
+          :
+          'Unset admin'
+          }</p></MenuItem>
       }
 
       {user && room && room.admins.find((value) => value === user.id) &&
@@ -148,7 +169,7 @@ export const ChatButtonAdminOption = ({
           </MenuItem>
           <Box sx={{display:'flex', flexDirection:'row-reverse'}}><Button type="submit" variant="contained" onClick={handleCloseMuteBar} >OK</Button></Box>
           </Menu>
-          </FormControl>
+        </FormControl>
       </FormGroup>
       }
       </>

@@ -127,6 +127,27 @@ export class ChatService {
     this.RoomList.set(roomDto.roomName.toUpperCase(), roomDto);
   }
 
+
+    /*********************** Set Admin  ************************/
+
+    async setAdmin(roomDto: RoomDto, userId: number) {
+      if (!this.isAdminFromRoom(userId, roomDto)) {
+        roomDto.admins.push(userId);
+        this.RoomList.set(roomDto.roomName.toUpperCase(), roomDto);
+      }
+    }
+
+    async unsetAdmin(roomDto: RoomDto, userId: number) {
+      const adminIndex = roomDto.admins.indexOf(userId);
+
+      if (adminIndex > -1) {
+        roomDto.admins.splice(adminIndex, 1);
+      }
+
+      this.RoomList.set(roomDto.roomName.toUpperCase(), roomDto);
+
+    }
+
   /*
   **
   ** @Controller
@@ -189,53 +210,13 @@ export class ChatService {
     this.RoomList.forEach((value) => { value.users.find( ({id}) => id === userDto.id ) && socket.join(value.roomName); });
   }
 
-  isAdminFromRoom(userDto: UserDto, roomDto: RoomDto): boolean {
-    return (roomDto.admins.find(id => id === userDto.id)? true : false);
+  isAdminFromRoom(userId: number, roomDto: RoomDto): boolean {
+    return (roomDto.admins.find(id => id === userId)? true : false);
   }
 
     
 
-                  /*********************** Set Admin  ************************/
 
-    async setAdmin(roomName : string, userId : number, victim : number)
-    {
-      if (this.getRoomFromName(roomName) === undefined)
-        {
-          console.log('cant leave, room doesnt exist');
-          return false;
-        }
-        const room = this.getRoomFromName(roomName);
-      if (userId === room.owner && victim !== room.owner)
-      {
-        const userDto: UserDto = await this.userService.findOneById(userId);
-        room.admins.push(userId);
-        console.log('on a bien setup ladmin pour notre ami ' + victim);
-        return true;
-      }
-      console.log('impossible de mettre admin lutilisateur');
-      return false;
-    }
-
-
-          /*********************** KICK  && BAN ************************/
-
-    // async kickFunction(userId : number, victim : number, roomArg : string)
-    // {
-    //   const room = this.getRoomFromName(roomArg);
-    //   const userDto: UserDto = await this.userService.findOneById(victim);
-    //   if (room.owner !== victim   &&    ( room.admins.has(userId) || room.owner === userId ))
-    //   {
-    //     console.log('kick successfull , good bye ' + victim);
-    //     room.users.delete(userDto);
-    //     this.tryDeleteRoom(roomArg);
-    //     return true;
-    //   }
-    //   else
-    //   {
-    //     console.log('you cant kick the user ' + victim);
-    //   }
-    //   return false;
-    // }
 
     // async banFunction(userId : number, victim : number, roomArg : string, timeBan : number)
     // {
@@ -282,37 +263,5 @@ export class ChatService {
     //   }
     //   return false;
     // }
-
-
-
-    async sendPrivateMessage(userId : number, victim : number, roomName : string, timeBan : number, message : string)
-    {
-      //not yet defined ...
-    }
-
-
-    /*
-    **
-    ** @Utils
-    **
-    */   
-
-
-
-
-  //   /* check if room empty and delete it */
-  //   async tryDeleteRoom(room : string){
-            
-  //     let TmpList;
-  //     if (this.getRoomFromName(room).userSet.size === 0)
-  //     {
-  //       TmpList = this.RoomList.filter(elem => elem.roomName !== room);
-  //       this.RoomList = TmpList;
-  //       return true;
-  //      }
-  //      else
-  //       return false
-
-  // }
 
 }
