@@ -327,31 +327,32 @@ export class GameService {
     this.newInvitationList.delete(userID);
   }
 
-  async addToInvitationList(client: Socket, invitedId: number) {
-    const currentUser: UserDto | null = await this.authService.getUserFromSocket(client);
+  async addToInvitationList(inviterSocket: Socket, inviteeId: number) {
+    const inviterUser: UserDto | null = await this.authService.getUserFromSocket(inviterSocket);
 
-    let ids: { userIds: number[]; userSocket: Socket }[] = this.newInvitationList.get(currentUser.id);
+    let ids: { userIds: number[]; userSocket: Socket }[] = this.newInvitationList.get(inviterUser.id);
     if (!ids) {
-      ids = [{ userIds: [invitedId], userSocket: client }];
-    } else {
+      ids = [{ userIds: [inviteeId], userSocket: inviterSocket }];
+    } 
+    else {
       for (let i = 0; i < ids.length; ++i) {
-        if (ids[i].userSocket.id === client.id) ids[i].userIds.push(invitedId);
+        if (ids[i].userSocket.id === inviterSocket.id) ids[i].userIds.push(inviteeId);
       }
     }
-    this.newInvitationList.set(currentUser.id, ids);
+    this.newInvitationList.set(inviterUser.id, ids);
   }
 
   async removeFromInvitationList(inviteeSocket: Socket, inviterId: number) {
-    const currentUser: UserDto | null = await this.authService.getUserFromSocket(inviteeSocket);
+    const inviteeUser: UserDto | null = await this.authService.getUserFromSocket(inviteeSocket);
 
     const ids: { userIds: number[]; userSocket: Socket }[] = this.newInvitationList.get(inviterId);
 
     for (let i = 0; i < ids.length; ++i) {
-      const index = ids[i].userIds.indexOf(currentUser.id);
+      const index = ids[i].userIds.indexOf(inviteeUser.id);
 
       if (index > -1) {
-        ids.splice(index, 1);
-        this.newInvitationList.set(currentUser.id, ids);
+        ids[i].userIds.splice(index, 1);
+        this.newInvitationList.set(inviteeUser.id, ids);
       }
     }
   }
