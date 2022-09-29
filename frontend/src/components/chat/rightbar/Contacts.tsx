@@ -7,11 +7,6 @@ import Menu from '@mui/material/Menu';
 
 import List from '@mui/material/List';
 import ListSubheader from '@mui/material/ListSubheader';
-
-import PersonIcon from '@mui/icons-material/Person';
-import BlockIcon from '@mui/icons-material/Block';
-import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
-
 import Switch from '@mui/material/Switch';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -64,19 +59,6 @@ export const Contacts = ({
   const handleCloseContact = () => {
     setOpenContact(null);
   };
-
-  const [block, setBlock] = React.useState<null | HTMLElement>(null);
-
-  const handleBlock = (event: React.MouseEvent<HTMLElement>) => {
-      setBlock(event.currentTarget);
-    };
-
-  const handleProfile = () => {
-  };
-
-  const handleInvitation = () => {
-  };
-
   
   const handleAdmin = () => {
   };
@@ -149,6 +131,7 @@ export const Contacts = ({
             
             <ChatButtonGlobalOption
               chosenUser={displayedUser}
+              handleClose={handleCloseContact}
             />
 
             { true ?   // admin can ban, mute and add new admin

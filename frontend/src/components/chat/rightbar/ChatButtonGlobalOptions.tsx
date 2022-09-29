@@ -8,14 +8,24 @@ import * as React from 'react';
 import { UserDto } from "api/dto/user.dto";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { UserAPI } from "api/user.api";
+import { WebsocketContext } from "contexts/WebsocketContext";
 
-export const ChatButtonGlobalOption = ({chosenUser} : {chosenUser: UserDto}) => {
+interface ChatButtonGlobalOptionProps {
+    chosenUser: UserDto, 
+    handleClose: () => void
+}
+
+export const ChatButtonGlobalOption = ({
+    chosenUser,
+    handleClose
+}: ChatButtonGlobalOptionProps) => {
 
     const user: UserDto | null = React.useContext(UserContext);
     const setUser: Function = React.useContext(SetUserContext);
+    const socket = React.useContext(WebsocketContext);
+    const navigate: NavigateFunction = useNavigate();
 
     const [isBlocked, setIsBlocked] = React.useState<boolean>(false);
-    const navigate: NavigateFunction = useNavigate();
 
     const handleBlock = async (event: React.MouseEvent<HTMLElement>) => {
         let resp: UserDto | null;
@@ -33,6 +43,8 @@ export const ChatButtonGlobalOption = ({chosenUser} : {chosenUser: UserDto}) => 
     };
   
     const handleInvitation = () => {
+        handleClose();
+        socket.emit("inviteGame", chosenUser.id);
     };
 
     React.useEffect(() => {
@@ -84,6 +96,6 @@ export const ChatButtonGlobalOption = ({chosenUser} : {chosenUser: UserDto}) => 
             />
           </MenuItem>
           </FormControl>
-      </FormGroup>
+        </FormGroup>
     )
 }
