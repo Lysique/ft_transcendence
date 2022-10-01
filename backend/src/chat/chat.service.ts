@@ -10,6 +10,11 @@ export class MessageDto {
   message : string;
 };
 
+export class PrivateMsgsDto {
+  userDto : UserDto;
+  messages : Array<MessageDto>;
+};
+
 export class RoomDto {
   roomName : string;
   owner : number;
@@ -37,9 +42,12 @@ export class ChatService {
       private authService: AuthService
     ) {
       this.RoomList = new Map();
+      this.PrivateMsgList = new Map();
+
     }
 
     public RoomList: Map<string, RoomDto>;
+    public PrivateMsgList: Map<number, PrivateMsgsDto[]>;
 
     /*
     **
@@ -168,6 +176,54 @@ export class ChatService {
     this.RoomList.set(roomDto.roomName.toUpperCase(), roomDto);
   }
 
+  addToPmList(sender: UserDto, receiver: UserDto) {
+    let allSenderMsgs = this.PrivateMsgList.get(sender.id);
+    let allReceiverMsgs = this.PrivateMsgList.get(receiver.id);
+
+
+    if (!allSenderMsgs) {
+      allSenderMsgs = [{userDto: receiver, messages: []}]
+    }
+    else {
+      const userMessagesIdx = allSenderMsgs.findIndex(({userDto}) => userDto.id === receiver.id );
+
+      if (userMessagesIdx < 0) {
+        allSenderMsgs.push({userDto: receiver, messages: []});
+      }
+    }
+
+    if (!allReceiverMsgs) {
+      allReceiverMsgs = [{userDto: sender, messages: []}]
+    }
+    else {
+      const userMessagesIdx = allReceiverMsgs.findIndex(({userDto}) => userDto.id === sender.id );
+
+      if (userMessagesIdx < 0) {
+        allReceiverMsgs.push({userDto: sender, messages: []});
+      }
+    }
+
+    this.PrivateMsgList.set(sender.id, allSenderMsgs);
+    this.PrivateMsgList.set(receiver.id, allReceiverMsgs);
+  }
+
+  addPrivateMessage(sender: UserDto, receiver: UserDto, message: string): MessageDto {
+    let allSenderMsgs = this.PrivateMsgList.get(sender.id);
+    let allReceiverMsgs = this.PrivateMsgList.get(receiver.id);
+
+    const messageDto: MessageDto = new MessageDto();
+    messageDto.message = message;
+    messageDto.userId = sender.id;
+    messageDto.userName = sender.name;
+
+    allSenderMsgs.find(({userDto}) => userDto.id === receiver.id ).messages.push(messageDto);
+    allReceiverMsgs.find(({userDto}) => userDto.id === sender.id ).messages.push(messageDto);
+
+    this.PrivateMsgList.set(sender.id, allSenderMsgs);
+    this.PrivateMsgList.set(receiver.id, allReceiverMsgs);
+    return messageDto;
+  }
+
   /*
   **
   ** @Controller
@@ -194,6 +250,10 @@ export class ChatService {
   ** @Utils
   **
   */
+ 
+  getUserPrivateMsgs(userId: number) {
+    return this.PrivateMsgList.get(userId);
+  }
 
   async getUserFromSocket(socket: Socket): Promise<UserDto> {
     const userDto: UserDto = await this.authService.getUserFromSocket(socket);

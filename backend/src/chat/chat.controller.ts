@@ -1,6 +1,6 @@
 import { Controller, Get, UseGuards, Req } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { ChatService, RoomDto, RoomReturnDto } from './chat.service';
+import { ChatService, PrivateMsgsDto, RoomDto, RoomReturnDto } from './chat.service';
 import { Request } from 'express';
 
 
@@ -22,6 +22,18 @@ export class ChatController {
 
       return { rooms : roomReturns };
 
+  }
+
+  @Get('userPMs')
+  @UseGuards(JwtAuthGuard)
+  public async getPMsFromUser(
+    @Req() req: Request,
+  ) {
+      const user: any = req.user;
+
+      const privateMsgs: PrivateMsgsDto[] = this.chatService.getUserPrivateMsgs(user.id);
+
+      return { privateMsgs : privateMsgs || [] };
   }
 
   @Get('roomNames')

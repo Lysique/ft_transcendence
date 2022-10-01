@@ -223,7 +223,7 @@ export class ChatGateway implements OnGatewayConnection {
   };
 
   @SubscribeMessage('unsetAdmin')
-  async unsetAdmin(@ConnectedSocket() socket: Socket,@MessageBody() body: {roomName: string, userId: number}) {
+  async unsetAdmin(@ConnectedSocket() socket: Socket, @MessageBody() body: {roomName: string, userId: number}) {
     if (!this.chatService.roomExist(body.roomName)) {
       this.server.to(socket.id).emit('chatNotif', {notif: 'This room no longer exists.'});
       return ;
@@ -256,7 +256,7 @@ export class ChatGateway implements OnGatewayConnection {
 
 
   @SubscribeMessage('banUser')
-  async banUser(@ConnectedSocket() socket: Socket,@MessageBody() body: {roomName: string, userId: number, time: number}) {
+  async banUser(@ConnectedSocket() socket: Socket, @MessageBody() body: {roomName: string, userId: number, time: number}) {
     if (!this.chatService.roomExist(body.roomName)) {
       this.server.to(socket.id).emit('chatNotif', {notif: 'This room no longer exists.'});
       return ;
@@ -294,7 +294,7 @@ export class ChatGateway implements OnGatewayConnection {
                     /*********************** MUTE EVENT  ************************/
 
   @SubscribeMessage('muteUser')
-  async muteUser(@ConnectedSocket() socket: Socket,@MessageBody() body: {roomName: string, userId: number, time: number}) {
+  async muteUser(@ConnectedSocket() socket: Socket, @MessageBody() body: {roomName: string, userId: number, time: number}) {
     if (!this.chatService.roomExist(body.roomName)) {
       this.server.to(socket.id).emit('chatNotif', {notif: 'This room no longer exists.'});
       return ;
@@ -315,10 +315,37 @@ export class ChatGateway implements OnGatewayConnection {
 
     if (roomDto.users.find(({id}) => id === body.userId) && body.time >= 0) {
       this.server.to('user_' + body.userId.toString()).emit('globalChatNotif',{ 
-        notif: `You got muted from ${body.roomName} for ${body.time} minutes.`});
+        notif: `You got muted from ${body.roomName} for ${body.time} minutes.`
+      });
     }
 
     this.chatService.setMuteTime(roomDto, body.userId, body.time);
+  };
+
+  /*********************** PRIVATE MESSAGE  ************************/
+
+  @SubscribeMessage('newPrivateMessage')
+  async privateMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: {userId: number, message: string}) {
+    const sender: UserDto = await this.chatService.getUserFromSocket(socket);
+    const receiver: UserDto = await this.chatService.getUserFromId(body.userId);
+
+    const message = this.chatService.addPrivateMessage(sender, receiver, body.message);
+
+    this.server.to('user_' + receiver.id.toString()).emit('newPrivateMsgUser', {userDto: sender});
+    this.server.to('user_' + sender.id.toString()).emit('receivePrivateMsg', {userId: receiver.id, messageDto: message});
+    this.server.to('user_' + receiver.id.toString()).emit('receivePrivateMsg', {userId: sender.id, messageDto: message});
+  };
+
+  @SubscribeMessage('sendPM')
+  async newPMRoom(@ConnectedSocket() socket: Socket, @MessageBody() body: {userId: number}) {
+    const sender: UserDto = await this.chatService.getUserFromSocket(socket);
+    const receiver: UserDto = await this.chatService.getUserFromId(body.userId);
+
+    this.chatService.addToPmList(sender, receiver);
+
+    this.server.to('user_' + sender.id.toString()).emit('newPrivateMsgUser', {userDto: receiver});
+    this.server.to('user_' + sender.id.toString()).emit('goToPM', {userDto: receiver});
+
   };
 
   @SubscribeMessage('closeGlobalChatNotif')

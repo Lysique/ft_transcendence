@@ -34,7 +34,7 @@ export const SendMsgBar = ({
                 onChange={handleMsgChange}
                 InputProps={{
                     endAdornment: (
-                        <IconButton edge="end" color="primary" onClick={() => { setSend(true)}}>
+                        <IconButton edge="end" color="primary" onClick={() => {setSend(true)}} >
                             <SendIcon/>
                         </IconButton>
                     ),}}

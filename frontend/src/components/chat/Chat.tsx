@@ -7,9 +7,10 @@ import { Feed } from './feed/Feed';
 import { JoinCreateRoomBar } from './leftbar/JoinCreateRoomBar';
 import { WebsocketContext } from 'contexts/WebsocketContext';
 import { ChatNotif } from './ChatNotif';
-import { ChatAPI, RoomDto } from 'api/chat.api';
+import { ChatAPI, PrivateMsgsDto, RoomDto } from 'api/chat.api';
 import { RoomTabs } from './leftbar/RoomTabs';
 import { DiscussionTabs } from './leftbar/DiscussionTabs';
+import { UserDto } from 'api/dto/user.dto';
 
 enum ChannelType {
   none = 0,
@@ -21,17 +22,20 @@ export const Chat = () => {
 
   const [tabIndex, setTabIndex] = React.useState<number>(0);
   const [rooms, setRooms] = React.useState<RoomDto[]>([]);
-  const [privateMsgs, setPrivateMsgs] = React.useState<RoomDto[]>([]);
+  const [privateMsgs, setPrivateMsgs] = React.useState<PrivateMsgsDto[]>([]);
   const [channelType, setChannelType] = React.useState<ChannelType>(ChannelType.none);
   const socket = React.useContext(WebsocketContext);
 
   React.useEffect(() => {
-    const fetchRooms = async () => {
-      const resp: {rooms: RoomDto[]} = await ChatAPI.getRoomsFromUser();
-      setRooms(resp.rooms);
+    const fetchMsgs = async () => {
+      const chans: {rooms: RoomDto[]} = await ChatAPI.getRoomsFromUser();
+      setRooms(chans.rooms);
+      const pms: {privateMsgs: PrivateMsgsDto[]} = await ChatAPI.getPMsFromUser();
+      setPrivateMsgs(pms.privateMsgs);
     };
 
-    fetchRooms();
+    fetchMsgs();
+
   }, []);
 
   //  Usefull only if rooms in database..
@@ -48,6 +52,46 @@ export const Chat = () => {
   //     socket.off("onUserChange");
   //   };
   // }, [socket]);
+
+  React.useEffect(() => {
+    socket.on('newPrivateMsgUser', ({userDto: newUser}) => {
+      if (!privateMsgs.find( ({userDto}) => userDto.id === newUser.id)) {
+        setPrivateMsgs((privateMsgs) => [...privateMsgs, {userDto: newUser, messages: []}]);
+      }
+    });
+    return () => {
+      socket.off('newPrivateMsgUser');
+    };
+  }, [socket, privateMsgs]);
+
+  React.useEffect(() => {
+    socket.on('receivePrivateMsg', ({userId, messageDto}) => {
+      const addPM: PrivateMsgsDto[] = privateMsgs.map(pm => {
+        if (pm.userDto.id === userId) {
+          pm.messages.push(messageDto);
+        }
+        return pm;
+      })
+      setPrivateMsgs(addPM);
+    });
+    return () => {
+      socket.off('receivePrivateMsg');
+    };
+  }, [socket, privateMsgs]);
+
+  React.useEffect(() => {
+    socket.on('goToPM', ({userDto: newUser}) => {
+      let index = privateMsgs.findIndex( ({userDto}) => userDto.id === newUser.id)
+      if (index < 0) {
+        index = privateMsgs.length + 1;
+      }
+      setTabIndex(index);
+      setChannelType(ChannelType.privateMessage);
+    });
+    return () => {
+      socket.off('goToPM');
+    };
+  }, [socket, privateMsgs]);
 
   React.useEffect(() => {
     socket.on('addRoom', ({room}) => {
@@ -166,7 +210,7 @@ export const Chat = () => {
                       rooms.at(tabIndex)?.users || null
                       :
                       channelType === ChannelType.privateMessage ?
-                      privateMsgs.at(tabIndex)?.users || null
+                      [privateMsgs.at(tabIndex)?.userDto as UserDto] || null
                       :
                       null
                     }

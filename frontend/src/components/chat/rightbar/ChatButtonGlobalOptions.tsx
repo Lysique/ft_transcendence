@@ -42,6 +42,11 @@ export const ChatButtonGlobalOption = ({
     const handleProfile = () => {
         navigate(`/profile/${chosenUser.id}`, { replace: true });
     };
+
+    const handlePrivateMsg = () => {
+        handleClose();
+        socket.emit('sendPM', {userId: chosenUser.id});
+    };
   
     const handleInvitation = () => {
         handleClose();
@@ -72,6 +77,10 @@ export const ChatButtonGlobalOption = ({
           {/* ************** PROFILE *************** */}
 
           <MenuItem onClick={handleProfile}><PersonIcon/><p style={{ marginLeft: "15px" }} >Profile</p></MenuItem>
+
+           {/* ************** PRIVATE MESSAGES *************** */}
+
+          <MenuItem onClick={handlePrivateMsg}><PersonIcon/><p style={{ marginLeft: "15px" }} >Send pm</p></MenuItem>
 
           {/* ************** INVITATION *************** */}
 

@@ -6,10 +6,11 @@ import { Paper } from '@mui/material'
 import Typography from '@mui/material/Typography';
 
 import { ChatSettings } from './ChatSettings';
-import { RoomDto } from 'api/chat.api';
+import { PrivateMsgsDto, RoomDto } from 'api/chat.api';
 import { SendMsgBar } from './SendMsgsBar';
 import { WebsocketContext } from 'contexts/WebsocketContext';
 import { ChatMessages } from './ChatMessages';
+import { PrivateMessages } from './PrivateMessages';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -45,7 +46,7 @@ publicChannel = 2
 
 interface FeedProps {
     rooms: RoomDto[]
-    privateMsgs: RoomDto[]
+    privateMsgs: PrivateMsgsDto[]
     tabIndex: number
     channelType: ChannelType
 }
@@ -68,6 +69,12 @@ export const Feed = ({
         const currRoom = rooms.at(tabIndex);
         if (currRoom) {
           socket.emit('roomMessage', {roomName: currRoom.roomName, message: message})
+        }
+      }
+      if (message !== '' && channelType === ChannelType.privateMessage) {
+        const msgs = privateMsgs.at(tabIndex);
+        if (msgs) {
+          socket.emit('newPrivateMessage', {userId: msgs.userDto.id, message: message})
         }
       }
       setSend(false);
@@ -94,6 +101,26 @@ export const Feed = ({
                   <ChatSettings room={room}/>
 
                   <ChatMessages room={room}/>
+
+                  </Box>
+                  
+                </TabPanel>
+              );
+
+            })
+          }
+
+          {channelType === ChannelType.privateMessage && privateMsgs.map((msgs: PrivateMsgsDto, index: number) => {
+
+              return (
+            
+                <TabPanel value={tabIndex} index={index} key={index} >                       
+                                          
+                  <Box sx={{ height: '60vh', overflow: "hidden", overflowY: "scroll"}}>
+
+                  <PrivateMessages
+                    pms={msgs}
+                  />
 
                   </Box>
                   
