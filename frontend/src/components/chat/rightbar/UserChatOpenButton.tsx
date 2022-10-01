@@ -1,15 +1,18 @@
 import { Button, ListItem, ListItemAvatar, ListItemText } from "@mui/material"
 import { UserDto } from "api/dto/user.dto"
+import { AvatarNoStatus } from "./AvatarNoStatus"
 import { ChatAvatar } from "./ChatAvatar"
 
 interface UserChatOpenButtonProps {
     displayedUser: UserDto
     handleOpenContact: (event: React.MouseEvent<HTMLElement>) => void
+    displayStatus: boolean
   }
 
 export const UserChatOpenButton = ({
     displayedUser,
-    handleOpenContact
+    handleOpenContact,
+    displayStatus
 
 } : UserChatOpenButtonProps ) => {
     
@@ -25,9 +28,15 @@ export const UserChatOpenButton = ({
         
         <ListItem key={displayedUser.id}>
             <ListItemAvatar >
+              {displayStatus?
                 <ChatAvatar 
                   user={displayedUser}
                 />
+                :
+                <AvatarNoStatus 
+                  user={displayedUser}
+                />
+              }
             </ListItemAvatar>
             <ListItemText primary={
               displayedUser.name.length > 8?

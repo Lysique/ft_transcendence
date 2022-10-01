@@ -70,6 +70,7 @@ export const Contacts = ({
             <UserChatOpenButton 
               displayedUser={displayedUser}
               handleOpenContact={handleOpenFriend}
+              displayStatus={true}
             />
 
             <ChatButtonList 
@@ -99,6 +100,7 @@ export const Contacts = ({
             <UserChatOpenButton 
               displayedUser={displayedUser}
               handleOpenContact={handleOpenContact}
+              displayStatus={false}
             />
 
             <ChatButtonList 

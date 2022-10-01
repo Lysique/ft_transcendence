@@ -2,12 +2,6 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { WebsocketContext } from "contexts/WebsocketContext";
 import React from "react"
 
-enum NotifType {
-  NoNotif = 0,
-  GlobalNotif = 1,
-  LocalNotif = 2
-}
-
 export const ChatNotif = () => {
 
     const [open, setOpen] = React.useState<boolean>(false);
