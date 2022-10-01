@@ -7,8 +7,6 @@ import { AvatarDto } from '../avatars/dto/avatar.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserDto } from './dto/user.dto';
 import { User, UserStatus } from './entities/user.entity';
-import { Server } from 'socket.io';
-import { WebSocketServer } from '@nestjs/websockets';
 
 @Injectable()
 export class UsersService {
@@ -42,8 +40,8 @@ export class UsersService {
 
     //  Create user entity based on createUserDto
     const user: User = new User();
-    user.id = createUserDto.id;
     user.name = createUserDto.name;
+    user.password = createUserDto.password;
 
     try {
       await this.userRepository.save(user);
@@ -54,8 +52,10 @@ export class UsersService {
     }
 
     const userDto = this.entityToDto(user);
-    const imageData: Buffer = await this.downloadImage(createUserDto.photoUrl);
-    await this.addAvatar(userDto, imageData);
+    if (createUserDto.photoUrl) {
+      const imageData: Buffer = await this.downloadImage(createUserDto.photoUrl);
+      await this.addAvatar(userDto, imageData);
+    }
     
     return userDto;
   }
@@ -95,6 +95,33 @@ export class UsersService {
 
     return userDto;
   }
+
+  //  Find one user by name.
+  public async findOneByName(name: string) {
+    const user: User = await this.userRepository.findOne({ 
+      where: {name: name},
+      relations:{blocked: true, friends: true}
+    })
+    
+    if (!user) {
+      return null;
+    }
+
+    const userDto: UserDto = this.entityToDto(user);
+
+    return userDto;
+  }
+
+    public async pwdCheck(name: string, password: string) {
+      const user: User = await this.userRepository.findOne({ 
+        where: {name: name}
+      })
+      
+      if (!user || user.password !== password) {
+        return false;
+      }
+      return true;
+    }
 
   public async setStatus(id: number, status: UserStatus) {
     const user: User = await this.userRepository.findOne({ 
@@ -308,5 +335,4 @@ export class UsersService {
       await this.userRepository.save(user);
     }
   }
-
 }

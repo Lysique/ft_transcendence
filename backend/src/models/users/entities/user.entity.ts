@@ -5,9 +5,8 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
-  ManyToOne,
   OneToMany,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 
 export enum UserStatus {
@@ -19,7 +18,7 @@ export enum UserStatus {
 //  User table
 @Entity()
 export class User {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ unique: true, nullable: true })
@@ -53,4 +52,7 @@ export class User {
 
   @Column({ nullable: true })
   secret: string;
+
+  @Column({ nullable: true })
+  password: string;
 }

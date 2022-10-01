@@ -2,6 +2,6 @@
 
 export class CreateUserDto {
     name: string;
-    id: number;
-    photoUrl: string;
+    password: string;
+    photoUrl?: string;
 }

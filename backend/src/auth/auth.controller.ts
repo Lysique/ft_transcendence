@@ -43,6 +43,49 @@ export class AuthController {
       res.redirect(process.env.FRONT_URL);
     }
 
+    @Post('pwdLogin')
+    async pwdLogin(
+      @Res({passthrough: true}) res: Response,
+      @Body() body: any
+      ) {
+      const userDto: UserDto = await this.authService.fetchUserByName(body.name);
+
+      if (!userDto) {
+        return ({loggedIn: false})
+      }
+      else {
+        if (!this.authService.pwdCheck(body.name, body.password)) {
+          return ({loggedIn: false})
+        }
+      }
+
+      const accessToken = await this.authService.generateToken({ 
+        sub: userDto.id, 
+        IsTwoFactAuth: false
+      });
+
+      res.cookie('jwt', accessToken, { httpOnly: true, sameSite: 'strict' });
+      
+      return ({loggedIn: true})
+    }
+
+    @Post('pwdSignup')
+    async pwdSignup(
+      @Res({passthrough: true}) res: Response,
+      @Body() body: any
+      ) {
+      const userDto = await this.authService.pwdSignup({name: body.name, password: body.password});
+
+      const accessToken = await this.authService.generateToken({ 
+        sub: userDto.id,
+        IsTwoFactAuth: false
+      });
+
+      res.cookie('jwt', accessToken, { httpOnly: true, sameSite: 'strict' });
+      
+      return userDto;
+    }
+
     @UseGuards(JwtTwoFactAuthGuard)
     @Get('isLogged')
     async isLoggedIn() {
