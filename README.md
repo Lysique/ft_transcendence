@@ -18,19 +18,18 @@ Finally, they can play the mighty Pong game against each other or watch other pl
 
 ### Root setup
 
-- Duplicate 'template.env' and name it '.env', then fill the database configuration
+- Duplicate 'template.env' and name it '.env'.
 
 ###  Backend setup
 
-- Duplicate 'constants.template.ts' in src/auth/constants and name it 'constants.ts', then choose a random secret of your choice to configure the jwt strategy (e.g 'coucou')
+- Choose a proper jwt secret in src/auth/constants and name it 'constants.ts'.
 
-- Duplicate template.env located at src/common/envs and fill in the details
-	- DATABASE_PASSWORD and DATABASE_NAME should match the configuration of the .env in the root folder
+- Duplicate template.env located at src/common/envs and fill in the details:
 	- FORTYTWO_ID and FORTYTWO_APP_SECRET will be given when registrating the app on the intranet of 42
 
 ### Frontend setup
 
-- Duplicate template.env in the frontend root folder and fill the new file (named '.env') with the backend information (ip and port)
+- Duplicate template.env in the frontend root folder and fill the new file (named '.env').
 
 ## Run a test database
 
@@ -49,8 +48,8 @@ $ docker run --link postgres:db --name adminer -p 8080:8080 -d adminer
 # - System : PostgreSQL
 # - Server : db
 # - Username : postgres
-# - Password : password provided in the ./backend/src/common/envs/.env file
-# - Database : (blank)
+# - Password : password provided in the .env file
+# - Database : database name provided in the .env file
 
 # stop testing databases
 $ docker stop postgres adminer
