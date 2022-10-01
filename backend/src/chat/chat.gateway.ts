@@ -331,7 +331,6 @@ export class ChatGateway implements OnGatewayConnection {
 
     const message = this.chatService.addPrivateMessage(sender, receiver, body.message);
 
-    this.server.to('user_' + receiver.id.toString()).emit('newPrivateMsgUser', {userDto: sender});
     this.server.to('user_' + sender.id.toString()).emit('receivePrivateMsg', {userId: receiver.id, messageDto: message});
     this.server.to('user_' + receiver.id.toString()).emit('receivePrivateMsg', {userId: sender.id, messageDto: message});
     this.server.to('user_' + receiver.id.toString()).emit('notif', {notif: `New message from ${sender.name}`});
@@ -345,6 +344,7 @@ export class ChatGateway implements OnGatewayConnection {
     this.chatService.addToPmList(sender, receiver);
 
     this.server.to('user_' + sender.id.toString()).emit('newPrivateMsgUser', {userDto: receiver});
+    this.server.to('user_' + receiver.id.toString()).emit('newPrivateMsgUser', {userDto: sender});
     this.server.to('user_' + sender.id.toString()).emit('goToPM', {userDto: receiver});
 
   };
