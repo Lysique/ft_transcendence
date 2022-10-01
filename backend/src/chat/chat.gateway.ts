@@ -122,7 +122,7 @@ export class ChatGateway implements OnGatewayConnection {
     if (roomDto.owner === userDto.id) {
       this.chatService.destroyRoom(roomDto);
       this.server.emit('deleteRoom',{ roomName: body.roomName });
-      this.server.to(body.roomName).emit('globalChatNotif',{ notif: `Room ${body.roomName} has been deleted by the owner.`});
+      this.server.to(body.roomName).emit('notif',{ notif: `Room ${body.roomName} has been deleted.`});
       this.server.socketsLeave(body.roomName);
       return ;
     }
@@ -183,7 +183,7 @@ export class ChatGateway implements OnGatewayConnection {
 
     this.chatService.leaveRoom(body.userId, roomDto);
     this.server.to('user_' + body.userId.toString()).emit('deleteRoom',{ roomName: body.roomName });
-    this.server.to('user_' + body.userId.toString()).emit('globalChatNotif',{ 
+    this.server.to('user_' + body.userId.toString()).emit('notif',{ 
       notif: `You got kicked from ${body.roomName}! Watch your manners, or begin a revolution against abuse of power!`});
       
     const roomReturn: RoomReturnDto = this.chatService.getReturnRoom(roomDto);
@@ -278,7 +278,7 @@ export class ChatGateway implements OnGatewayConnection {
     if (roomDto.users.find(({id}) => id === body.userId) && body.time >= 0) {
       this.chatService.leaveRoom(body.userId, roomDto);
       this.server.to('user_' + body.userId.toString()).emit('deleteRoom',{ roomName: body.roomName });
-      this.server.to('user_' + body.userId.toString()).emit('globalChatNotif',{ 
+      this.server.to('user_' + body.userId.toString()).emit('notif',{ 
         notif: `You got banned from ${body.roomName} for ${body.time} minutes.`});
     }
 
@@ -314,7 +314,7 @@ export class ChatGateway implements OnGatewayConnection {
     }
 
     if (roomDto.users.find(({id}) => id === body.userId) && body.time >= 0) {
-      this.server.to('user_' + body.userId.toString()).emit('globalChatNotif',{ 
+      this.server.to('user_' + body.userId.toString()).emit('notif',{ 
         notif: `You got muted from ${body.roomName} for ${body.time} minutes.`
       });
     }
@@ -334,6 +334,7 @@ export class ChatGateway implements OnGatewayConnection {
     this.server.to('user_' + receiver.id.toString()).emit('newPrivateMsgUser', {userDto: sender});
     this.server.to('user_' + sender.id.toString()).emit('receivePrivateMsg', {userId: receiver.id, messageDto: message});
     this.server.to('user_' + receiver.id.toString()).emit('receivePrivateMsg', {userId: sender.id, messageDto: message});
+    this.server.to('user_' + receiver.id.toString()).emit('notif', {notif: `New message from ${sender.name}`});
   };
 
   @SubscribeMessage('sendPM')
@@ -348,9 +349,9 @@ export class ChatGateway implements OnGatewayConnection {
 
   };
 
-  @SubscribeMessage('closeGlobalChatNotif')
-  async closeGlobalNotif(@ConnectedSocket() socket: Socket) {
+  @SubscribeMessage('notifClosed')
+  async closeNotif(@ConnectedSocket() socket: Socket) {
     const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
-    this.server.to('user_' + userDto.id.toString()).emit('closeUserChatNotif');
+    this.server.to('user_' + userDto.id.toString()).emit('closeNotif');
   };
 };

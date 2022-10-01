@@ -20,6 +20,7 @@ import { Link } from "react-router-dom";
 import SearchFriendBar from "./SearchFriendBar";
 import { UserDto } from "../../api/dto/user.dto";
 import { WebsocketContext } from "contexts/WebsocketContext";
+import Notif from "./Notif";
 
 interface ResponsiveAppBarProps {
   handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
@@ -145,6 +146,9 @@ const ResponsiveAppBar = ({ handleToggle, setLoggedIn }: ResponsiveAppBarProps) 
               </Button>
             ))}
           </Box>
+
+          <Notif />
+          
           { user?
           <Box>
             <SearchFriendBar />
