@@ -55,7 +55,7 @@ export class AuthService {
   }
 
   async pwdCheck(name: string, pwd: string) {
-    return this.usersService.pwdCheck(name, pwd);
+    return await this.usersService.pwdCheck(name, pwd);
   }
 
   //  Generate jwt token

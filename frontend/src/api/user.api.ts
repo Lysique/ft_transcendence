@@ -23,6 +23,8 @@ export class UserAPI {
     const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/auth/pwdLogin`, {
       method: "POST", 
       credentials: "include",
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ name: name, password: pwd})
     })
     return (resp.ok? resp.json() : {loggedIn: false})
   }

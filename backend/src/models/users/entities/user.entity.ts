@@ -19,7 +19,7 @@ export enum UserStatus {
 //  User table
 @Entity()
 export class User {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ unique: true, nullable: true })

@@ -30,6 +30,10 @@ export const PwdSignup = ({
             setUser(resp);
         }
         setOpen(false);
+        setName('');
+        setPwd('');
+        setError('');
+        setErrorPwd('');
     }
 
     const onSignup = () => {
@@ -66,8 +70,9 @@ export const PwdSignup = ({
         <TextField
             error={error === '' ? false : true}
             id="outlined-name"
-            label="Room name"
+            label="Username"
             helperText={error}
+            value={name}
             onChange={(e: any) => { setName(e.target.value) }}
             sx ={{ ml:3, mr:3 }}
             />
@@ -75,7 +80,7 @@ export const PwdSignup = ({
             <TextField
             error={errorPwd === '' ? false : true}
             id="outlined-name"
-            label="password*"
+            label="password"
             helperText={errorPwd}
             value={pwd}
             onChange={(e: any) => { setPwd(e.target.value) }}

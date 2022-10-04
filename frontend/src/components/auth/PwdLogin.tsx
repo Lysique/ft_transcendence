@@ -28,26 +28,18 @@ export const PwdLogin = ({
             const respUser = await UserAPI.getUserProfile();
             setUser(respUser);
             setOpen(false);
+            setError('');
+            setErrorPwd('');
         }
-        setError('Ids invalids');
+        else {
+            setError('Ids invalids');
+        }
+        setPwd('');
+        setName('');
     }
 
     const onLogin = () => {
-        if (name === '') {
-            setError('Please enter a name')
-        }
-        else if (name.length > 15) {
-            setError('Name too long (15 char max)')
-        }
-        else if (pwd.length < 5) {
-            setErrorPwd('Password to short (5 char min)')
-        }
-        else if (pwd.length > 30) {
-            setErrorPwd('Password to long (30 char max)')
-        }
-        else {
-            login();
-        }
+        login();
     }
     return (
 
@@ -65,8 +57,9 @@ export const PwdLogin = ({
         <TextField
             error={error === '' ? false : true}
             id="outlined-name"
-            label="Room name"
+            label="Username"
             helperText={error}
+            value={name}
             onChange={(e: any) => { setName(e.target.value) }}
             sx ={{ ml:3, mr:3 }}
             />
