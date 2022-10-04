@@ -45,6 +45,9 @@ export class UsersService {
     //  Create user entity based on createUserDto
     const user: User = new User();
     user.name = createUserDto.name;
+    if (createUserDto.id) {
+      user.id = createUserDto.id;
+    }
     if (createUserDto.password) {
       user.password = await hashPwd(createUserDto.password);
     }
