@@ -35,7 +35,9 @@ Finally, they can play the mighty Pong game against each other or watch other pl
 
 ### Authentication
 
-If you wish to authenticate throught passwords, fill the REACT_APP_AUTH in the frontend .env file with 'password'. Else leave empty.
+If you wish to authenticate throught passwords: 
+- Fill the REACT_APP_AUTH in the frontend .env file with 'password'.
+- In the user entity (src/models/users/entities/user.entity.ts), modify the id decorator from 'PrimaryColumn()' to 'PrimaryGeneratedColumn()'.
 
 ## Run adminer after launching with make
 
