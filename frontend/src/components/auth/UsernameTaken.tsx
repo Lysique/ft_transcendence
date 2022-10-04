@@ -3,7 +3,9 @@ import { UserAPI } from '../../api/user.api';
 import { SetUserContext } from '../../App';
 import { UpdateUserName } from '../profile/profileName/UpdateUserName';
 
-export default function UsernameTaken() {
+export default function UsernameTaken({
+    setLoggedIn
+}: {setLoggedIn: Function }) {
 
     const setUser: Function = React.useContext(SetUserContext);
 
@@ -15,6 +17,7 @@ export default function UsernameTaken() {
 
     const handleCancel = async () => {
         await UserAPI.logout();
+        setLoggedIn(false);
         setUser(null);
         setOpen(false);
     };

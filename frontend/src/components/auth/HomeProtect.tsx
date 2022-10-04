@@ -25,7 +25,9 @@ const HomeProtect = ({
         {
             user && !user.name?
 
-            <UsernameTaken />
+            <UsernameTaken
+                setLoggedIn={setLoggedIn}
+            />
 
             : loggedIn && !user?
 
