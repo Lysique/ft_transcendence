@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { comparePwd, hashPwd } from 'src/common/helper/bcrypt';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -81,7 +81,11 @@ export class UsersService {
   
   //  Find all users.
   public async findAll() {
-    const users: User[] = await this.userRepository.find();
+    const users: User[] = await this.userRepository.find({
+      where: {
+        name:  Not(IsNull()) 
+      }
+    });
 
     const usersDto: UserDto[] = users.map(x => this.entityToDto(x));
 
