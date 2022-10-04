@@ -1,4 +1,5 @@
 import { Autocomplete } from "@mui/material";
+import { WebsocketContext } from "contexts/WebsocketContext";
 import React from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { UserDto } from "../../api/dto/user.dto";
@@ -21,6 +22,23 @@ const SearchFriendBar = () => {
         fetchUsers();
 
     }, []);
+
+    const socket = React.useContext(WebsocketContext);
+    React.useEffect(() => {  
+      socket.on("onUserChange", () => {
+        
+        const fetchUsers = async() => {
+            const resp: {users: UserDto[]} = await UserAPI.getAllUsers();
+            setUsers(resp.users);
+        }
+
+        fetchUsers();
+      });
+  
+      return () => {
+        socket.off("onUserChange");
+      };
+    }, [socket]);
     
     const handleClick = (event: any, value: string, reason: any) => {
         const user = users?.find(x => x.name === value);
