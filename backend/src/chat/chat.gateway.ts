@@ -10,6 +10,7 @@ import { Server, Socket} from 'socket.io';
 import { ChatService, MessageDto, RoomDto, RoomReturnDto } from './chat.service';
 import { Inject } from '@nestjs/common';
 import { UserDto } from 'src/models/users/dto/user.dto';
+import { comparePwd } from 'src/common/helper/bcrypt';
 
 
 @WebSocketGateway({
@@ -41,7 +42,7 @@ export class ChatGateway implements OnGatewayConnection {
 
     const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
 
-    const newRoom: RoomDto = this.chatService.createRoom(body.roomName, body.password, userDto);
+    const newRoom: RoomDto = await this.chatService.createRoom(body.roomName, body.password, userDto);
 
     const roomReturn: RoomReturnDto = this.chatService.getReturnRoom(newRoom);
 
@@ -66,7 +67,7 @@ export class ChatGateway implements OnGatewayConnection {
       return ;
     }
     
-    if (roomDto.password !== '' && roomDto.password !== body.password) {
+    if (roomDto.password !== '' && await comparePwd(body.password, roomDto.password) === false) {
       this.server.to(socket.id).emit('chatNotif', {notif: 'Wrong password.'});
       return ;
     }
@@ -152,7 +153,7 @@ export class ChatGateway implements OnGatewayConnection {
       return ;
     }
 
-    this.chatService.changePassword(roomDto, body.password);
+    await this.chatService.changePassword(roomDto, body.password);
     this.server.to(socket.id).emit('chatNotif', {notif: `Password changed successfully.`});
   };
 

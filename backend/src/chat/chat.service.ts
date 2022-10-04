@@ -3,6 +3,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserDto } from 'src/models/users/dto/user.dto';
 import { UsersService } from 'src/models/users/users.service';
 import { Socket } from 'socket.io';
+import { hashPwd } from 'src/common/helper/bcrypt';
 
 export class MessageDto {
   userId : number;
@@ -57,7 +58,7 @@ export class ChatService {
                /*********************** CREATE ROOM  ************************/
 
 
-  createRoom(roomName: string, password: string, userDto: UserDto): RoomDto {
+  async createRoom(roomName: string, password: string, userDto: UserDto): Promise<RoomDto> {
     const roomDto = new RoomDto();
 
     roomDto.roomName = roomName;
@@ -65,7 +66,12 @@ export class ChatService {
     roomDto.admins = [userDto.id];
     roomDto.users = [];
     roomDto.messages = [];
-    roomDto.password = password;
+    if (password && password !== '') {
+      roomDto.password = await hashPwd(password);
+    }
+    else {
+      roomDto.password = password;
+    }
     roomDto.mutedMap = new Map();
     roomDto.banMap = new Map();
 
@@ -130,8 +136,13 @@ export class ChatService {
 
        /*********************** CHANGE PW ************************/
 
-  changePassword(roomDto: RoomDto, password: string) {
-    roomDto.password = password;
+  async changePassword(roomDto: RoomDto, password: string) {
+    if (password === '') {
+      roomDto.password = '';
+    }
+    else {
+      roomDto.password = await hashPwd(password);
+    }
     this.RoomList.set(roomDto.roomName.toUpperCase(), roomDto);
   }
 

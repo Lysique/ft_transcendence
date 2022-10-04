@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { comparePwd, hashPwd } from 'src/common/helper/bcrypt';
 import { Repository } from 'typeorm';
 import { AvatarsService } from '../avatars/avatars.service';
 import { AvatarDto } from '../avatars/dto/avatar.dto';
@@ -33,6 +34,7 @@ export class UsersService {
     userDto.blocked = user.blocked? user.blocked.map(x => this.entityToDto(x)): [];
     userDto.currentAvatar = user.currentAvatarId? {id: user.currentAvatarId, data:user.currentAvatarData} : null;
     userDto.twoFactAuth = user.twoFactAuth;
+    userDto.password = user.password;
 
     return userDto;
   }
@@ -43,7 +45,9 @@ export class UsersService {
     //  Create user entity based on createUserDto
     const user: User = new User();
     user.name = createUserDto.name;
-    user.password = createUserDto.password;
+    if (createUserDto.password) {
+      user.password = await hashPwd(createUserDto.password);
+    }
     user.wins = 0;
     user.loses = 0;
 
@@ -121,7 +125,7 @@ export class UsersService {
         where: {name: name}
       })
       
-      if (!user || user.password !== password) {
+      if (!user || await comparePwd(password, user.password) === false) {
         return false;
       }
       return true;

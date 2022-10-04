@@ -16,11 +16,22 @@ export const ChangeRoomPwdDialog = ({
 }: ChangeRoomPwdDialogProps) => {
 
     const [pwd, setPwd] = React.useState<string>('');
+    const [errorPwd, setErrorPwd] = React.useState<string>('');
     const socket = React.useContext(WebsocketContext);
 
     const changePassword = () => {
-        setOpen(false);
-        socket.emit('changePassword', {roomName: roomName, password: pwd});
+        if (pwd.length !== 0 && pwd.length < 5) {
+            setErrorPwd('Password to short (5 char min)')
+        }
+        else if (pwd.length > 30) {
+            setErrorPwd('Password to long (30 char max)')
+        }
+        else {
+            setOpen(false);
+            setErrorPwd('');
+            setPwd('');
+            socket.emit('changePassword', {roomName: roomName, password: pwd});
+        }
     }
 
     const handlePwdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,8 +53,11 @@ export const ChangeRoomPwdDialog = ({
             </DialogContentText>
 
             <TextField
+                error={errorPwd === '' ? false : true}
+                helperText={errorPwd}
                 id="outlined-password-input"
                 label="Password"
+                value={pwd}
                 onChange={handlePwdChange}
                 sx={{ml:3, mr:3}}
             />
