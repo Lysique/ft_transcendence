@@ -6,7 +6,6 @@ import { UserStatus } from "../entities/user.entity";
 export class UserDto {
     id: number;
     name: string;
-    password?: string;
     status: UserStatus;
     friends: UserDto[];
     blocked: UserDto[];

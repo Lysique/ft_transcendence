@@ -34,7 +34,6 @@ export class UsersService {
     userDto.blocked = user.blocked? user.blocked.map(x => this.entityToDto(x)): [];
     userDto.currentAvatar = user.currentAvatarId? {id: user.currentAvatarId, data:user.currentAvatarData} : null;
     userDto.twoFactAuth = user.twoFactAuth;
-    userDto.password = user.password;
 
     return userDto;
   }
@@ -45,12 +44,7 @@ export class UsersService {
     //  Create user entity based on createUserDto
     const user: User = new User();
     user.name = createUserDto.name;
-    if (createUserDto.id) {
-      user.id = createUserDto.id;
-    }
-    if (createUserDto.password) {
-      user.password = await hashPwd(createUserDto.password);
-    }
+    user.id = createUserDto.id;
     user.wins = 0;
     user.loses = 0;
 
@@ -63,10 +57,10 @@ export class UsersService {
     }
 
     const userDto = this.entityToDto(user);
-    if (createUserDto.photoUrl) {
-      const imageData: Buffer = await this.downloadImage(createUserDto.photoUrl);
-      await this.addAvatar(userDto, imageData);
-    }
+
+    const imageData: Buffer = await this.downloadImage(createUserDto.photoUrl);
+    await this.addAvatar(userDto, imageData);
+
     
     return userDto;
   }
@@ -110,33 +104,6 @@ export class UsersService {
 
     return userDto;
   }
-
-  //  Find one user by name.
-  public async findOneByName(name: string) {
-    const user: User = await this.userRepository.findOne({ 
-      where: {name: name},
-      relations:{blocked: true, friends: true}
-    })
-    
-    if (!user) {
-      return null;
-    }
-
-    const userDto: UserDto = this.entityToDto(user);
-
-    return userDto;
-  }
-
-    public async pwdCheck(name: string, password: string) {
-      const user: User = await this.userRepository.findOne({ 
-        where: {name: name}
-      })
-      
-      if (!user || await comparePwd(password, user.password) === false) {
-        return false;
-      }
-      return true;
-    }
 
   public async setStatus(id: number, status: UserStatus) {
     const user: User = await this.userRepository.findOne({ 

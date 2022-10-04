@@ -24,12 +24,6 @@ export class AuthService {
     return userDto;
   }
 
-  async fetchUserByName(name: string): Promise<UserDto> {
-    const userDto: UserDto | null = await this.usersService.findOneByName(name);
-
-    return userDto;
-  }
-
   //  Create a new user in database.
   async signup(user: any): Promise<UserDto> {
     const createUserDto = new CreateUserDto();
@@ -41,21 +35,6 @@ export class AuthService {
     const userDto = await this.usersService.create(createUserDto);
 
     return userDto;
-  }
-
-  async pwdSignup(user: any): Promise<UserDto> {
-    const createUserDto = new CreateUserDto();
-
-    createUserDto.name = user.name;
-    createUserDto.password = user.password;
-
-    const userDto = await this.usersService.create(createUserDto);
-
-    return userDto;
-  }
-
-  async pwdCheck(name: string, pwd: string) {
-    return await this.usersService.pwdCheck(name, pwd);
   }
 
   //  Generate jwt token

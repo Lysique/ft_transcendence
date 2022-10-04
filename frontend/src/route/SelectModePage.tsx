@@ -129,7 +129,6 @@ const SelectMode = () => {
       if (resp) {
         setData(resp.games);
       }
-      console.log(resp?.games);
     };
     fetchSessions();
   };

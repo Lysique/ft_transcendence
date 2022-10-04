@@ -21,8 +21,6 @@ import SearchFriendBar from "./SearchFriendBar";
 import { UserDto } from "../../api/dto/user.dto";
 import { WebsocketContext } from "contexts/WebsocketContext";
 import Notif from "./Notif";
-import { PwdLogin } from "components/auth/PwdLogin";
-import { PwdSignup } from "components/auth/PwdSignup";
 
 interface ResponsiveAppBarProps {
   handleToggle: React.ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
@@ -62,31 +60,10 @@ const ResponsiveAppBar = ({ handleToggle, setLoggedIn }: ResponsiveAppBarProps) 
   };
 
   const socket = React.useContext(WebsocketContext);
-  const [openLogin, setOpenLogin] = React.useState<boolean>(false);
-  const [openSignup, setOpenSignup] = React.useState<boolean>(false);
 
-  const SignupButton = () => {
-    return (
-      <MenuItem
-        key="Signup"
-        onClick={() => setOpenSignup(true)}
-      >
-        <Typography textAlign="center">Signup</Typography>
-      </MenuItem>
-    );
-  };
 
   const LoginButton = () => {
     return (
-      <div key="login">
-      {process.env.REACT_APP_AUTH === 'password' ?
-      <MenuItem
-        key="LoginPwd"
-        onClick={() => setOpenLogin(true)}
-      >
-        <Typography textAlign="center">Login</Typography>
-      </MenuItem>
-      :
       <MenuItem
         key="Login"
         href={`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/auth/login`}
@@ -94,8 +71,6 @@ const ResponsiveAppBar = ({ handleToggle, setLoggedIn }: ResponsiveAppBarProps) 
       >
         <Typography textAlign="center">Login</Typography>
       </MenuItem>
-      }
-      </div>
     );
   };
 
@@ -156,13 +131,6 @@ const ResponsiveAppBar = ({ handleToggle, setLoggedIn }: ResponsiveAppBarProps) 
       button: HomepageButton(),
     },
   ];
-
-  if (process.env.REACT_APP_AUTH === 'password' ) {
-    loggedOutSettings.push({
-      name: "Signup",
-      button: SignupButton()
-    })
-  }
 
   return (
     <AppBar position="static">
@@ -228,22 +196,6 @@ const ResponsiveAppBar = ({ handleToggle, setLoggedIn }: ResponsiveAppBarProps) 
           </Box>
         </Toolbar>
       </Container>
-
-      {process.env.REACT_APP_AUTH === 'password' &&
-      <>
-      <PwdLogin
-        open={openLogin}
-        setOpen={setOpenLogin}
-        setLoggedIn={setLoggedIn}
-      />
-
-      <PwdSignup
-        open={openSignup}
-        setOpen={setOpenSignup}
-        setLoggedIn={setLoggedIn}
-      />
-      </>
-      }
 
     </AppBar>
   );

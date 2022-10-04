@@ -18,26 +18,6 @@ export class UserAPI {
       credentials: "include",
     })
   }
-
-  public static async pwdLogin(name: string, pwd: string): Promise<{loggedIn: boolean}> {
-    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/auth/pwdLogin`, {
-      method: "POST", 
-      credentials: "include",
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ name: name, password: pwd})
-    })
-    return (resp.ok? resp.json() : {loggedIn: false})
-  }
-
-  public static async pwdSignup(name: string, pwd: string): Promise<UserDto | null> {
-    const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/auth/pwdSignup`, {
-      method: "POST", 
-      credentials: "include",
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ name: name, password: pwd})
-    })
-    return (resp.ok? resp.json() : null)
-  }
   
   public static async getUserProfile(): Promise<UserDto | null> {
     const resp = await fetch(`http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/users/profile`, {
