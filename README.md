@@ -27,7 +27,7 @@ Finally, they can play the mighty Pong game against each other or watch other pl
 - Duplicate template.env located at src/common/envs and fill in the details:
 	- FORTYTWO_ID and FORTYTWO_APP_SECRET will be given when registrating the app on the intranet of 42
 	
-- If you want to launch the project with 'make', change the DATABASE_HOST variable in the .env file with 'db' and set FRONT_URL port to 80.
+- If you want to launch the project with 'make', change the DATABASE_HOST variable in the .env file with 'db'
 
 ### Frontend setup
 
