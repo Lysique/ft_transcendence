@@ -39,15 +39,15 @@ export const PrivateMessages = ({
             user?.id === message.userId?
 
             <SendMessage>
-                <div className="sender">Moi</div>
-                {message.message}
+            <Typography className="sender" style={{backgroundColor: "background.paper"}} >Moi</Typography> 
+            <Typography className="message" style={{wordWrap: "break-word", backgroundColor: "background.paper"}} >{message.message}</Typography> 
             </SendMessage>
 
             : !user?.blocked?.find(({id}) => message.userId === id) ?
             
             <RecvMessage>
             <Typography className="sender" style={{backgroundColor: "background.paper"}} >{message.userName}</Typography> 
-                {message.message}
+            <Typography className="message" style={{wordWrap: "break-word", backgroundColor: "background.paper"}} >{message.message}</Typography>
             </RecvMessage>
             : 
             null

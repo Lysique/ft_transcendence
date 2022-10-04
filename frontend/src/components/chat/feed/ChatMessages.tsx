@@ -57,14 +57,14 @@ export const ChatMessages = ({
 
             <SendMessage>
             <Typography className="sender" style={{backgroundColor: "background.paper"}} >Moi</Typography> 
-            <Typography className="message" style={{backgroundColor: "background.paper"}} >{message.message}</Typography> 
+            <Typography className="message" style={{wordWrap: "break-word", backgroundColor: "background.paper"}} >{message.message}</Typography> 
             </SendMessage>
 
             : !user?.blocked?.find(({id}) => message.userId === id) ?
             
             <RecvMessage>
             <Typography className="sender" style={{backgroundColor: "background.paper"}} >{message.userName}</Typography> 
-            <Typography className="message" style={{backgroundColor: "background.paper"}} >{message.message}</Typography> 
+            <Typography className="message" style={{wordWrap: "break-word", backgroundColor: "background.paper"}} >{message.message}</Typography> 
             </RecvMessage>
             : 
             null
