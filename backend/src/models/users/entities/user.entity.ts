@@ -7,6 +7,7 @@ import {
   ManyToMany,
   OneToMany,
   PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 
 export enum UserStatus {
