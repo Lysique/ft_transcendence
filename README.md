@@ -37,6 +37,12 @@ Finally, they can play the mighty Pong game against each other or watch other pl
 
 If you wish to authenticate throught passwords, fill the REACT_APP_AUTH in the frontend .env file with 'password'. Else leave empty.
 
+## Run adminer after launching with make
+
+```bash
+$ docker run --link database-docker:db --network ft_transcendence_mynetwork --name adminer -p 8080:8080 -d adminer
+```
+
 ## Run a test database
 
 ```bash
