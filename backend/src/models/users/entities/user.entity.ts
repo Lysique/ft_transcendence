@@ -38,6 +38,12 @@ export class User {
   @OneToMany(() => Avatar, (avatar) => avatar.user, { eager: true })
   avatars: Avatar[];
 
+  @Column()
+  wins: number;
+
+  @Column()
+  loses: number;
+
   @OneToMany(() => GamePlayer, (gamePlayer) => gamePlayer.user)
   gamePlayer: GamePlayer;
 

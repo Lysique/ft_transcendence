@@ -10,6 +10,8 @@ export interface UserDto {
     id: number;
     name: string;
     status: UserStatus;
+    wins: number;
+    loses: number;
     friends?: UserDto[];
     blocked?: UserDto[];
     currentAvatar?: AvatarDto;

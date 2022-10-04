@@ -1,7 +1,10 @@
 import { Typography } from "@mui/material";
+import { UserDto } from "api/dto/user.dto";
+import { UserContext } from "App";
 import React from "react";
 
 export const StatBar = () => {
+    const user: UserDto | null = React.useContext(UserContext);
     
     return (
         <>
@@ -9,7 +12,9 @@ export const StatBar = () => {
                 Stats: 
             </Typography>
 
-            Wins: 5 <br/> Loses: 5
+            Wins: {user?.wins}
+            <br/> 
+            Loses: {user?.loses}
             <br/>
         </>
     );

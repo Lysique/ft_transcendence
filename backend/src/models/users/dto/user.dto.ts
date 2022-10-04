@@ -12,6 +12,8 @@ export class UserDto {
     blocked: UserDto[];
     avatars: AvatarDto[];
 	gamePlayer: GamePlayer;
+    wins: number;
+    loses: number;
     currentAvatar?: AvatarDto;
     twoFactAuth: boolean;
 }

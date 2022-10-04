@@ -27,6 +27,8 @@ export class UsersService {
     userDto.name = user.name;
     userDto.status = user.status;
     userDto.avatars = user.avatars;
+    userDto.wins = user.wins;
+    userDto.loses = user.loses;
     userDto.friends = user.friends? user.friends.map(x => this.entityToDto(x)): [];
     userDto.blocked = user.blocked? user.blocked.map(x => this.entityToDto(x)): [];
     userDto.currentAvatar = user.currentAvatarId? {id: user.currentAvatarId, data:user.currentAvatarData} : null;
@@ -42,6 +44,8 @@ export class UsersService {
     const user: User = new User();
     user.name = createUserDto.name;
     user.password = createUserDto.password;
+    user.wins = 0;
+    user.loses = 0;
 
     try {
       await this.userRepository.save(user);
@@ -138,6 +142,34 @@ export class UsersService {
     const userDto: UserDto = this.entityToDto(user);
 
     return userDto;
+  }
+
+  public async addWin(id: number) {
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: id},
+    })
+    
+    if (!user) {
+      return null;
+    }
+
+    user.wins += 1;
+
+    await this.userRepository.save(user);
+  }
+
+  public async addLose(id: number) {
+    const user: User = await this.userRepository.findOne({ 
+      where: {id: id},
+    })
+    
+    if (!user) {
+      return null;
+    }
+
+    user.loses += 1;
+
+    await this.userRepository.save(user);
   }
 
   public async updateName(id: number, name: string) {
