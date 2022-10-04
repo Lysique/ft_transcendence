@@ -31,7 +31,7 @@ Finally, they can play the mighty Pong game against each other or watch other pl
 
 - Duplicate template.env in the frontend root folder and fill the new file (named '.env').
 
-### Authentification
+### Authentication
 
 If you wish to authenticate throught passwords, fill the REACT_APP_AUTH in the frontend .env file with 'password'. Else leave empty.
 
