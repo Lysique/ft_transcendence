@@ -12,7 +12,6 @@ import { HistoryBar } from "components/profile/profileHistory/HistoryBar";
 import { StatBar } from "components/profile/profileStats/StatBar";
 import { WebsocketContext } from "contexts/WebsocketContext";
 
-
 export const VisitorProfile = () => {
   const [visited, setVisited] = React.useState<UserDto | null>(null);
   const socket = React.useContext(WebsocketContext);
@@ -31,7 +30,7 @@ export const VisitorProfile = () => {
   }, [id, navigate]);
 
   React.useEffect(() => {
-    socket.on('onUserChange', () => {
+    socket.on("onUserChange", () => {
       const fetchProfile = async () => {
         const resp = await UserAPI.getOneUserById(id ? id : "");
         if (!resp || Object.keys(resp).length === 0) {
@@ -39,7 +38,7 @@ export const VisitorProfile = () => {
         }
         setVisited(resp);
       };
-    fetchProfile();
+      fetchProfile();
     });
     return () => {
       socket.off("onUserChange");
@@ -96,7 +95,7 @@ export const VisitorProfile = () => {
         <Grid item xs={6} container spacing={3} direction={"column"}>
           <Grid item>
             <Item>
-              <StatBar />
+              <StatBar user={visited} />
             </Item>
           </Grid>
           <Grid item>
