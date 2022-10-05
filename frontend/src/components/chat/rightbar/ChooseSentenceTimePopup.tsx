@@ -70,7 +70,13 @@ export const ChooseSentenceTimePopup = ({
           name="row-radio-buttons-group"
           onChange={handlePickTime}
         >
-          <FormControlLabel value="unban" control={<Radio />} label="Unban" />
+          <FormControlLabel value="unban" control={<Radio />} label=
+                {sentence === Sentence.ban ?
+                    'Kick'
+                        : sentence === Sentence.mute &&
+                    'Unmute'
+                } 
+          />
           <FormControlLabel value="onemin" control={<Radio />} label="1 min" />
           <FormControlLabel value="fivemin" control={<Radio />} label="5 min" />
 
