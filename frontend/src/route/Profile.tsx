@@ -83,7 +83,7 @@ export const Profile = () => {
         <Grid item xs={6} container spacing={3} direction={"column"}>
           <Grid item>
             <Item>
-              <StatBar />
+              <StatBar user={user} />
             </Item>
           </Grid>
           <Grid item>

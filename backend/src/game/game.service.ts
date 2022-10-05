@@ -353,7 +353,7 @@ export class GameService {
 
       if (index > -1) {
         ids[i].userIds.splice(index, 1);
-        this.newInvitationList.set(inviteeUser.id, ids);
+        this.newInvitationList.set(inviterId, ids);
       }
     }
   }

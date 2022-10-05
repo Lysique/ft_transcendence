@@ -18,15 +18,15 @@ function PlayWithMe() {
     socket.on(
       "wantToPlay",
       ({
-        userName,
+        name,
         userId,
         inviterSocketId,
       }: {
-        userName: string;
+        name: string;
         userId: number;
         inviterSocketId: string;
       }) => {
-        setInviterName(userName);
+        setInviterName(name);
         setInviterId(userId);
         setSocketId(inviterSocketId);
         setOpenInvitation(true);
