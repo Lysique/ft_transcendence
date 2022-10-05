@@ -53,6 +53,7 @@ export default function AvatarList({
           const data: UserDto | null = await UserAPI.getUserProfile();
           setUser(data);
           setValidation(false);
+          setSelectedId(null);
         }
       }
       if (validation === true) {
