@@ -5,7 +5,7 @@ import { UserDto } from 'api/dto/user.dto';
 import { RoomDto } from 'api/chat.api';
 
 interface ChatButtonListProps {
-    displayedUser: UserDto
+    displayedUser: UserDto | null
     room: RoomDto | null
     open: null | HTMLElement
     handleClose: () => void
@@ -20,6 +20,8 @@ export const ChatButtonList = ({
 }: ChatButtonListProps ) => {
 
     return (
+      <>
+      { displayedUser ?
       <Menu
         id="contact-appbar"
         anchorEl={open}
@@ -48,5 +50,9 @@ export const ChatButtonList = ({
       />
       
       </Menu>
+      : 
+      ''
+      }
+      </>
     )
 }

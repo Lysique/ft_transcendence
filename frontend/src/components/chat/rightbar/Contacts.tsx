@@ -20,6 +20,7 @@ export const Contacts = ({
   const user: UserDto | null = React.useContext(UserContext);
   const [friends, setFriends] = React.useState<UserDto[]>([]);
   const [otherUsers, setOtherUsers] = React.useState<UserDto[]>([]);
+  const [userButton, setUserButton] = React.useState<UserDto | null>(null);
 
   React.useEffect(() => {
     if (user && user.friends) {
@@ -28,28 +29,20 @@ export const Contacts = ({
     setOtherUsers(users? users : [])
   }, [user, users]);
 
-  const [openContact, setOpenContact] = React.useState<null | HTMLElement>(null);
+  const [openButtons, setOpenButtons] = React.useState<null | HTMLElement>(null);
 
-  const handleOpenContact = (event: React.MouseEvent<HTMLElement>) => {
-    setOpenContact(event.currentTarget);
-  };
+  const handleOpenButton = (event: React.MouseEvent<HTMLElement>, userDto: UserDto) => {
+    setOpenButtons(event.currentTarget);
+    setUserButton(userDto);
+  }
     
-  const handleCloseContact = () => {
-    setOpenContact(null);
-  };
-
-  const [openFriend, setOpenFriend] = React.useState<null | HTMLElement>(null);
-
-  const handleOpenFriend = (event: React.MouseEvent<HTMLElement>) => {
-    setOpenFriend(event.currentTarget);
-  };
-    
-  const handleCloseFriend = () => {
-    setOpenFriend(null);
+  const handleCloseButton = () => {
+    setOpenButtons(null);
   };
   
 
   return (
+    <>
     <List key='contact-list'
       sx={{
         bgcolor: 'background.paper',
@@ -65,19 +58,12 @@ export const Contacts = ({
 
             {friends.map((displayedUser) => (
 
-            <div key={displayedUser.id}>
+            <div key={'friend' + displayedUser.id}>
 
             <UserChatOpenButton 
               displayedUser={displayedUser}
-              handleOpenContact={handleOpenFriend}
+              handleOpenContact={handleOpenButton}
               displayStatus={true}
-            />
-
-            <ChatButtonList 
-              open={openFriend}
-              handleClose={handleCloseFriend}
-              displayedUser={displayedUser}
-              room={null}
             />
 
             </div>
@@ -95,20 +81,14 @@ export const Contacts = ({
 
             displayedUser.id !== user?.id &&
 
-            <div key={displayedUser.id}>
+            <div key={'members' + displayedUser.id}>
 
             <UserChatOpenButton 
               displayedUser={displayedUser}
-              handleOpenContact={handleOpenContact}
+              handleOpenContact={handleOpenButton}
               displayStatus={false}
             />
 
-            <ChatButtonList 
-              open={openContact}
-              handleClose={handleCloseContact}
-              displayedUser={displayedUser}
-              room={room}
-            />
 
             </div>
 
@@ -117,5 +97,14 @@ export const Contacts = ({
           </ul>
         </li>
     </List>
+
+    <ChatButtonList 
+      open={openButtons}
+      handleClose={handleCloseButton}
+      displayedUser={userButton}
+      room={room}
+    />
+
+    </>
   );
 }

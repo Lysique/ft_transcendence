@@ -86,12 +86,13 @@ export class GameGateway implements OnGatewayDisconnect {
       return;
     }
 
-    if (!this.gameService.isUserInGame(inviteeID)) {
+    if (this.gameService.isUserInGame(inviteeID)) {
       this.server.to(inviterSocket.id).emit('errorGameInvite', { errorMsg: 'User is already in game!' });
       return;
     }
 
     const inviter = await this.gameService.getUserFromSocket(inviterSocket);
+    
     this.server
       .to('user_' + inviteeID.toString())
       .emit('wantToPlay', { name: inviter.name, userId: inviter.id, inviterSocketId: inviterSocket.id });

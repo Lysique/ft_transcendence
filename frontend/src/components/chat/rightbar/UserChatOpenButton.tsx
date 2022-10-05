@@ -5,7 +5,7 @@ import { ChatAvatar } from "./ChatAvatar"
 
 interface UserChatOpenButtonProps {
     displayedUser: UserDto
-    handleOpenContact: (event: React.MouseEvent<HTMLElement>) => void
+    handleOpenContact: (event: React.MouseEvent<HTMLElement>, userDto: UserDto) => void
     displayStatus: boolean
   }
 
@@ -23,7 +23,7 @@ export const UserChatOpenButton = ({
         aria-controls="contact-appbar"
         aria-haspopup="true"
         sx={{ textTransform: 'none' }}
-        onClick={handleOpenContact}
+        onClick={(e : any) => {handleOpenContact(e, displayedUser)}}
       >
         
         <ListItem key={displayedUser.id}>
