@@ -353,6 +353,9 @@ export class ChatGateway implements OnGatewayConnection {
   @SubscribeMessage('notifClosed')
   async closeNotif(@ConnectedSocket() socket: Socket) {
     const userDto: UserDto = await this.chatService.getUserFromSocket(socket);
+    if (!userDto) {
+      return ;
+    }
     this.server.to('user_' + userDto.id.toString()).emit('closeNotif');
   };
 };
