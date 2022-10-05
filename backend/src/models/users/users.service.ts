@@ -105,7 +105,7 @@ export class UsersService {
     return userDto;
   }
 
-  public async setStatus(id: number, status: UserStatus) {
+  public async setStatus(id: number, status: UserStatus): Promise<UserDto> {
     const user: User = await this.userRepository.findOne({ 
       where: {id: id},
       relations:{blocked: true, friends: true}

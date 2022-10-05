@@ -38,21 +38,6 @@ export const Chat = () => {
 
   }, []);
 
-  //  Usefull only if rooms in database..
-  // React.useEffect(() => {
-  //   socket.on("onUserChange", () => {
-  //     const fetchRooms = async () => {
-  //       const resp: {rooms: RoomDto[]} = await ChatAPI.getRoomsFromUser();
-  //       setRooms(resp.rooms);
-  //     };
-  
-  //     fetchRooms();
-  //   });
-  //   return () => {
-  //     socket.off("onUserChange");
-  //   };
-  // }, [socket]);
-
   React.useEffect(() => {
     socket.on('newPrivateMsgUser', ({userDto: newUser}) => {
       if (!privateMsgs.find( ({userDto}) => userDto.id === newUser.id)) {
@@ -78,6 +63,21 @@ export const Chat = () => {
       socket.off('receivePrivateMsg');
     };
   }, [socket, privateMsgs]);
+
+  React.useEffect(() => {
+    socket.on('newRoomMessage', ({roomName, messageDto}) => {
+      const addRoomMsg: RoomDto[] = rooms.map(room => {
+        if (room.roomName === roomName) {
+          room.messages.push(messageDto);
+        }
+        return room;
+      })
+      setRooms(addRoomMsg);
+    });
+    return () => {
+      socket.off('newRoomMessage');
+    };
+  }, [socket, rooms]);
 
   React.useEffect(() => {
     socket.on('goToPM', ({userDto: newUser}) => {

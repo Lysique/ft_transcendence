@@ -68,12 +68,7 @@ export class GameService {
   }
 
   async monitorQueue(server: Server) {
-
-    //  TODO: GameID needed ??
-    let gameID: string;
     if (this.queue.size === 2) {
-      gameID = this.queue.get(Array.from(this.queue.keys())[0]).id + this.queue.get(Array.from(this.queue.keys())[1]).id;
-
       await this.setUpGame(
         this.queue.get(Array.from(this.queue.keys())[0]),
         this.queue.get(Array.from(this.queue.keys())[1]),
@@ -180,13 +175,13 @@ export class GameService {
       if (gameSession.player1.score >= 5) {
         gameSession.gameWinner = gameSession.player1.userName;
         gameSession.gameLoser = gameSession.player2.userName;
-        this.userService.addWin(gameSession.player1.userID);
-        this.userService.addLose(gameSession.player2.userID);
+        await this.userService.addWin(gameSession.player1.userID);
+        await this.userService.addLose(gameSession.player2.userID);
       } else {
         gameSession.gameWinner = gameSession.player2.userName;
         gameSession.gameLoser = gameSession.player1.userName;
-        this.userService.addWin(gameSession.player2.userID);
-        this.userService.addLose(gameSession.player1.userID);
+        await this.userService.addWin(gameSession.player2.userID);
+        await this.userService.addLose(gameSession.player1.userID);
       }
       gameSession.gameStatus = 'stopped';
       server.to(gameID).emit('gameFinished', gameSession.gameWinner);

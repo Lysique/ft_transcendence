@@ -2,7 +2,6 @@ import { styled, Typography } from "@mui/material";
 import { MessageDto, RoomDto } from "api/chat.api";
 import { UserDto } from "api/dto/user.dto";
 import { UserContext } from "App";
-import { WebsocketContext } from "contexts/WebsocketContext";
 import React from "react";
 
 const RecvMessage = styled('div')(({ theme }) => ({
@@ -29,27 +28,11 @@ export const ChatMessages = ({
     room
 }: ChatMessagesProps) => {
 
-
-    const [messages, setMessages] = React.useState<MessageDto[]>(room.messages);
-    const socket = React.useContext(WebsocketContext);
     const user: UserDto | null = React.useContext(UserContext);
 
-    React.useEffect(() => {
-      socket.on('newRoomMessage', ({roomName, messageDto}) => {
-          if (roomName === room.roomName) {
-            setMessages((messages) => [...messages, messageDto]);
-            room.messages.push(messageDto);
-        }
-      });
-      return () => {
-        socket.off('newRoomMessage');
-      };
-      // eslint-disable-next-line
-    }, [socket]);
-    
     return (
         <>
-        {messages.map((message: MessageDto, index: number) => {
+        {room.messages.map((message: MessageDto, index: number) => {
         return (
             <div key={index}>
             { 
