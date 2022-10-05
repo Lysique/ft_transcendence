@@ -383,8 +383,8 @@ export class GameService {
   }
 
   async isUserInGame(userID: number) {
-    const { status } = await this.userService.findOneById(userID);
-    return (status === UserStatus.InGame);
+    const userDto = await this.userService.findOneById(userID);
+    return (userDto.status === UserStatus.InGame);
   }
 
   /*
