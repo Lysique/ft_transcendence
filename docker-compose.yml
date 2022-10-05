@@ -3,6 +3,8 @@ version: "3.9"
 services:
   frontend:
     build: ./frontend # Path to dockerfile
+    depends_on:
+        - backend
     ports: # Port binding to host from docker container
       - "3000:3000" # Bind port 80 of host to 3000 of container
     restart: always # What to do if container crashes

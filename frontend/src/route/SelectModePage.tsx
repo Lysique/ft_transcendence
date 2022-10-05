@@ -220,16 +220,16 @@ const SelectMode = () => {
         </Box>
       </Container>
       <div>
-        {spectator && (
-          <Spectator
-            status={true}
-            showActiveGames={showActiveGames}
-            data={data}
-            setData={setData}
-          />
-        )}
+        <Spectator
+          status={spectator}
+          showActiveGames={showActiveGames}
+          data={data}
+          setData={setData}
+        />
       </div>
-      <div>{rules && <Rules status={true} showRules={showRules} />}</div>
+      <div>
+        <Rules status={rules} showRules={showRules} />
+      </div>
       <div>
         {open && (
           <Backdrop
