@@ -34,6 +34,9 @@ export class AvatarsService {
   public async findOneById(id: number)
   {
     const avatar: Avatar = await this.avatarRepository.findOneBy({id: id});
+    if (!avatar) {
+      return ;
+    }
 
     const avatarDto: AvatarDto = this.entityToDto(avatar);
 
