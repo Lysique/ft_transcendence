@@ -323,6 +323,9 @@ export class ChatService {
 
   async addSocketToRooms(socket: Socket) {
     const userDto: UserDto = await this.authService.getUserFromSocket(socket);
+    if (!userDto) {
+      return ;
+    }
 
     this.RoomList.forEach((value) => { value.users.find( ({id}) => id === userDto.id ) && socket.join(value.roomName); });
   }
